@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sa mémoire · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#" aria-current="page"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Réglages</h1>
+</div>
+
+<main class="page reglages">
+  <nav class="oc-window" aria-label="Réglages">
+    <div class="oc-window__body oc-window__body--flush">
+      <ul class="liste-nav">
+        <li><a href="#"><i class="ic i-brancher"></i>Brancher l'IA</a></li>
+        <li><a href="#"><i class="ic i-reglages"></i>Régler l'IA</a></li>
+        <li><a href="#" aria-current="page"><i class="ic i-memoire"></i>Sa mémoire</a></li>
+        <li><a href="#"><i class="ic i-journal"></i>Son journal</a></li>
+        <li><a href="#"><i class="ic i-images"></i>Images</a></li>
+        <li><a href="#"><i class="ic i-poste"></i>Ton PC</a></li>
+        <li><a href="#"><i class="ic i-theme"></i>Thème</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Sa mémoire</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <label class="oc-switch"><input type="checkbox" checked>Elle se souvient d'une session à l'autre</label>
+      <fieldset class="oc-fieldset">
+        <legend>Ce qu'elle sait de toi</legend>
+        <ul class="lignes">
+          <li><span>Tu prépares le titre AIS.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+          <li><span>Tu es à l'aise avec Linux, moins avec Active Directory.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+          <li><span>Tu veux des indices, pas la solution.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+        </ul>
+      </fieldset>
+      <fieldset class="oc-fieldset">
+        <legend>Ses notes</legend>
+        <ul class="lignes">
+          <li><span>Ton PC a 32 Go. WSL2 est réglé sur 24 Go.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+          <li><span>Le WiFi simulé ne marche pas sur ce PC.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+          <li><span>L'image de Windows Server 2022 est déjà fournie.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+          <li><span>Dernière panne : nginx arrêté sur srv-web, réparée en 19 min.</span><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Corriger"><i class="ic i-crayon"></i></button><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer"><i class="ic i-fermer"></i></button></li>
+        </ul>
+      </fieldset>
+      <div class="a-part">
+        <span class="mono">7 lignes sur 30</span>
+        <button class="oc-btn oc-btn--danger"><i class="ic i-fermer"></i>Effacer sa mémoire</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

@@ -89,9 +89,11 @@ Le produit :
 - Un dessin simple et classique, proche de GNS3 et de Packet Tracer, avec le
   panneau de l'IA sur le côté.
 - Le menu : Labs, Cours, Pannes, et Réglages à droite. L'écran du lab : le
-  schéma, les terminaux, l'IA sur le côté. Les deux sont validés en
-  maquette. Un écran nouveau part de `maquettes/` et de
-  `maquettes/opn-display.css`.
+  schéma, les terminaux, l'IA sur le côté. Le panneau de droite est toujours
+  l'IA : elle y montre une discussion, une panne, une vérification ou un
+  cours.
+- Les écrans validés en maquette sont listés dans `maquettes/README.md`. Un
+  écran nouveau part de `maquettes/` et de `maquettes/opn-display.css`.
 - Le nom est un nom de travail. Le dépôt est privé, le mainteneur décidera
   plus tard quand l'ouvrir.
 

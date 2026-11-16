@@ -211,8 +211,19 @@ commencer (« Go »).
 - Les captures sont dans `maquettes/captures/`.
 - Le mainteneur a validé le menu et l'écran du lab : « C'est bien », et il a
   demandé la suite.
-- Cinq écrans de plus sont proposés : la liste des labs, un nouveau lab, une
-  panne, la vérification, un cours. Ils attendent son avis.
+- Cinq écrans de plus : la liste des labs, un nouveau lab, une panne, la
+  vérification, un cours. Le mainteneur les a validés : « Super ! Je
+  confirme ».
+- À droite de l'écran du lab, le panneau est toujours l'IA. Ce qu'elle y
+  montre change : une discussion, une panne, une vérification, un cours.
+- Pendant une panne, le schéma ne montre rien en rouge, et les tests restent
+  cachés jusqu'à la vérification.
+- Six écrans de plus sont proposés : la première ouverture, l'installation,
+  et quatre réglages de l'IA (la brancher, la régler, sa mémoire, son
+  journal). Ils attendent son avis.
+- Dans « Régler l'IA », Claude propose que la liberté de l'IA sur le PC et sa
+  mémoire restent à part. Les trois façons de régler (par niveau, un par un,
+  elle s'adapte) portent sur le lab, la solution et l'initiative.
 
 ### Le matériel d'OpenContact
 

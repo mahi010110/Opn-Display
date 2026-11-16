@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Régler l'IA · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#" aria-current="page"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Réglages</h1>
+</div>
+
+<main class="page reglages">
+  <nav class="oc-window" aria-label="Réglages">
+    <div class="oc-window__body oc-window__body--flush">
+      <ul class="liste-nav">
+        <li><a href="#"><i class="ic i-brancher"></i>Brancher l'IA</a></li>
+        <li><a href="#" aria-current="page"><i class="ic i-reglages"></i>Régler l'IA</a></li>
+        <li><a href="#"><i class="ic i-memoire"></i>Sa mémoire</a></li>
+        <li><a href="#"><i class="ic i-journal"></i>Son journal</a></li>
+        <li><a href="#"><i class="ic i-images"></i>Images</a></li>
+        <li><a href="#"><i class="ic i-poste"></i>Ton PC</a></li>
+        <li><a href="#"><i class="ic i-theme"></i>Thème</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Régler l'IA</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <fieldset class="oc-fieldset bloc">
+        <legend>Sur ton PC</legend>
+        <div class="choix" role="radiogroup" aria-label="Sur ton PC">
+          <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="pc" checked></span>Avec accord<span class="mono">elle demande avant d'agir</span></label>
+          <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="pc"></span>Libre<span class="mono">elle agit sans demander</span></label>
+          <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="pc"></span>Seulement les outils de lab</label>
+        </div>
+        <p class="note">Supprimer des fichiers ou toucher aux protections de Windows demande toujours ton accord.</p>
+      </fieldset>
+      <fieldset class="oc-fieldset bloc">
+        <legend>Avec toi</legend>
+        <div class="rang">
+          <div class="segments" role="group" aria-label="Façon de régler">
+            <button aria-pressed="true">Par niveau</button>
+            <button aria-pressed="false">Un par un</button>
+            <button aria-pressed="false">Elle s'adapte</button>
+          </div>
+          <div class="segments" role="group" aria-label="Niveau">
+            <button aria-pressed="false">Prof</button>
+            <button aria-pressed="true">Coach</button>
+            <button aria-pressed="false">Silencieuse</button>
+          </div>
+        </div>
+        <dl class="fiche">
+          <dt>Dans le lab</dt><dd>elle agit avec ton accord</dd>
+          <dt>Quand tu demandes la solution</dt><dd>un indice d'abord</dd>
+          <dt>Elle te parle d'elle-même</dt><dd>quand elle voit une erreur</dd>
+        </dl>
+      </fieldset>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

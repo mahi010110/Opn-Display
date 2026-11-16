@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Première ouverture · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Avant ton premier lab</h1>
+</div>
+
+<main class="page page--paire">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Ton PC</h2>
+    </header>
+    <div class="oc-window__body">
+      <ul class="tests tests--large">
+        <li><i class="ic i-ok"></i>Windows 11 avec WSL2<small>trouvé</small></li>
+        <li><i class="ic i-ok"></i>Mémoire<small>32 Go, 24,3 libres</small></li>
+        <li><i class="ic i-ok"></i>Conteneurs<small>oui</small></li>
+        <li><i class="ic i-ok"></i>Machines virtuelles<small>oui, ton processeur les accepte</small></li>
+        <li><i class="ic i-alerte manque"></i>WiFi simulé<small>non, il demande une version plus récente de WSL</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Ce que l'app installe</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <p class="lu">Un Linux à elle, rangé dans WSL2. Les machines de tes labs tournent dedans. 1,8&nbsp;Go à télécharger.</p>
+      <fieldset class="oc-fieldset">
+        <legend>Un réglage de Windows</legend>
+        <p>WSL2 ne prend que 16 Go sur tes 32. Avec 24 Go, tu lances de plus gros labs.</p>
+        <p class="note">Ce réglage vaut pour tout WSL2 sur ce PC. L'app ajoute cette ligne au fichier .wslconfig :</p>
+        <pre class="ligne">memory=24GB</pre>
+        <label class="oc-check"><input type="checkbox">Passer à 24 Go</label>
+      </fieldset>
+      <div class="pied">
+        <button class="oc-btn oc-btn--primary">Installer</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>Rien n'est installé pour l'instant.</span>
+</footer>
+
+</body>
+</html>

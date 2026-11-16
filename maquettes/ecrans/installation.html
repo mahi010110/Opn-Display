@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installation · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Avant ton premier lab</h1>
+</div>
+
+<main class="page page--paire">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Ton PC</h2>
+    </header>
+    <div class="oc-window__body">
+      <ul class="tests tests--large">
+        <li><i class="ic i-ok"></i>Windows 11 avec WSL2<small>trouvé</small></li>
+        <li><i class="ic i-ok"></i>Mémoire<small>32 Go, 24,3 libres</small></li>
+        <li><i class="ic i-ok"></i>Conteneurs<small>oui</small></li>
+        <li><i class="ic i-ok"></i>Machines virtuelles<small>oui, ton processeur les accepte</small></li>
+        <li><i class="ic i-alerte manque"></i>WiFi simulé<small>non, il demande une version plus récente de WSL</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Installation</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <ul class="etapes">
+        <li class="fait">Télécharger le Linux de l'app<small>1,8 Go, fait</small></li>
+        <li class="en-cours">L'installer dans WSL2<span class="pas pas--grand" aria-hidden="true"><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><small>environ 2 minutes</small></li>
+        <li>Passer WSL2 à 24 Go<small>tu as dit oui</small></li>
+        <li>Premier démarrage</li>
+      </ul>
+      <p class="note">Rien d'autre ne change sur ton PC. Tu peux faire autre chose pendant ce temps.</p>
+      <div class="pied">
+        <button class="oc-btn">Arrêter l'installation</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>Installation en cours, étape 2 sur 4</span>
+</footer>
+
+</body>
+</html>

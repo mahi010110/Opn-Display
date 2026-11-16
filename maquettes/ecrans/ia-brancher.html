@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brancher l'IA · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#" aria-current="page"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Réglages</h1>
+</div>
+
+<main class="page reglages">
+  <nav class="oc-window" aria-label="Réglages">
+    <div class="oc-window__body oc-window__body--flush">
+      <ul class="liste-nav">
+        <li><a href="#" aria-current="page"><i class="ic i-brancher"></i>Brancher l'IA</a></li>
+        <li><a href="#"><i class="ic i-reglages"></i>Régler l'IA</a></li>
+        <li><a href="#"><i class="ic i-memoire"></i>Sa mémoire</a></li>
+        <li><a href="#"><i class="ic i-journal"></i>Son journal</a></li>
+        <li><a href="#"><i class="ic i-images"></i>Images</a></li>
+        <li><a href="#"><i class="ic i-poste"></i>Ton PC</a></li>
+        <li><a href="#"><i class="ic i-theme"></i>Thème</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Brancher l'IA</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <div class="choix" role="radiogroup" aria-label="Brancher l'IA">
+        <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="b" checked></span>Une clé API<span class="mono">branchée, essayée à 14:02</span></label>
+        <div class="choix-detail">
+          <div class="grille-2">
+            <label class="oc-field"><span class="oc-field__label">Fournisseur</span><select class="oc-select"><option>Anthropic</option></select></label>
+            <label class="oc-field"><span class="oc-field__label">Modèle</span><select class="oc-select"><option>Claude Sonnet 5.5</option></select></label>
+          </div>
+          <label class="oc-field"><span class="oc-field__label">Clé</span><input class="oc-input oc-input--mono" type="password" value="xxxxxxxxxxxxxxxxxxxxxxxx" aria-label="Clé"></label>
+          <p class="note">La clé est rangée dans le trousseau de Windows. L'IA ne la voit jamais.</p>
+          <button class="oc-btn oc-btn--sm">Essayer</button>
+        </div>
+        <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="b"></span>Un modèle local<span class="mono">Ollama n'est pas installé</span></label>
+        <label class="choix-ligne"><span class="oc-radio"><input type="radio" name="b"></span>L'abonnement ChatGPT<span class="mono">Codex n'est pas installé</span></label>
+      </div>
+      <p class="note">Un modèle local est gratuit, et il prend de la RAM à tes labs.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

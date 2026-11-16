@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Son journal · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#" aria-current="page"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Réglages</h1>
+</div>
+
+<main class="page reglages">
+  <nav class="oc-window" aria-label="Réglages">
+    <div class="oc-window__body oc-window__body--flush">
+      <ul class="liste-nav">
+        <li><a href="#"><i class="ic i-brancher"></i>Brancher l'IA</a></li>
+        <li><a href="#"><i class="ic i-reglages"></i>Régler l'IA</a></li>
+        <li><a href="#"><i class="ic i-memoire"></i>Sa mémoire</a></li>
+        <li><a href="#" aria-current="page"><i class="ic i-journal"></i>Son journal</a></li>
+        <li><a href="#"><i class="ic i-images"></i>Images</a></li>
+        <li><a href="#"><i class="ic i-poste"></i>Ton PC</a></li>
+        <li><a href="#"><i class="ic i-theme"></i>Thème</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Son journal</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="puces" role="group" aria-label="Filtrer">
+        <button class="puce" aria-pressed="true">Tout 7</button>
+        <button class="puce" aria-pressed="false">Sur le PC 3</button>
+        <button class="puce" aria-pressed="false">Dans le lab 4</button>
+      </div>
+      <table class="table">
+        <thead>
+          <tr><th>Heure</th><th>Où</th><th>Ce qu'elle a fait</th><th>Accord</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="chiffre">15:00</td><td class="chiffre">pc1, srv-web</td><td>3 tests lancés</td><td class="chiffre"></td></tr>
+          <tr><td class="chiffre">14:41</td><td class="chiffre">srv-web</td><td>Panne posée : <code>systemctl disable --now nginx</code></td><td class="chiffre"></td></tr>
+          <tr><td class="chiffre">14:40</td><td class="chiffre">le lab</td><td>Lab sauvegardé avant la panne</td><td class="chiffre"></td></tr>
+          <tr><td class="chiffre">14:20</td><td class="chiffre">ton PC</td><td>Lire le dossier Documents</td><td class="chiffre refus">refusé</td></tr>
+          <tr><td class="chiffre">14:03</td><td class="chiffre">ton PC</td><td>Télécharger l'image d'OPNsense</td><td class="chiffre">autorisé</td></tr>
+          <tr><td class="chiffre">14:02</td><td class="chiffre">ton PC</td><td>Télécharger l'image de Debian 12</td><td class="chiffre">autorisé</td></tr>
+          <tr><td class="chiffre">14:02</td><td class="chiffre">le lab</td><td>Lab Agence Exemple créé, 6 machines</td><td class="chiffre"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

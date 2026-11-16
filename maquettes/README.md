@@ -38,11 +38,17 @@ Validé le 16 novembre 2026.
 | Écran | Le moment | État |
 |---|---|---|
 | `lab` | travailler dans le lab, et donner son accord à l'IA | validé |
-| `labs` | choisir un lab, voir ce que le PC sait faire | proposé |
-| `nouveau-lab` | décrire un lab, voir le lab proposé et sa RAM, le lancer | proposé |
-| `panne` | recevoir une panne, demander un indice | proposé |
-| `repare` | dire « c'est réparé », voir les tests et l'explication | proposé |
-| `cours` | suivre un cours dans le lab | proposé |
+| `labs` | choisir un lab, voir ce que le PC sait faire | validé |
+| `nouveau-lab` | décrire un lab, voir le lab proposé et sa RAM, le lancer | validé |
+| `panne` | recevoir une panne, demander un indice | validé |
+| `repare` | dire « c'est réparé », voir les tests et l'explication | validé |
+| `cours` | suivre un cours dans le lab | validé |
+| `ouverture` | la première ouverture : ce que le PC sait faire, ce que l'app installe | proposé |
+| `installation` | suivre l'installation | proposé |
+| `ia-brancher` | brancher l'IA | proposé |
+| `ia-regler` | régler l'IA | proposé |
+| `ia-memoire` | voir, corriger, couper ou effacer sa mémoire | proposé |
+| `ia-journal` | voir ce que l'IA a fait | proposé |
 
 ## L'écran du lab
 
@@ -74,6 +80,32 @@ Le panneau de droite est toujours l'IA. Ce qu'elle y montre change.
 
 La pastille à côté du nom du lab dit ce qui se passe : le nombre de machines
 en marche, une panne en cours, une panne réparée, un cours.
+
+## La première ouverture
+
+- Le menu n'est pas encore là : il arrive quand l'app est installée.
+- À gauche, ce que le PC sait faire. Ce qui manque est dit avec sa raison.
+- À droite, ce que l'app installe. Le réglage de la mémoire de WSL2 est une
+  case à cocher, vide au départ, avec la ligne que l'app écrira.
+- Pendant l'installation, chaque étape a un carré : plein quand elle est
+  faite, en trame quand elle est en cours, vide quand elle attend.
+
+## Les réglages
+
+- Une liste à gauche : Brancher l'IA, Régler l'IA, Sa mémoire, Son journal,
+  Images, Ton PC, Thème.
+- Brancher l'IA : une clé API, un modèle local, ou l'abonnement ChatGPT. Le
+  choix retenu s'ouvre, les autres disent leur état en une ligne.
+- Régler l'IA, en deux cadres. « Sur ton PC » : avec accord, libre, ou
+  seulement les outils de lab. « Avec toi » : la façon de régler (par niveau,
+  un par un, ou elle s'adapte), puis ce que ça donne dans le lab, pour la
+  solution et pour son initiative.
+- Sa liberté sur le PC et sa mémoire restent des réglages à part, quelle que
+  soit la façon de régler. C'est une proposition.
+- Sa mémoire : un interrupteur, les lignes qu'elle garde, qu'on corrige ou
+  qu'on retire une à une, et « Effacer sa mémoire » à part, en rouge.
+- Son journal : l'heure, l'endroit, ce qu'elle a fait, et l'accord donné ou
+  refusé.
 
 ## Les icônes des machines
 
