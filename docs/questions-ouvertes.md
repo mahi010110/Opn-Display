@@ -105,11 +105,16 @@ connexion claude.ai, ni faire passer des requêtes par l'abonnement. Lancer
 `claude -p` depuis l'app n'est pas interdit en toutes lettres, mais Anthropic
 annonce que ce mode n'utilisera plus l'abonnement par défaut.
 
-Recommandation : pour Claude, l'abonnement passe par le serveur MCP de l'app,
-et l'IA parle alors dans la fenêtre de Claude. Dans le panneau de l'app : une
-clé API, un modèle local, ou l'abonnement ChatGPT par Codex. Si le mainteneur
-veut l'abonnement Claude dans le panneau, poser la question à Anthropic avant
-de le construire.
+La seule voie permise en toutes lettres est le serveur MCP : l'utilisateur y
+branche son Claude, et l'IA parle dans la fenêtre de Claude. Le mainteneur a
+répondu qu'il veut une vraie application, et que le serveur MCP viendra
+peut-être plus tard. L'abonnement Claude n'a donc pas de voie sûre dans la
+première version.
+
+Recommandation : la première version branche l'IA par une clé API, par un
+modèle local, ou par l'abonnement ChatGPT avec Codex. Pour l'abonnement
+Claude dans le panneau de l'app, poser la question à Anthropic avant de
+construire quoi que ce soit. Sans accord, il attend le serveur MCP.
 
 ### Le réglage de la RAM de WSL2
 
@@ -141,9 +146,12 @@ Rien n'a encore été mesuré sur son PC (Windows 11 Famille, 32 Go). La liste
 est dans [mesures.md](mesures.md), partie 8. Les deux mesures qui pèsent le
 plus sur la suite : KVM dans WSL2, et ESXi dans KVM sous WSL2.
 
-Recommandation : commencer par les trois lectures qui prennent deux minutes
-(version du noyau, KVM, WiFi simulé), avec un script qui ne change rien au
-PC.
+Le mainteneur ne veut pas de script à lancer sur son PC. L'app fera ces
+mesures elle-même.
+
+Recommandation : le premier écran construit est celui où l'app vérifie le PC
+(version du noyau, KVM, WiFi simulé) et affiche ce qu'elle trouve. Il sert à
+tous les utilisateurs, et il donne les mesures qui manquent.
 
 ## Le nom et le dépôt
 

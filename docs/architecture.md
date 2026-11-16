@@ -44,8 +44,9 @@ et de la virtualisation imbriquée pour y lancer d'autres VM.
 
 ### Ce qu'on change
 
-- Rien à installer à la main. L'app installe et règle son environnement Linux
-  toute seule.
+- Rien à installer à la main, aucun script à lancer. L'app installe et règle
+  son environnement Linux toute seule, et vérifie elle-même ce que le PC sait
+  faire.
 - Tous les domaines, pas seulement le réseau.
 - L'IA, qui a les mêmes commandes que l'interface.
 
@@ -134,8 +135,11 @@ l'app.
 | Clé API | L'app appelle le fournisseur. La clé reste dans le trousseau du système | Connu |
 | Modèle local | L'app parle à Ollama sur le PC | Connu. Le modèle prend de la RAM au lab |
 | Abonnement ChatGPT | L'app lance Codex, l'outil officiel installé sur le PC | Fait dans `natif/` d'OpenContact |
-| Abonnement Claude | L'utilisateur branche son Claude Code ou son Claude Desktop sur le serveur MCP de l'app | La voie sûre d'après les règles d'Anthropic. L'IA parle dans la fenêtre de Claude |
-| Assistant extérieur | L'app expose un serveur MCP, et l'utilisateur y branche son propre assistant | Fait dans `natif/` d'OpenContact |
+| Abonnement Claude | L'utilisateur branche son Claude Code ou son Claude Desktop sur le serveur MCP de l'app | La seule voie sûre d'après les règles d'Anthropic. L'IA parle dans la fenêtre de Claude. Plus tard, peut-être |
+| Assistant extérieur | L'app expose un serveur MCP, et l'utilisateur y branche son propre assistant | Fait dans `natif/` d'OpenContact. Plus tard, peut-être |
+
+Le mainteneur veut une vraie application : l'IA parle dans le panneau de
+l'app. Le serveur MCP n'est pas dans la première version (16 novembre 2026).
 
 ### Les outils de l'IA
 
@@ -204,7 +208,7 @@ Ce sont les pistes des recherches. Rien n'est choisi.
 | Environnement Linux | WSL2 sous Windows, Lima sous macOS | Aucune VM à gérer soi-même |
 | Conteneurs | Docker ou containerd, commandé depuis Rust (bollard) | Connu, documenté |
 | VM | QEMU, commandé par QMP et l'agent invité | Ce que font GNS3 et EVE-NG |
-| Agent | Une boucle en Rust (rig-core ou genai), MCP avec rmcp | Pas de Python à embarquer |
+| Agent | Une boucle en Rust (rig-core ou genai) | Pas de Python à embarquer. Si le serveur MCP se fait un jour : rmcp |
 | Terminaux | xterm.js | Le plus répandu |
 | Écran des VM | noVNC, branché sur QEMU | Marche pour Windows comme pour Linux |
 | Données locales | SQLite | Un seul fichier, sur le PC |
@@ -214,4 +218,4 @@ Ce sont les pistes des recherches. Rien n'est choisi.
 
 L'ordre de construction, la licence et la pile dépendent des mesures. Ce qui
 est fait est dans [mesures.md](mesures.md). Ce qui reste se mesure sur le PC
-du mainteneur.
+du mainteneur, par l'app elle-même.

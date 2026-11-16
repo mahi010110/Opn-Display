@@ -1,12 +1,13 @@
 # Les mesures du 16 novembre 2026
 
-Faites avant de choisir la pile, l'ordre de construction et la licence. Les
-sondes sont dans `mesures/` et se relancent (voir
-[../mesures/README.md](../mesures/README.md)).
+Faites avant de choisir la pile, l'ordre de construction et la licence.
 
 Tout a été fait depuis l'environnement cloud : une machine Linux de 4
 processeurs et 15 Go, sans KVM. Rien n'a été mesuré sur le PC du mainteneur.
-Ce qui lui revient est en partie 8.
+Ce qui reste à y mesurer est en partie 8, et c'est l'app qui le fera.
+
+Le dépôt ne garde aucun script de mesure, le mainteneur n'en veut pas. La
+partie 6 dit comment chaque essai a été fait.
 
 Une mesure vaut pour le jour où elle a été faite.
 
@@ -116,16 +117,17 @@ Lu dans son dépôt (`website/docs/user-guide/security.md`). Version 0.19.0 du
 Sur la machine cloud, avec les paquets d'Ubuntu 24.04 (FRR 8.4.4, QEMU
 8.2.2).
 
-Le réseau virtuel (`mesures/reseau-virtuel.sh`), des machines vides reliées à
-un switch :
+Le réseau virtuel. Chaque machine vide est un espace de noms réseau, relié
+par une paire veth à un bridge. À la fin, la première machine envoie un ping
+à la dernière.
 
 | Machines | Montage | RAM prise | Démontage |
 |---|---|---|---|
 | 50 | 0,6 s | 34 Mo | 0,1 s |
 | 300 | 4 s | 103 Mo | 0,6 s |
 
-Les routeurs (`mesures/routeurs-frr.sh`), une chaîne de routeurs FRR en
-OSPF :
+Les routeurs. Une chaîne de routeurs FRR en OSPF, un par espace de noms, avec
+un hello d'une seconde. Le premier routeur envoie un ping au dernier.
 
 | Routeurs | Lancement | RAM | Routes arrivées |
 |---|---|---|---|
@@ -137,8 +139,8 @@ OSPF :
 - Une panne se pose donc d'une commande, et un test simple (un ping, une
   route) la voit.
 
-La remise à zéro d'un disque de VM (`mesures/remise-a-zero.sh`), une image de
-référence de 4 Go et une couche jetable :
+La remise à zéro d'un disque de VM, avec `qemu-img`. Une image de référence
+qcow2 de 4 Go en lecture seule, et une couche jetable par-dessus.
 
 | Geste | Temps |
 |---|---|
@@ -168,7 +170,10 @@ environnement).
 
 ## 8. Ce qui reste à mesurer sur le PC du mainteneur
 
-- La version de WSL et de son noyau (`uname -r`).
+Le mainteneur ne veut pas de script à lancer sur son PC. Ces mesures se
+feront dans l'app, quand elle existera.
+
+- La version de WSL et de son noyau.
 - KVM répond-il dans WSL2 (`/dev/kvm`) ?
 - Le module de WiFi simulé se charge-t-il ?
 - La RAM que prend l'environnement Linux à vide.
@@ -179,8 +184,8 @@ environnement).
 - AD, client, OPNsense, Wazuh et Kali ensemble : la RAM réelle.
 - La taille de l'installeur.
 
-Les trois premières se lisent en deux minutes, sans rien installer de plus
-que WSL2. Les autres demandent de télécharger des images.
+Les trois premières sont des lectures, sans rien installer de plus que WSL2.
+Les autres demandent de télécharger des images.
 
 ## 9. Ce qu'on en tire
 
@@ -190,9 +195,10 @@ que WSL2. Les autres demandent de télécharger des images.
 - Le réseau virtuel et les routeurs coûtent peu : 20 routeurs prennent
   367 Mo. La RAM ira aux VM.
 - La remise à zéro d'un disque prend moins d'une seconde.
-- Pour l'abonnement Claude, la voie sûre est le serveur MCP. Lancer
-  `claude -p` depuis l'app repose sur un comportement qu'Anthropic annonce
-  vouloir changer.
+- Pour l'abonnement Claude, la voie sûre est le serveur MCP. Le mainteneur
+  garde le serveur MCP pour plus tard, peut-être (voir
+  [carnet.md](carnet.md)). Lancer `claude -p` depuis l'app repose sur un
+  comportement qu'Anthropic annonce vouloir changer.
 - Le catalogue de GNS3 est une liste de descriptions, sans vérification. Sa
   licence GPL-3.0 interdit de le copier dans une app sous MIT ou Apache. On
   peut s'inspirer de sa forme.

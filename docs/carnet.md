@@ -118,7 +118,7 @@ l'a validée (« C'est bon »).
 ### Les mesures
 
 Faites le même jour depuis l'environnement cloud, à la demande du mainteneur.
-Le détail est dans [mesures.md](mesures.md), les sondes dans `mesures/`.
+Le détail est dans [mesures.md](mesures.md).
 
 - WSL2 marche sur Windows 11 Famille, avec KVM, le réseau virtuel et l'iSCSI
   dans son noyau. Le WiFi simulé demande le noyau 6.18.
@@ -132,3 +132,25 @@ Le détail est dans [mesures.md](mesures.md), les sondes dans `mesures/`.
   disque de VM remis à zéro en moins d'une seconde.
 - Rien n'est mesuré sur le PC du mainteneur. Ce qui reste est dans
   [mesures.md](mesures.md), partie 8.
+
+### Une vraie application, pas de script
+
+Après les mesures, Claude recommandait un script pour lire trois valeurs sur
+le PC du mainteneur, et le serveur MCP pour l'abonnement Claude. Le
+mainteneur a répondu : « Non, je veux une véritable application. Peut-être
+plus tard un MCP. Je veux pas de script, rien du tout. »
+
+- Opn-Display est une vraie application. Le lab, les terminaux et l'IA sont
+  dedans.
+- Le serveur MCP viendra peut-être plus tard. Il n'est pas dans la première
+  version.
+- Pas de script. Le dossier `mesures/` et ses trois scripts sont retirés du
+  dépôt. Claude ne prépare aucun script pour le PC du mainteneur.
+- Ce qui reste à mesurer sur son PC, l'app le mesurera elle-même.
+- La seule voie sûre pour l'abonnement Claude passait par le serveur MCP. La
+  question est dans [questions-ouvertes.md](questions-ouvertes.md).
+
+### Le CLAUDE.md
+
+Écrit le même jour, à la racine du dépôt : comment on travaille, comment on
+écrit, ce qui est décidé.

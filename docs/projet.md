@@ -14,6 +14,9 @@ Une app de bureau qui fait tourner une infrastructure informatique entière
 sur ton PC, avec une IA qui la construit, la casse, l'explique et vérifie tes
 réparations.
 
+C'est une vraie application : le lab, les terminaux et l'IA sont dedans.
+L'utilisateur n'a aucun script à lancer.
+
 C'est le projet fil rouge du mainteneur pour le titre AIS, en juillet 2027.
 L'app doit servir à tout le monde, pas seulement aux apprenants de cette
 formation.
@@ -173,6 +176,9 @@ Après l'examen :
 - la voix ;
 - le lab dans le navigateur ;
 - le lab sur un serveur distant.
+
+Peut-être plus tard, sans date : un serveur MCP, pour brancher un assistant
+extérieur sur l'app.
 
 ## 7. Les limites connues
 
