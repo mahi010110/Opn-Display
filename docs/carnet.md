@@ -194,6 +194,23 @@ fiche.
   avec le panneau de l'IA sur le côté.
 - Le brief est dans [brief-conception.md](brief-conception.md).
 
+### La première maquette
+
+Le mainteneur a donné son accord pour copier le matériel d'OpenContact et
+commencer (« Go »).
+
+- Le matériel est copié dans `maquettes/kit/`, depuis le dépôt d'OpenContact
+  à la version `a1d317b`.
+- Les icônes de machines manquaient. Elles viennent du même jeu,
+  pixelarticons 2.4.2 : `server`, `move` pour le routeur,
+  `arrows-horizontal` pour le switch, `wall` pour le pare-feu, `database`
+  pour le stockage.
+- Claude propose un menu à trois entrées, Labs, Cours et Pannes, avec
+  Réglages à droite, et l'écran du lab : le schéma, les terminaux, l'IA sur
+  le côté.
+- Les captures sont dans `maquettes/captures/`. Le mainteneur n'a pas encore
+  donné son avis.
+
 ### Le matériel d'OpenContact
 
 Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,

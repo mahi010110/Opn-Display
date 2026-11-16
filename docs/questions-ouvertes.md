@@ -65,10 +65,16 @@ proposer le menu (16 novembre 2026). Le brief est écrit :
 [brief-conception.md](brief-conception.md). La suite : le menu, puis les
 maquettes en captures, avant de coder un écran.
 
-Reste aussi à dire comment le matériel arrive dans ce dépôt. Opn-Link le
-prend par un script, et ici il n'y a pas de script.
+Le menu et l'écran du lab sont proposés en maquette
+([../maquettes/README.md](../maquettes/README.md)). Le mainteneur doit dire
+s'ils lui vont.
 
-Recommandation : le décider au moment des maquettes. Une piste : un
+Pour les maquettes, le matériel a été copié à la main dans `maquettes/kit/`,
+avec l'accord du mainteneur. Reste à dire comment il arrivera dans l'app, et
+comment il suivra les changements d'OpenContact. Opn-Link le prend par un
+script, et ici il n'y a pas de script.
+
+Recommandation : le décider quand on code le premier écran. Une piste : un
 sous-module git qui pointe sur le dépôt d'OpenContact.
 
 ## Les souhaits qui butent sur une limite
