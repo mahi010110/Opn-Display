@@ -14,27 +14,59 @@ Le mainteneur veut tout pour juillet 2027, et a demandé une proposition
 d'ordre après les mesures. Il a déjà fixé un point : l'émulation avant le
 pilotage.
 
-Recommandation, à confirmer après les mesures : commencer par un petit lab
-complet sur le PC du mainteneur. Deux ou trois machines Linux, l'IA pose une
-panne, l'utilisateur répare, l'IA vérifie. Ensuite on ajoute les machines une
-famille à la fois : réseau, Windows Server, pare-feu et sécurité, stockage,
-WiFi, ESXi. À chaque étape, l'app marche et peut se montrer.
+Recommandation, proposée le 16 novembre 2026. À chaque étape, l'app marche et
+peut se montrer.
+
+1. Les maquettes : un brief de conception, puis les écrans en captures, avec
+   le matériel d'OpenContact.
+2. L'app s'ouvre et vérifie le PC : WSL2, le noyau, KVM, le WiFi simulé, la
+   RAM. Elle installe son environnement Linux. Cette étape donne les mesures
+   qui manquent.
+3. Un premier lab : deux ou trois machines Linux en conteneurs, reliées, avec
+   leurs terminaux dans l'app.
+4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
+   réparation. Avec ses réglages et ses garde-fous.
+5. Le réseau : routeurs, switchs, VLAN, routage, NAT.
+6. Les VM : Windows Server et Active Directory. Dès qu'une VM tourne, on
+   essaie ESXi, pour savoir tôt s'il marche sous Windows.
+7. Les pare-feu et la sécurité : OPNsense, VPN, Wazuh, Kali.
+8. Le stockage et le WiFi simulé.
+9. ESXi, si l'essai de l'étape 6 a marché.
+10. macOS, l'installeur et la version publique.
+11. Le pilotage.
+
+Chaque famille de machines arrive avec ses pannes et ses cours. La version
+Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
 
 ### La licence
 
-Recommandation provisoire : MIT ou Apache-2.0, comme Opn-Link. L'app lance
-QEMU et les autres outils sous GPL comme des programmes séparés, ce qui est
-permis. Si on veut un jour intégrer du code sous GPL dans l'app, par exemple
-les pannes de GNS3, il faudra passer en GPL-3.0. À confirmer quand la pile
-est choisie.
+Recommandation, proposée le 16 novembre 2026 : MIT ou Apache-2.0, au choix
+de celui qui réutilise. C'est la licence d'Opn-Link, de Rust et de Tauri.
+
+- L'app lance QEMU et les autres outils sous GPL comme des programmes
+  séparés, ce qui est permis.
+- Hermes Agent est sous MIT. On peut lui reprendre du code.
+- On ne peut pas copier les 858 pannes de GNS3, qui sont sous GPL-3.0. Elles
+  n'ont pas de vérification, et notre catalogue a son propre format. La perte
+  est faible.
+- Le matériel « Utilitaire 98 » vient d'OpenContact, qui est sous licence
+  propriétaire. Le mainteneur en est l'auteur, il peut le publier aussi sous
+  la licence d'Opn-Display. C'est à lui de le dire.
 
 ### Le design
 
-Le mainteneur veut un design propre à Opn-Display. Reste à dire qui le
-conçoit, et à partir de quoi.
+Le matériel est celui d'OpenContact, « Utilitaire 98 » (décidé le
+16 novembre 2026). Restent les écrans et la navigation d'Opn-Display, à
+dessiner avec ce matériel.
 
 Recommandation : écrire un brief de conception, comme pour Opn-Link, puis
-montrer plusieurs propositions en captures avant de choisir.
+montrer des maquettes en captures avant de coder un écran.
+
+Reste aussi à dire comment le matériel arrive dans ce dépôt. Opn-Link le
+prend par un script, et ici il n'y a pas de script.
+
+Recommandation : le décider au moment des maquettes. Une piste : un
+sous-module git qui pointe sur le dépôt d'OpenContact.
 
 ## Les souhaits qui butent sur une limite
 
@@ -111,10 +143,12 @@ répondu qu'il veut une vraie application, et que le serveur MCP viendra
 peut-être plus tard. L'abonnement Claude n'a donc pas de voie sûre dans la
 première version.
 
-Recommandation : la première version branche l'IA par une clé API, par un
-modèle local, ou par l'abonnement ChatGPT avec Codex. Pour l'abonnement
-Claude dans le panneau de l'app, poser la question à Anthropic avant de
-construire quoi que ce soit. Sans accord, il attend le serveur MCP.
+Décidé le 16 novembre : l'app branche l'IA par une clé API, par un modèle
+local, ou par l'abonnement ChatGPT avec Codex. Pour l'abonnement Claude dans
+le panneau de l'app, la question est posée à Anthropic avant de construire
+quoi que ce soit. Sans accord, il attend le serveur MCP.
+
+Recommandation : Claude prépare le message, le mainteneur l'envoie.
 
 ### Le réglage de la RAM de WSL2
 

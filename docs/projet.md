@@ -91,12 +91,15 @@ l'émulation.
 
 En juillet 2027, l'app accepte :
 
-- un abonnement (Claude, ChatGPT), par l'outil officiel de l'éditeur installé
-  sur le PC. La coquille native d'OpenContact le fait déjà avec Codex. Pour
-  Claude, les règles d'Anthropic limitent cette voie (voir
-  [questions-ouvertes.md](questions-ouvertes.md)) ;
 - une clé API ;
-- un modèle local (Ollama).
+- un modèle local (Ollama) ;
+- l'abonnement ChatGPT, par Codex, l'outil officiel installé sur le PC. La
+  coquille native d'OpenContact le fait déjà.
+
+L'abonnement Claude dépend d'Anthropic. Ses règles ne permettent en toutes
+lettres que le serveur MCP, que le mainteneur garde pour plus tard. La
+question lui sera posée (voir
+[questions-ouvertes.md](questions-ouvertes.md)).
 
 ### Ce qu'elle peut faire
 
@@ -167,8 +170,9 @@ En juillet 2027 :
 - sur Windows 11, Linux et macOS ;
 - avec tout ce qui peut s'émuler (partie 3) ;
 - avec les trois façons de brancher l'IA ;
-- avec un design propre à Opn-Display, qui ne reprend pas celui
-  d'OpenContact.
+- avec le matériel d'interface et d'UX d'OpenContact, « Utilitaire 98 » :
+  ses jetons, ses polices, ses icônes, ses composants et les règles de son
+  kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
 
 Après l'examen :
 

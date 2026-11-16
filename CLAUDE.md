@@ -77,7 +77,9 @@ Le produit :
 - Les trois références : GNS3 et EVE-NG pour l'émulation, Hermes Agent pour
   l'IA.
 - Gratuit et libre. La licence reste à choisir.
-- Un design propre à Opn-Display, qui ne reprend pas celui d'OpenContact.
+- Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
+  ses jetons, ses polices, ses icônes, ses composants et les règles de son
+  kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
 - Le nom est un nom de travail. Le dépôt est privé, le mainteneur décidera
   plus tard quand l'ouvrir.
 
@@ -104,7 +106,9 @@ L'IA :
   quand on demande la solution, son initiative, sa mémoire.
 - Trois façons de régler, au choix de l'utilisateur : les niveaux Prof,
   Coach et Silencieuse, des réglages séparés, ou une IA qui s'adapte seule.
-- Elle se branche par abonnement, par clé API ou par modèle local.
+- Elle se branche par une clé API, par un modèle local, ou par l'abonnement
+  ChatGPT avec Codex. Pour l'abonnement Claude, la question est posée à
+  Anthropic. Sans accord, il attend le serveur MCP.
 - Les cours : des cours prêts, et des cours écrits en direct.
 - Les images : elle les récupère quand elle peut, sinon l'utilisateur les
   fournit. L'app ne contient ni Windows, ni ESXi, ni image Cisco.
@@ -132,8 +136,7 @@ confiance », il peut revenir dessus.
 
 - L'architecture et la pile. `docs/architecture.md` est une proposition.
 - L'ordre de construction et la licence. Claude doit les proposer.
-- L'abonnement Claude dans l'app. Les règles d'Anthropic ne laissent que le
-  serveur MCP.
+- Les écrans et la navigation, à dessiner avec le matériel d'OpenContact.
 - Les idées de la première fiche qui n'ont pas été rediscutées : les
   espaces, les modes, le schéma en direct, la progression.
 - Rien n'est mesuré sur le PC du mainteneur.
@@ -145,8 +148,10 @@ La liste complète est dans `docs/questions-ouvertes.md`.
 - `mahi010110/Opn...`, branche `claude/sweet-hypatia-p4qlsl` : les recherches
   et la première fiche du projet. La fiche sert à comprendre l'idée, elle ne
   dit pas ce qui est décidé.
-- OpenContact (`mahi010110/Open-Contact`) : son dossier `natif/` montre
-  comment une app Tauri lance Codex pour l'abonnement ChatGPT et parle à
-  Ollama. Son design ne s'applique pas ici.
+- OpenContact (`mahi010110/Open-Contact`) : son kit `design/` et ses jetons
+  (`styles/tokens/`) donnent le matériel « Utilitaire 98 », et son
+  `CLAUDE.md` dit comment il s'emploie (parties 4 à 7). Son dossier `natif/`
+  montre comment une app Tauri lance Codex pour l'abonnement ChatGPT et
+  parle à Ollama.
 - Opn-Link (`mahi010110/opn-link`) : la même façon de travailler et
   d'écrire.

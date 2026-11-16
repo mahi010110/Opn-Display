@@ -204,7 +204,7 @@ Ce sont les pistes des recherches. Rien n'est choisi.
 | Partie | Piste | Pourquoi |
 |---|---|---|
 | App de bureau | Tauri 2, en Rust | Déjà utilisé dans `natif/` d'OpenContact et prévu pour Opn-Link. Installeur léger |
-| Interface | Une page web dans Tauri | Les briques de terminal et de schéma existent pour le web |
+| Interface | Une page web dans Tauri | Le matériel « Utilitaire 98 » d'OpenContact est fait pour le web (des jetons CSS). Les briques de terminal et de schéma existent aussi pour le web |
 | Environnement Linux | WSL2 sous Windows, Lima sous macOS | Aucune VM à gérer soi-même |
 | Conteneurs | Docker ou containerd, commandé depuis Rust (bollard) | Connu, documenté |
 | VM | QEMU, commandé par QMP et l'agent invité | Ce que font GNS3 et EVE-NG |

@@ -154,3 +154,24 @@ plus tard un MCP. Je veux pas de script, rien du tout. »
 
 Écrit le même jour, à la racine du dépôt : comment on travaille, comment on
 écrit, ce qui est décidé.
+
+Le mainteneur l'a lu et validé : « le reste me va ». Sont donc retenus :
+
+- la règle « pas de script », telle qu'elle y est écrite ;
+- deux règles reprises d'Opn-Link : la façon d'écrire, et les captures
+  montrées avant de garder un changement visible ;
+- pour brancher l'IA : une clé API, un modèle local, ou l'abonnement ChatGPT
+  avec Codex. Pour l'abonnement Claude, la question sera posée à Anthropic.
+  Sans accord, il attend le serveur MCP.
+
+### Le matériel d'OpenContact
+
+Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,
+on utilisera le même matériel UI/UX qu'OpenContact. »
+
+- Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
+  ses jetons, ses polices, ses icônes, ses composants et les règles de son
+  kit `design/`.
+- Claude comprend que les écrans et la navigation restent à dessiner pour
+  Opn-Display, avec ce matériel : OpenContact n'a ni lab, ni terminal, ni
+  schéma. Le mainteneur peut corriger.
