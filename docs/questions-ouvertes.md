@@ -65,9 +65,9 @@ proposer le menu (16 novembre 2026). Le brief est écrit :
 [brief-conception.md](brief-conception.md). La suite : le menu, puis les
 maquettes en captures, avant de coder un écran.
 
-Le menu et l'écran du lab sont proposés en maquette
-([../maquettes/README.md](../maquettes/README.md)). Le mainteneur doit dire
-s'ils lui vont.
+Le menu et l'écran du lab sont validés (16 novembre 2026). Ils sont décrits
+dans [../maquettes/README.md](../maquettes/README.md). Les autres écrans se
+dessinent à partir d'eux, et se montrent en captures.
 
 Pour les maquettes, le matériel a été copié à la main dans `maquettes/kit/`,
 avec l'accord du mainteneur. Reste à dire comment il arrivera dans l'app, et

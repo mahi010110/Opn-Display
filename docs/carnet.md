@@ -208,8 +208,11 @@ commencer (« Go »).
 - Claude propose un menu à trois entrées, Labs, Cours et Pannes, avec
   Réglages à droite, et l'écran du lab : le schéma, les terminaux, l'IA sur
   le côté.
-- Les captures sont dans `maquettes/captures/`. Le mainteneur n'a pas encore
-  donné son avis.
+- Les captures sont dans `maquettes/captures/`.
+- Le mainteneur a validé le menu et l'écran du lab : « C'est bien », et il a
+  demandé la suite.
+- Cinq écrans de plus sont proposés : la liste des labs, un nouveau lab, une
+  panne, la vérification, un cours. Ils attendent son avis.
 
 ### Le matériel d'OpenContact
 

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Un cours · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#" aria-current="page"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <a class="oc-btn oc-btn--ghost oc-btn--sm" href="#"><i class="ic i-retour"></i>Mes labs</a>
+  <h1 class="lab-nom">Agence Exemple</h1>
+  <span class="oc-chip oc-chip--dot" style="--chip-dot:var(--accent)">Cours : le DHCP</span>
+  <div class="lab-gestes">
+    <button class="oc-btn"><i class="ic i-zero"></i>Remettre à zéro</button>
+    <button class="oc-btn"><i class="ic i-arreter"></i>Arrêter le lab</button>
+  </div>
+</div>
+
+<main class="lab">
+  <div class="lab-gauche">
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--inactive">
+        <h2 class="oc-window__title">Schéma</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="palette">
+          <p class="palette-titre">Ajouter</p>
+          <button><i class="ic ic-24 i-serveur"></i>Serveur</button>
+          <button><i class="ic ic-24 i-poste"></i>Poste</button>
+          <button><i class="ic ic-24 i-routeur"></i>Routeur</button>
+          <button><i class="ic ic-24 i-switch"></i>Switch</button>
+          <button><i class="ic ic-24 i-parefeu"></i>Pare-feu</button>
+          <button><i class="ic ic-24 i-stockage"></i>Stockage</button>
+        </div>
+        <div class="plan">
+          <svg class="cables" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="12,24 36,24 60,24"/>
+            <polyline points="60,24 60,50"/>
+            <polyline points="30,73 30,50 87,50 87,73"/>
+            <polyline points="49,50 49,73"/>
+            <polyline points="68,50 68,73"/>
+          </svg>
+          <span class="reseau" style="left:24%;top:24%">WAN</span>
+          <span class="reseau" style="left:77.5%;top:50%">LAN 192.168.10.0/24</span>
+
+          <div class="machine machine--dehors" style="left:12%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-internet"></i></span>
+            <span class="machine-nom">Internet</span>
+          </div>
+          <div class="machine" style="left:36%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-parefeu"></i></span>
+            <span class="machine-nom">fw1</span>
+            <span class="machine-ip">192.168.10.1</span>
+          </div>
+          <div class="machine" style="left:60%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
+            <span class="machine-nom">sw1</span>
+          </div>
+          <div class="machine" style="left:30%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-ad</span>
+            <span class="machine-ip">192.168.10.10</span>
+          </div>
+          <div class="machine" style="left:49%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-web</span>
+            <span class="machine-ip">192.168.10.20</span>
+          </div>
+          <div class="machine machine--choisie" style="left:68%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc1</span>
+            <span class="machine-ip">192.168.10.101</span>
+          </div>
+          <div class="machine machine--eteinte" style="left:87%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc2</span>
+            <span class="machine-ip">éteint</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--accent">
+        <h2 class="oc-window__title">Terminaux</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="terminaux">
+          <div class="terminal">
+            <div class="onglets" role="tablist">
+              <button role="tab" aria-selected="true">pc1</button>
+              <button role="tab" aria-selected="false">fw1</button>
+              <button role="tab" aria-selected="false" aria-label="Ouvrir un terminal"><i class="ic i-plus"></i></button>
+            </div>
+<div class="ecran"><pre>root@pc1:~# ip -4 addr show eth0
+<span class="sortie">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 state UP
+    inet 192.168.10.101/24 brd 192.168.10.255 scope global dynamic eth0
+       valid_lft 3412sec preferred_lft 3412sec</span>
+root@pc1:~# <span class="curseur"></span></pre></div>
+          </div>
+          <div class="terminal">
+            <div class="onglets" role="tablist">
+              <button role="tab" aria-selected="true">fw1</button>
+            </div>
+<div class="ecran"><pre>root@fw1:~ # dhcpd -t
+<span class="sortie">Configuration file check passed</span>
+root@fw1:~ # <span class="curseur"></span></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">IA</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="ia">
+        <div class="ia-niveau">
+          <div class="segments" role="group" aria-label="Niveau de l'IA">
+            <button aria-pressed="true">Prof</button>
+            <button aria-pressed="false">Coach</button>
+            <button aria-pressed="false">Silencieuse</button>
+          </div>
+        </div>
+        <div class="cours">
+          <div class="cours-tete">
+            <span class="pas" aria-hidden="true"><i class="fait"></i><i class="fait"></i><i></i><i></i><i></i></span>
+            Le DHCP, étape 2 sur 5
+          </div>
+          <h3>Voir le bail d'un poste</h3>
+          <p>Au démarrage, pc1 a demandé une adresse. fw1 lui en a prêté une pour une heure : c'est le bail.</p>
+          <div class="commande">
+            <code>ip -4 addr show eth0</code>
+            <button class="oc-btn oc-btn--sm"><i class="ic i-taper"></i>Taper dans pc1</button>
+          </div>
+          <p>Cherche le mot <code>dynamic</code> : l'adresse vient du DHCP. <code>valid_lft</code> dit combien de secondes le bail dure encore.</p>
+          <div class="cours-gestes">
+            <button class="oc-btn"><i class="ic i-retour"></i>Précédent</button>
+            <button class="oc-btn oc-btn--primary">Suivant<i class="ic i-suite"></i></button>
+          </div>
+        </div>
+        <div class="ia-saisie">
+          <input class="oc-input" type="text" placeholder="Pose une question sur cette étape" aria-label="Écrire à l'IA">
+          <button class="oc-iconbtn" aria-label="Envoyer"><i class="ic i-envoyer"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>6,2 Go sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+  <span>Enregistré à 14:32</span>
+</footer>
+
+</body>
+</html>

@@ -162,7 +162,7 @@ body.app {
   min-height: 0;
   display: flex;
 }
-.lab .oc-window__title {
+.oc-window__title {
   font-size: var(--pixel-16);
   letter-spacing: 0.04em;
 }
@@ -446,12 +446,13 @@ a.oc-btn {
   background: var(--teal-wash);
 }
 
-.accord {
+.carte {
+  flex: none;
   border: 1px solid var(--border-strong);
   background: var(--surface-window);
   box-shadow: var(--shadow-raised);
 }
-.accord-tete {
+.carte-tete {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -460,14 +461,14 @@ a.oc-btn {
   font-size: var(--text-12);
   color: var(--text-muted);
 }
-.accord-corps {
+.carte-corps {
   padding: var(--space-3);
 }
-.accord-quoi {
+.carte-titre {
   font-size: var(--text-14);
   font-weight: var(--weight-semibold);
 }
-.accord-detail {
+.carte-detail {
   margin: 6px 0 0;
   font-family: var(--font-mono);
   font-size: var(--text-12);
@@ -475,7 +476,7 @@ a.oc-btn {
   color: var(--text-muted);
   white-space: pre;
 }
-.accord-gestes {
+.carte-gestes {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
@@ -488,6 +489,285 @@ a.oc-btn {
   gap: var(--space-3);
   padding: var(--space-3) 10px 10px;
   border-top: 1px solid var(--border-soft);
+}
+
+/* ---------- ce que l'IA épingle : une panne, une vérification, un cours ---------- */
+
+.ia-epingle {
+  flex: none;
+  padding: 10px 10px 0;
+}
+.note {
+  font-size: var(--text-12);
+  line-height: var(--leading-body);
+  color: var(--text-muted);
+}
+.tests li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 1px var(--space-3);
+  padding: 6px 0;
+  border-top: 1px dotted var(--border-soft);
+  font-size: var(--text-13);
+}
+.tests li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.tests .ic {
+  margin-top: 1px;
+  color: var(--status-ok);
+}
+.tests small {
+  grid-column: 2;
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--text-muted);
+}
+
+.cours {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-4) 10px;
+}
+.cours-tete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+}
+.pas {
+  display: inline-flex;
+  gap: 3px;
+}
+.pas i {
+  width: 14px;
+  height: 8px;
+  border: 1px solid var(--border-strong);
+}
+.pas i.fait {
+  background: var(--ink);
+}
+.cours h3 {
+  margin: 0;
+  font-size: var(--text-16);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+.cours p {
+  font-size: var(--text-14);
+  line-height: var(--leading-body);
+}
+.commande {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 5px 5px 5px 10px;
+  background: var(--surface-field);
+  border: 1px solid var(--border-field);
+  box-shadow: var(--bevel-field);
+}
+.commande code {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-13);
+}
+.cours-gestes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+/* ---------- les pages : une liste, un formulaire ---------- */
+
+.page {
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  padding: 0 var(--space-5) var(--space-5) var(--space-4);
+}
+.page--deux {
+  grid-template-columns: minmax(0, 1fr) 372px;
+  align-items: start;
+}
+.page--plein {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+}
+.colonne {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.en-marche {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.en-marche-nom {
+  font-size: var(--text-16);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+.en-marche .lab-gestes {
+  flex: none;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-13);
+}
+.table th {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-soft);
+  font-size: var(--text-11);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--text-muted);
+}
+.table td {
+  height: 40px;
+  padding: 0 var(--space-4);
+  border-top: 1px dotted var(--border-soft);
+}
+.table tbody tr:first-child td {
+  border-top: 0;
+}
+.table .nom {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+.table .chiffre {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.table .fin {
+  text-align: right;
+}
+.table--serree td {
+  height: 32px;
+}
+
+.fiche {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3) var(--space-4);
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-13);
+}
+.fiche dt {
+  color: var(--text-muted);
+}
+.fiche dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+.fiche .manque {
+  color: var(--status-warn);
+}
+
+.decrire {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.propositions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: 10px;
+}
+.pointille {
+  appearance: none;
+  height: 26px;
+  padding: 0 10px;
+  background: none;
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-1);
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.propose {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+}
+.propose-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-4);
+  border-left: 1px solid var(--border-soft);
+}
+.propose-liste .mot {
+  max-width: none;
+}
+.propose-pied {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-soft);
+}
+.propose-pied .mono {
+  flex: 1;
+}
+
+.en-marche-texte {
+  flex: 1;
+  min-width: 0;
+}
+.page--plein .oc-window:last-child {
+  min-height: 0;
+}
+.page--plein .oc-window:last-child .oc-window__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.plan--projet .machine-case::after {
+  display: none;
+}
+.propose-liste .pointille {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fiche-geste {
+  margin-top: var(--space-3);
+}
+.table--serree .nom {
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  font-weight: var(--weight-medium);
 }
 
 /* ---------- le grand écran ---------- */

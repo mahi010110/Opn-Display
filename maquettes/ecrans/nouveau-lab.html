@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nouveau lab · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#" aria-current="page"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <a class="oc-btn oc-btn--ghost oc-btn--sm" href="#"><i class="ic i-retour"></i>Mes labs</a>
+  <h1 class="lab-nom">Nouveau lab</h1>
+</div>
+
+<main class="page page--plein">
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Décris ton lab</h2>
+    </header>
+    <div class="oc-window__body">
+      <div class="decrire">
+        <textarea class="oc-input" rows="2" aria-label="Décris ton lab">Le réseau d'une petite agence : un pare-feu, un AD, un serveur web et deux postes.</textarea>
+        <button class="oc-btn">Proposer</button>
+      </div>
+      <div class="propositions">
+        <button class="pointille">Trois routeurs en OSPF</button>
+        <button class="pointille">Un AD et deux postes</button>
+        <button class="pointille">Un pare-feu et une DMZ</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Le lab proposé</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="propose">
+        <div class="plan plan--projet">
+          <svg class="cables" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="12,24 36,24 60,24"/>
+            <polyline points="60,24 60,50"/>
+            <polyline points="30,70 30,50 87,50 87,70"/>
+            <polyline points="49,50 49,70"/>
+            <polyline points="68,50 68,70"/>
+          </svg>
+          <span class="reseau" style="left:24%;top:24%">WAN</span>
+          <span class="reseau" style="left:77.5%;top:50%">LAN 192.168.10.0/24</span>
+
+          <div class="machine machine--dehors" style="left:12%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-internet"></i></span>
+            <span class="machine-nom">Internet</span>
+          </div>
+          <div class="machine" style="left:36%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-parefeu"></i></span>
+            <span class="machine-nom">fw1</span>
+          </div>
+          <div class="machine" style="left:60%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
+            <span class="machine-nom">sw1</span>
+          </div>
+          <div class="machine" style="left:30%;top:70%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-ad</span>
+          </div>
+          <div class="machine" style="left:49%;top:70%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-web</span>
+          </div>
+          <div class="machine" style="left:68%;top:70%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc1</span>
+          </div>
+          <div class="machine" style="left:87%;top:70%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc2</span>
+          </div>
+        </div>
+
+        <div class="propose-liste">
+          <p class="mot mot--ia">J'ai mis le serveur web dans le même réseau que les postes. Dis-moi si tu préfères une DMZ.</p>
+          <table class="table table--serree">
+            <thead>
+              <tr><th>Machine</th><th>Système</th><th>RAM</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="nom">fw1</td><td>OPNsense</td><td class="chiffre">1 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer fw1"><i class="ic i-fermer"></i></button></td></tr>
+              <tr><td class="nom">sw1</td><td>Switch</td><td class="chiffre">0 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer sw1"><i class="ic i-fermer"></i></button></td></tr>
+              <tr><td class="nom">srv-ad</td><td>Windows Server 2022</td><td class="chiffre">4 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer srv-ad"><i class="ic i-fermer"></i></button></td></tr>
+              <tr><td class="nom">srv-web</td><td>Debian 12, nginx</td><td class="chiffre">0,3 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer srv-web"><i class="ic i-fermer"></i></button></td></tr>
+              <tr><td class="nom">pc1</td><td>Debian 12</td><td class="chiffre">0,5 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer pc1"><i class="ic i-fermer"></i></button></td></tr>
+              <tr><td class="nom">pc2</td><td>Debian 12</td><td class="chiffre">0,4 Go</td><td class="fin"><button class="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm" aria-label="Retirer pc2"><i class="ic i-fermer"></i></button></td></tr>
+            </tbody>
+          </table>
+          <button class="pointille"><i class="ic i-plus"></i>Ajouter une machine</button>
+          <div class="propose-pied">
+            <span class="mono">6,2 Go sur les 24,3 libres<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span>
+            <button class="oc-btn oc-btn--primary">Lancer le lab</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

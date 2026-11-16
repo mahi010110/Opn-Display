@@ -2,8 +2,8 @@
 
 Les écrans d'Opn-Display en HTML et CSS, faits avec le matériel
 « Utilitaire 98 » d'OpenContact et des données inventées. Rien n'y marche :
-on les regarde avant de coder. Ce sont des propositions, rien n'est décidé.
-Le brief est dans [../docs/brief-conception.md](../docs/brief-conception.md).
+on les regarde avant de coder. Un écran est une proposition tant que le
+mainteneur ne l'a pas validé. Le brief est dans [../docs/brief-conception.md](../docs/brief-conception.md).
 
 Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
 
@@ -23,7 +23,9 @@ Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
 - `captures/` : chaque écran à 1366 × 768 et à 1920 × 1080, en clair et en
   sombre.
 
-## Le menu proposé
+## Le menu
+
+Validé le 16 novembre 2026.
 
 - Trois entrées en haut à gauche : Labs, Cours, Pannes. Réglages à droite.
 - Labs ouvre la liste des labs. Un lab ouvert prend tout l'écran, et « Mes
@@ -33,9 +35,14 @@ Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
 
 ## Les écrans
 
-| Écran | Le moment |
-|---|---|
-| `lab` | travailler dans le lab, et donner son accord à l'IA |
+| Écran | Le moment | État |
+|---|---|---|
+| `lab` | travailler dans le lab, et donner son accord à l'IA | validé |
+| `labs` | choisir un lab, voir ce que le PC sait faire | proposé |
+| `nouveau-lab` | décrire un lab, voir le lab proposé et sa RAM, le lancer | proposé |
+| `panne` | recevoir une panne, demander un indice | proposé |
+| `repare` | dire « c'est réparé », voir les tests et l'explication | proposé |
+| `cours` | suivre un cours dans le lab | proposé |
 
 ## L'écran du lab
 
@@ -51,6 +58,22 @@ Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
   une barre en trame.
 - Une machine en marche a un carré vert. Une machine éteinte est en trame. La
   machine dont le terminal est ouvert a son nom en bleu marine.
+
+## Ce que l'IA montre à droite
+
+Le panneau de droite est toujours l'IA. Ce qu'elle y montre change.
+
+- La discussion, et une demande d'accord quand elle veut agir sur le PC.
+- Une panne : la carte reste en haut du panneau, avec « Un indice » et
+  « C'est réparé ». Les tests sont écrits mais cachés jusqu'à la
+  vérification. Le schéma ne montre rien en rouge.
+- Une vérification : chaque test, sa commande et son résultat, puis
+  l'explication de la panne. Une ligne rappelle que l'IA peut se tromper.
+- Un cours : l'étape, une commande à taper dans une machine d'un geste,
+  « Précédent » et « Suivant ».
+
+La pastille à côté du nom du lab dit ce qui se passe : le nombre de machines
+en marche, une panne en cours, une panne réparée, un cours.
 
 ## Les icônes des machines
 
