@@ -164,6 +164,19 @@ Le mainteneur l'a lu et validé : « le reste me va ». Sont donc retenus :
   avec Codex. Pour l'abonnement Claude, la question sera posée à Anthropic.
   Sans accord, il attend le serveur MCP.
 
+### L'ordre de construction, et la licence
+
+Claude a proposé l'ordre et la licence. Le mainteneur a dit qu'il n'avait pas
+compris la demande, Claude l'a reformulée plus simplement, puis il a répondu.
+
+- L'ordre est décidé. D'abord les maquettes, puis l'app qui vérifie le PC,
+  puis un petit lab de deux ou trois machines Linux, puis l'IA, puis les
+  autres familles de machines (réseau, Windows Server, pare-feu et sécurité,
+  stockage et WiFi, ESXi), puis macOS et la version publique, puis le
+  pilotage. Le détail est dans [questions-ouvertes.md](questions-ouvertes.md).
+- La licence n'est pas choisie : « Je décide plus tard ». Le projet reste
+  gratuit et libre.
+
 ### Le matériel d'OpenContact
 
 Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,

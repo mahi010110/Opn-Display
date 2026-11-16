@@ -10,12 +10,9 @@ recommandation pour chaque point.
 
 ### L'ordre de construction
 
-Le mainteneur veut tout pour juillet 2027, et a demandé une proposition
-d'ordre après les mesures. Il a déjà fixé un point : l'émulation avant le
-pilotage.
-
-Recommandation, proposée le 16 novembre 2026. À chaque étape, l'app marche et
-peut se montrer.
+Décidé le 16 novembre 2026 : le mainteneur a répondu « Oui, cet ordre » à la
+proposition ci-dessous. Elle reste ici pour mémoire. À chaque étape, l'app
+marche et peut se montrer.
 
 1. Les maquettes : un brief de conception, puis les écrans en captures, avec
    le matériel d'OpenContact.
@@ -40,8 +37,12 @@ Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
 
 ### La licence
 
-Recommandation, proposée le 16 novembre 2026 : MIT ou Apache-2.0, au choix
-de celui qui réutilise. C'est la licence d'Opn-Link, de Rust et de Tauri.
+Le mainteneur a répondu « Je décide plus tard » (16 novembre 2026). La
+question reste ouverte. Il veut un projet gratuit et libre.
+
+Recommandation, proposée le 16 novembre 2026 : MIT, ou Apache-2.0 qui est
+presque pareille avec une clause de plus sur les brevets. C'est la licence
+d'Opn-Link, de Rust et de Tauri.
 
 - L'app lance QEMU et les autres outils sous GPL comme des programmes
   séparés, ce qui est permis.

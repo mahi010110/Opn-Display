@@ -184,6 +184,11 @@ Après l'examen :
 Peut-être plus tard, sans date : un serveur MCP, pour brancher un assistant
 extérieur sur l'app.
 
+L'ordre de construction, décidé le 16 novembre 2026 : les maquettes, puis
+l'app qui vérifie le PC, puis un petit lab Linux, puis l'IA, puis les autres
+familles de machines, puis macOS et la version publique, puis le pilotage
+(voir [questions-ouvertes.md](questions-ouvertes.md)).
+
 ## 7. Les limites connues
 
 Elles viennent des recherches. Aucune n'a été mesurée sur le PC du

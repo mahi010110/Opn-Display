@@ -76,7 +76,12 @@ Le produit :
 - L'émulation se construit d'abord, le pilotage ensuite.
 - Les trois références : GNS3 et EVE-NG pour l'émulation, Hermes Agent pour
   l'IA.
-- Gratuit et libre. La licence reste à choisir.
+- Gratuit et libre. La licence est à choisir : le mainteneur décidera plus
+  tard. Claude recommande MIT ou Apache-2.0.
+- L'ordre de construction : les maquettes, puis l'app qui vérifie le PC, puis
+  un petit lab Linux, puis l'IA, puis les autres familles de machines, puis
+  macOS et la version publique, puis le pilotage. Le détail est dans
+  `docs/questions-ouvertes.md`.
 - Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
   ses jetons, ses polices, ses icônes, ses composants et les règles de son
   kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
@@ -135,7 +140,9 @@ confiance », il peut revenir dessus.
 ## Ce qui n'est pas décidé
 
 - L'architecture et la pile. `docs/architecture.md` est une proposition.
-- L'ordre de construction et la licence. Claude doit les proposer.
+- La licence.
+- La question à Anthropic sur l'abonnement Claude, et la façon dont le
+  matériel d'OpenContact arrive dans ce dépôt.
 - Les écrans et la navigation, à dessiner avec le matériel d'OpenContact.
 - Les idées de la première fiche qui n'ont pas été rediscutées : les
   espaces, les modes, le schéma en direct, la progression.
