@@ -60,8 +60,10 @@ Le matériel est celui d'OpenContact, « Utilitaire 98 » (décidé le
 16 novembre 2026). Restent les écrans et la navigation d'Opn-Display, à
 dessiner avec ce matériel.
 
-Recommandation : écrire un brief de conception, comme pour Opn-Link, puis
-montrer des maquettes en captures avant de coder un écran.
+Le mainteneur veut un dessin simple et classique, et il a demandé à Claude de
+proposer le menu (16 novembre 2026). Le brief est écrit :
+[brief-conception.md](brief-conception.md). La suite : le menu, puis les
+maquettes en captures, avant de coder un écran.
 
 Reste aussi à dire comment le matériel arrive dans ce dépôt. Opn-Link le
 prend par un script, et ici il n'y a pas de script.
@@ -124,8 +126,14 @@ points y figurent. Ils n'ont été ni confirmés ni refusés :
 - les parcours : débutant, certification, titre ou diplôme, curieux ;
 - le lien futur avec OpenContact et Opn-Link.
 
-Recommandation : les passer en revue avec le brief de conception, écran par
-écran.
+Le 16 novembre, le mainteneur a coché huit de ces idées (le schéma en
+direct, les paquets en animation, le tableau blanc, le replay, le compte
+rendu, la progression, les parcours, le mode examen) en disant qu'il ne
+savait pas encore. Pour le menu, il a demandé une proposition à la place des
+quatre espaces.
+
+Recommandation : les dessiner en maquettes, et trancher sur les captures. Le
+lien avec OpenContact et Opn-Link se rediscute après la première version.
 
 ## À vérifier
 

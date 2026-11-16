@@ -15,6 +15,7 @@ Opn-Display est un nom de travail. Rien n'est codé.
 - Avant de proposer quelque chose, relire `docs/projet.md`,
   `docs/architecture.md`, `docs/mesures.md`, `docs/questions-ouvertes.md` et
   `docs/carnet.md`.
+- Pour dessiner un écran, lire d'abord `docs/brief-conception.md`.
 - Rien n'est décidé tant que le mainteneur ne l'a pas dit. Une fiche, une
   recherche ou une proposition de Claude ne vaut pas décision.
 - On ne décide pas à la place du mainteneur. Une question qu'il n'a pas
@@ -85,6 +86,8 @@ Le produit :
 - Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
   ses jetons, ses polices, ses icônes, ses composants et les règles de son
   kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
+- Un dessin simple et classique, proche de GNS3 et de Packet Tracer, avec le
+  panneau de l'IA sur le côté. Claude propose le menu.
 - Le nom est un nom de travail. Le dépôt est privé, le mainteneur décidera
   plus tard quand l'ouvrir.
 
@@ -143,9 +146,11 @@ confiance », il peut revenir dessus.
 - La licence.
 - La question à Anthropic sur l'abonnement Claude, et la façon dont le
   matériel d'OpenContact arrive dans ce dépôt.
-- Les écrans et la navigation, à dessiner avec le matériel d'OpenContact.
-- Les idées de la première fiche qui n'ont pas été rediscutées : les
-  espaces, les modes, le schéma en direct, la progression.
+- Le menu et les écrans, à dessiner avec le matériel d'OpenContact.
+- Huit idées de la première fiche : le schéma en direct, les paquets en
+  animation, le tableau blanc, le replay, le compte rendu, la progression,
+  les parcours, le mode examen. Le mainteneur ne sait pas encore. Elles se
+  dessinent en maquettes, et il tranche sur les captures.
 - Rien n'est mesuré sur le PC du mainteneur.
 
 La liste complète est dans `docs/questions-ouvertes.md`.

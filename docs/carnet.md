@@ -177,6 +177,23 @@ compris la demande, Claude l'a reformulée plus simplement, puis il a répondu.
 - La licence n'est pas choisie : « Je décide plus tard ». Le projet reste
   gratuit et libre.
 
+### Le brief de conception
+
+Le mainteneur a donné son accord pour commencer par le brief (« Let's go »).
+Claude lui a posé quatre questions sur les idées d'écrans de la première
+fiche.
+
+- Les huit idées : le schéma en direct, les paquets en animation, le tableau
+  blanc, le replay, le compte rendu, la progression, les parcours, le mode
+  examen. Il les a toutes cochées, en ajoutant « honnêtement je sais pas ».
+  Elles ne sont donc pas décidées. Elles se dessinent en maquettes, et il
+  tranchera en voyant les captures.
+- Le menu : « Propose-moi le menu ». Les quatre espaces de la fiche ne sont
+  pas retenus d'office.
+- Le dessin : « Simple et classique », proche de GNS3 et de Packet Tracer,
+  avec le panneau de l'IA sur le côté.
+- Le brief est dans [brief-conception.md](brief-conception.md).
+
 ### Le matériel d'OpenContact
 
 Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,

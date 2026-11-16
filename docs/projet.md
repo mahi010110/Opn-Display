@@ -172,7 +172,9 @@ En juillet 2027 :
 - avec les trois façons de brancher l'IA ;
 - avec le matériel d'interface et d'UX d'OpenContact, « Utilitaire 98 » :
   ses jetons, ses polices, ses icônes, ses composants et les règles de son
-  kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
+  kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel,
+  dans un style simple et classique
+  ([brief-conception.md](brief-conception.md)).
 
 Après l'examen :
 
