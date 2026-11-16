@@ -1040,6 +1040,237 @@ a.oc-btn {
   color: var(--text-muted);
 }
 
+/* ---------- les huit idées de la première fiche ---------- */
+
+.plan-outils {
+  position: absolute;
+  top: var(--space-3);
+  right: 10px;
+  z-index: 1;
+  padding: 4px var(--space-3);
+  background: var(--surface-window);
+  border: 1px solid var(--border-soft);
+}
+.cables .manque {
+  stroke: var(--status-danger);
+  stroke-dasharray: 4 3;
+}
+.machine--ecart .machine-case {
+  outline: 2px solid var(--status-danger);
+  outline-offset: 2px;
+}
+.machine--ecart .machine-ip,
+.reseau--ecart {
+  color: var(--status-danger);
+}
+.ecarts {
+  position: absolute;
+  left: 10px;
+  bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--status-danger);
+}
+
+.cables .trajet {
+  stroke: var(--select-bg);
+  stroke-width: 3;
+}
+.paquet {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: var(--select-bg);
+  border: 2px solid var(--surface-field);
+  outline: 1px solid var(--select-bg);
+}
+.volet {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.volet .plan,
+.volet .tableau {
+  flex: 1;
+  min-height: 0;
+}
+.table tr.courant td,
+.table tr.courant .chiffre {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.lecteur {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+}
+.volet > .lecteur {
+  margin-top: auto;
+  border-top: 1px solid var(--border-soft);
+}
+.ia > .lecteur {
+  border-bottom: 1px solid var(--border-soft);
+}
+.lecteur .pas {
+  margin-left: auto;
+}
+
+.tableau {
+  position: relative;
+  background: var(--surface-field);
+  box-shadow: var(--bevel-field);
+}
+.dessin {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.dessin rect,
+.dessin line,
+.dessin path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.dessin .vie {
+  stroke: var(--border-soft);
+  stroke-dasharray: 3 3;
+}
+.dessin .pointe {
+  fill: var(--ink);
+  stroke: none;
+}
+.dessin text {
+  fill: var(--ink);
+  stroke: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.dessin .dit {
+  fill: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+.deroule {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.deroule li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: 7px 10px;
+  border-top: 1px dotted var(--border-soft);
+  font-size: var(--text-13);
+}
+.deroule li:first-child {
+  border-top: 0;
+}
+.deroule time {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+}
+.deroule li.courant,
+.deroule li.courant time {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.deroule li.apres {
+  color: var(--text-muted);
+}
+
+.tickets li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 40px;
+  border-top: 1px dotted var(--border-soft);
+  font-size: var(--text-13);
+}
+.tickets li:first-child {
+  border-top: 0;
+}
+.tickets b {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
+}
+
+.dialogue--large {
+  width: 720px;
+}
+.faits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  background: var(--surface-chrome);
+  border: 1px solid var(--border-soft);
+}
+.faits b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-16);
+  font-weight: var(--weight-semibold);
+}
+.etiquette {
+  font-size: var(--text-11);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.rendu > * + * {
+  margin-top: var(--space-3);
+}
+.rendu .etiquette {
+  margin-top: var(--space-5);
+}
+.rendu ol {
+  padding-left: 20px;
+  list-style: decimal;
+  font-size: var(--text-14);
+  line-height: var(--leading-body);
+}
+.revoir li {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px dotted var(--border-soft);
+  font-size: var(--text-14);
+}
+.revoir li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.revoir .oc-btn {
+  justify-self: start;
+}
+.suite li {
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+}
+.suite li > * {
+  grid-column: auto;
+}
+
 /* ---------- le grand écran ---------- */
 
 @media (min-width: 1600px) {

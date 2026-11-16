@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progression · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+    <a href="#" aria-current="page"><i class="ic i-progression"></i>Progression</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Progression</h1>
+</div>
+
+<main class="page page--deux">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Ce que tu sais faire</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="puces" role="group" aria-label="Filtrer">
+        <button class="puce" aria-pressed="true">Tout 7</button>
+        <button class="puce" aria-pressed="false">Réseau 3</button>
+        <button class="puce" aria-pressed="false">Linux 2</button>
+        <button class="puce" aria-pressed="false">Windows 1</button>
+        <button class="puce" aria-pressed="false">Sécurité 1</button>
+      </div>
+      <table class="table">
+        <thead>
+          <tr><th>Savoir-faire</th><th>Famille</th><th>Niveau</th><th>Dernière fois</th></tr>
+        </thead>
+        <tbody>
+            <tr><td class="nom">Lire une adresse et un masque</td><td class="chiffre">Réseau</td><td><span class="pas" aria-label="4 sur 4"><i class="fait"></i><i class="fait"></i><i class="fait"></i><i class="fait"></i></span></td><td class="chiffre">il y a 3 jours</td></tr>
+            <tr><td class="nom">Dépanner un service web</td><td class="chiffre">Linux</td><td><span class="pas" aria-label="3 sur 4"><i class="fait"></i><i class="fait"></i><i class="fait"></i><i></i></span></td><td class="chiffre">aujourd'hui</td></tr>
+            <tr><td class="nom">Configurer un DHCP</td><td class="chiffre">Réseau</td><td><span class="pas" aria-label="2 sur 4"><i class="fait"></i><i class="fait"></i><i></i><i></i></span></td><td class="chiffre">aujourd'hui</td></tr>
+            <tr><td class="nom">Se connecter en SSH par clé</td><td class="chiffre">Linux</td><td><span class="pas" aria-label="2 sur 4"><i class="fait"></i><i class="fait"></i><i></i><i></i></span></td><td class="chiffre">il y a 8 jours</td></tr>
+            <tr><td class="nom">Séparer deux VLAN</td><td class="chiffre">Réseau</td><td><span class="pas" aria-label="1 sur 4"><i class="fait"></i><i></i><i></i><i></i></span></td><td class="chiffre">il y a 12 jours</td></tr>
+            <tr><td class="nom">Joindre un poste au domaine</td><td class="chiffre">Windows</td><td><span class="pas" aria-label="0 sur 4"><i></i><i></i><i></i><i></i></span></td><td class="chiffre">jamais</td></tr>
+            <tr><td class="nom">Écrire une règle de pare-feu</td><td class="chiffre">Sécurité</td><td><span class="pas" aria-label="0 sur 4"><i></i><i></i><i></i><i></i></span></td><td class="chiffre">jamais</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">À revoir</h2>
+    </header>
+    <div class="oc-window__body">
+      <ul class="revoir">
+        <li><span><b>Séparer deux VLAN</b><br><span class="mono">pas pratiqué depuis 12 jours</span></span><button class="oc-btn oc-btn--primary">Une panne sur les VLAN</button></li>
+        <li><span><b>Se connecter en SSH par clé</b><br><span class="mono">un indice demandé la dernière fois</span></span><button class="oc-btn">Revoir le cours</button></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>6,2 Go sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+  <span>Enregistré à 14:32</span>
+</footer>
+
+</body>
+</html>

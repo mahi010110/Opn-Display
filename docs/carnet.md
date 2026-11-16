@@ -232,6 +232,10 @@ commencer (« Go »).
 - Trois écrans de plus, retenus par Claude : la liste des cours, la liste
   des pannes, et la fenêtre pour fournir l'image de Windows Server. Le
   catalogue des pannes dit ce qui ne marche plus, jamais la cause.
+- Les huit idées de la première fiche sont dessinées, une par écran. Claude
+  recommande d'en garder trois pour la première version : le schéma en
+  direct, le compte rendu et le mode examen. Les cinq autres viendraient
+  plus tard. Le mainteneur n'a pas encore tranché.
 
 ### Le matériel d'OpenContact
 

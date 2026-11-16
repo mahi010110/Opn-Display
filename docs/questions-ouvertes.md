@@ -138,8 +138,23 @@ rendu, la progression, les parcours, le mode examen) en disant qu'il ne
 savait pas encore. Pour le menu, il a demandé une proposition à la place des
 quatre espaces.
 
-Recommandation : les dessiner en maquettes, et trancher sur les captures. Le
-lien avec OpenContact et Opn-Link se rediscute après la première version.
+Les huit idées sont dessinées (16 novembre 2026), dans `maquettes/ecrans/`,
+sous les noms `idee-…`. Le mainteneur tranche en voyant les captures.
+
+Recommandation de Claude :
+
+| Idée | Avis | Pourquoi |
+|---|---|---|
+| Le schéma en direct | garder | L'app connaît déjà le lab prévu et le lab réel. Il se coupe pendant une panne |
+| Le compte rendu | garder | L'IA l'écrit à partir du journal et des tests. Il sert aussi au dossier d'examen |
+| Le mode examen | garder | Ce sont des pannes sans indice, avec un temps. Peu de travail une fois les pannes faites |
+| Les paquets en animation | plus tard | Le plus long à construire : capturer, lire et placer chaque paquet sur le schéma |
+| Le tableau blanc | plus tard | Un dessin faux se remarque moins qu'un texte faux. À faire quand les cours sont rodés |
+| Le replay | plus tard | Le journal et le compte rendu couvrent déjà le besoin |
+| La progression | plus tard | Elle ne dit rien tant qu'il y a peu de cours et de pannes. Les listes marquent déjà ce qui est fait |
+| Les parcours | plus tard | Il faut relier chaque cours à un référentiel. Les familles suffisent au début |
+
+Le lien avec OpenContact et Opn-Link se rediscute après la première version.
 
 ## À vérifier
 
