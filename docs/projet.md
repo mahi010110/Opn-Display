@@ -127,6 +127,11 @@ L'utilisateur choisit entre trois façons de régler :
 - des réglages séparés, un par comportement ;
 - une IA qui s'adapte seule, selon ton niveau et ce que tu fais.
 
+Ces trois façons portent sur le lab, la solution et l'initiative. La liberté
+de l'IA sur le PC et sa mémoire se règlent à part : Prof, Coach ou
+Silencieuse ne change jamais ce qu'elle a le droit de faire sur le PC
+(retenu par Claude le 16 novembre 2026, le mainteneur lui a laissé le choix).
+
 ### Les pannes
 
 Elles viennent d'un catalogue écrit à l'avance, et l'IA peut aussi en

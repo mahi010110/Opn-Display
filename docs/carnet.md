@@ -224,6 +224,14 @@ commencer (« Go »).
 - Dans « Régler l'IA », Claude propose que la liberté de l'IA sur le PC et sa
   mémoire restent à part. Les trois façons de régler (par niveau, un par un,
   elle s'adapte) portent sur le lab, la solution et l'initiative.
+- Le mainteneur a répondu : « À toi de décider. C'est toi qui as la main. »
+  Claude retient donc les six écrans et ce choix sur « Régler l'IA ». Pour
+  la suite des maquettes, Claude décide, montre les captures et note ce
+  qu'il retient. Le mainteneur peut revenir dessus. Le code, la licence et
+  ce qui se publie restent à son accord.
+- Trois écrans de plus, retenus par Claude : la liste des cours, la liste
+  des pannes, et la fenêtre pour fournir l'image de Windows Server. Le
+  catalogue des pannes dit ce qui ne marche plus, jamais la cause.
 
 ### Le matériel d'OpenContact
 

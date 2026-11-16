@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cours · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#" aria-current="page"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Cours</h1>
+</div>
+
+<main class="page page--deux">
+  <div class="colonne">
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--accent">
+        <h2 class="oc-window__title">En cours</h2>
+      </header>
+      <div class="oc-window__body">
+        <div class="en-marche">
+          <div class="en-marche-texte">
+            <p class="en-marche-nom">Le DHCP</p>
+            <p class="mono">étape 2 sur 5, dans le lab Agence Exemple</p>
+          </div>
+          <div class="lab-gestes">
+            <button class="oc-btn oc-btn--primary">Reprendre</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--inactive">
+        <h2 class="oc-window__title">Les cours prêts</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="puces" role="group" aria-label="Filtrer">
+          <button class="puce" aria-pressed="true">Tout 14</button>
+          <button class="puce" aria-pressed="false">Réseau 5</button>
+          <button class="puce" aria-pressed="false">Linux 4</button>
+          <button class="puce" aria-pressed="false">Windows 2</button>
+          <button class="puce" aria-pressed="false">Sécurité 2</button>
+          <button class="puce" aria-pressed="false">Stockage 1</button>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>Cours</th><th>Famille</th><th>Longueur</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="nom">Adresses, masques et passerelles</td><td class="chiffre">Réseau</td><td class="chiffre">6 étapes</td><td class="fin"><span class="fait"><i class="ic i-ok"></i>fait</span></td></tr>
+            <tr><td class="nom">Les VLAN</td><td class="chiffre">Réseau</td><td class="chiffre">7 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+            <tr><td class="nom">Le routage OSPF</td><td class="chiffre">Réseau</td><td class="chiffre">8 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+            <tr><td class="nom">Un serveur web avec nginx</td><td class="chiffre">Linux</td><td class="chiffre">5 étapes</td><td class="fin"><span class="fait"><i class="ic i-ok"></i>fait</span></td></tr>
+            <tr><td class="nom">Les droits et les utilisateurs</td><td class="chiffre">Linux</td><td class="chiffre">6 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+            <tr><td class="nom">Active Directory : le premier domaine</td><td class="chiffre">Windows</td><td class="chiffre">9 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+            <tr><td class="nom">Un pare-feu et ses règles</td><td class="chiffre">Sécurité</td><td class="chiffre">7 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+            <tr><td class="nom">Les partages NFS et SMB</td><td class="chiffre">Stockage</td><td class="chiffre">5 étapes</td><td class="fin"><button class="oc-btn oc-btn--sm">Commencer</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Un autre sujet</h2>
+    </header>
+    <div class="oc-window__body">
+      <div class="demande">
+        <textarea class="oc-input" rows="3" aria-label="Le sujet du cours" placeholder="Un sujet, ou le PDF de ton TP"></textarea>
+        <p class="note">L'IA écrit le cours pour toi et prépare son lab. Elle peut se tromper.</p>
+        <button class="oc-btn">Écrire le cours</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>6,2 Go sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

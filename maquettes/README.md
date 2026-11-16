@@ -2,8 +2,11 @@
 
 Les écrans d'Opn-Display en HTML et CSS, faits avec le matériel
 « Utilitaire 98 » d'OpenContact et des données inventées. Rien n'y marche :
-on les regarde avant de coder. Un écran est une proposition tant que le
-mainteneur ne l'a pas validé. Le brief est dans [../docs/brief-conception.md](../docs/brief-conception.md).
+on les regarde avant de coder. Le brief est dans
+[../docs/brief-conception.md](../docs/brief-conception.md).
+
+Un écran a un état : « validé » quand le mainteneur l'a dit, « retenu » quand
+il a laissé Claude décider, « proposé » tant que personne n'a tranché.
 
 Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
 
@@ -43,12 +46,15 @@ Validé le 16 novembre 2026.
 | `panne` | recevoir une panne, demander un indice | validé |
 | `repare` | dire « c'est réparé », voir les tests et l'explication | validé |
 | `cours` | suivre un cours dans le lab | validé |
-| `ouverture` | la première ouverture : ce que le PC sait faire, ce que l'app installe | proposé |
-| `installation` | suivre l'installation | proposé |
-| `ia-brancher` | brancher l'IA | proposé |
-| `ia-regler` | régler l'IA | proposé |
-| `ia-memoire` | voir, corriger, couper ou effacer sa mémoire | proposé |
-| `ia-journal` | voir ce que l'IA a fait | proposé |
+| `ouverture` | la première ouverture : ce que le PC sait faire, ce que l'app installe | retenu |
+| `installation` | suivre l'installation | retenu |
+| `ia-brancher` | brancher l'IA | retenu |
+| `ia-regler` | régler l'IA | retenu |
+| `ia-memoire` | voir, corriger, couper ou effacer sa mémoire | retenu |
+| `ia-journal` | voir ce que l'IA a fait | retenu |
+| `cours-liste` | choisir un cours, en demander un autre à l'IA | retenu |
+| `pannes-liste` | choisir une panne du catalogue, ou en demander une inventée | retenu |
+| `image` | fournir l'image de Windows Server | retenu |
 
 ## L'écran du lab
 
@@ -101,11 +107,23 @@ en marche, une panne en cours, une panne réparée, un cours.
   un par un, ou elle s'adapte), puis ce que ça donne dans le lab, pour la
   solution et pour son initiative.
 - Sa liberté sur le PC et sa mémoire restent des réglages à part, quelle que
-  soit la façon de régler. C'est une proposition.
+  soit la façon de régler.
 - Sa mémoire : un interrupteur, les lignes qu'elle garde, qu'on corrige ou
   qu'on retire une à une, et « Effacer sa mémoire » à part, en rouge.
 - Son journal : l'heure, l'endroit, ce qu'elle a fait, et l'accord donné ou
   refusé.
+
+## Les cours, les pannes, une image
+
+- Cours : le cours commencé en haut, avec « Reprendre ». Dessous, les cours
+  prêts, filtrés par famille. À droite, un champ pour demander un autre
+  sujet à l'IA.
+- Pannes : le catalogue dit ce qui ne marche plus, jamais la cause. À
+  droite, « Une panne inventée » : l'IA casse quelque chose dans le lab
+  ouvert, au niveau choisi.
+- Une image que l'app ne peut pas contenir se fournit en trois pas
+  numérotés, dans une fenêtre posée sur le lab. Chaque pas porte son bouton.
+  On peut lancer le lab sans la machine.
 
 ## Les icônes des machines
 

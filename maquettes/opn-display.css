@@ -9,10 +9,12 @@ body {
 h1,
 h2,
 p,
-ul {
+ul,
+ol {
   margin: 0;
 }
-ul {
+ul,
+ol {
   padding: 0;
   list-style: none;
 }
@@ -976,6 +978,66 @@ a.oc-btn {
 }
 .oc-fieldset .fiche {
   margin-bottom: 0;
+}
+
+/* ---------- les listes des cours et des pannes, la fenêtre d'une image ---------- */
+
+.table .fait {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--status-ok);
+}
+.demande {
+  display: grid;
+  gap: var(--space-4);
+}
+.demande .oc-btn {
+  justify-self: end;
+}
+.demande .segments {
+  justify-self: start;
+}
+.dialogue {
+  width: 560px;
+}
+.numeros {
+  counter-reset: pas;
+}
+.numeros li {
+  counter-increment: pas;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) 0;
+  border-top: 1px dotted var(--border-soft);
+  font-size: var(--text-14);
+  line-height: var(--leading-body);
+}
+.numeros li:first-child {
+  border-top: 0;
+}
+.numeros li::before {
+  content: counter(pas);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
+}
+.numeros li > * {
+  grid-column: 2;
+}
+.numeros .oc-btn {
+  justify-self: start;
+}
+.numeros .apres {
+  color: var(--text-muted);
 }
 
 /* ---------- le grand écran ---------- */

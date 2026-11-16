@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pannes · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#" aria-current="page"><i class="ic i-pannes"></i>Pannes</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Pannes</h1>
+</div>
+
+<main class="page page--deux">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Le catalogue</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="puces" role="group" aria-label="Filtrer">
+        <button class="puce" aria-pressed="true">Tout 16</button>
+        <button class="puce" aria-pressed="false">Réseau 7</button>
+        <button class="puce" aria-pressed="false">Linux 4</button>
+        <button class="puce" aria-pressed="false">Windows 2</button>
+        <button class="puce" aria-pressed="false">Sécurité 2</button>
+        <button class="puce" aria-pressed="false">Stockage 1</button>
+      </div>
+      <table class="table">
+        <thead>
+          <tr><th>Ce qui ne marche plus</th><th>Famille</th><th>Niveau</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="nom">Le site web ne répond plus</td><td class="chiffre">Linux</td><td class="chiffre">facile</td><td class="fin"><span class="fait"><i class="ic i-ok"></i>réparée en 19 min</span></td></tr>
+          <tr><td class="nom">Un poste n'obtient pas d'adresse</td><td class="chiffre">Réseau</td><td class="chiffre">facile</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">Un nom ne se trouve plus</td><td class="chiffre">Réseau</td><td class="chiffre">facile</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">Plus d'Internet depuis les postes</td><td class="chiffre">Réseau</td><td class="chiffre">moyen</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">La connexion SSH par clé est refusée</td><td class="chiffre">Linux</td><td class="chiffre">moyen</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">Deux VLAN ne se parlent plus</td><td class="chiffre">Réseau</td><td class="chiffre">moyen</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">Un poste ne rejoint pas le domaine</td><td class="chiffre">Windows</td><td class="chiffre">difficile</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+          <tr><td class="nom">Le tunnel VPN ne monte pas</td><td class="chiffre">Sécurité</td><td class="chiffre">difficile</td><td class="fin"><button class="oc-btn oc-btn--sm">Lancer</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Une panne inventée</h2>
+    </header>
+    <div class="oc-window__body">
+      <div class="demande">
+        <p class="lu">L'IA casse quelque chose dans le lab Agence Exemple, sans te dire quoi.</p>
+        <div class="segments" role="group" aria-label="Niveau">
+          <button aria-pressed="true">Facile</button>
+          <button aria-pressed="false">Moyen</button>
+          <button aria-pressed="false">Difficile</button>
+        </div>
+        <p class="note">L'app sauvegarde le lab avant. Tu peux toujours revenir en arrière.</p>
+        <button class="oc-btn oc-btn--primary">Poser une panne</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>6,2 Go sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

@@ -34,6 +34,10 @@ Opn-Display est un nom de travail. Rien n'est codé.
   dans la doc. Les recherches se sont déjà contredites.
 - Un changement visible (un écran, un bouton) est montré au mainteneur en
   captures avant d'être gardé.
+- Pour les maquettes, le mainteneur a laissé la main à Claude (« C'est toi
+  qui as la main », 16 novembre 2026). Claude décide, montre les captures et
+  note ce qu'il a retenu. Le mainteneur peut revenir dessus. Ça ne vaut pas
+  pour le code, la licence ni ce qui se publie.
 - Ni image propriétaire (Windows, ESXi, Cisco) ni clé API dans le dépôt.
 
 ## Comment on écrit
@@ -120,6 +124,8 @@ L'IA :
   quand on demande la solution, son initiative, sa mémoire.
 - Trois façons de régler, au choix de l'utilisateur : les niveaux Prof,
   Coach et Silencieuse, des réglages séparés, ou une IA qui s'adapte seule.
+  Elles portent sur le lab, la solution et l'initiative. Sa liberté sur le
+  PC et sa mémoire se règlent à part.
 - Elle se branche par une clé API, par un modèle local, ou par l'abonnement
   ChatGPT avec Codex. Pour l'abonnement Claude, la question est posée à
   Anthropic. Sans accord, il attend le serveur MCP.
