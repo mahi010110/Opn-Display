@@ -1,6 +1,7 @@
 # Architecture
 
-Une proposition. Rien n'est mesuré, rien n'est codé.
+Une proposition. Rien n'est codé. Les premières mesures sont dans
+[mesures.md](mesures.md). Rien n'est encore mesuré sur le PC du mainteneur.
 
 Les pistes viennent des recherches du 13 novembre 2026 et des trois outils
 que le mainteneur donne en référence : GNS3 et EVE-NG pour l'émulation,
@@ -52,9 +53,13 @@ et de la virtualisation imbriquée pour y lancer d'autres VM.
 
 | Système | Environnement Linux | Ce qu'on sait |
 |---|---|---|
-| Windows 11 | Une distribution WSL2 propre à l'app, avec KVM imbriqué | L'imbrication existe sous Windows 11. À mesurer sur l'édition Famille |
+| Windows 11 | Une distribution WSL2 propre à l'app, avec KVM imbriqué | WSL2 marche sur l'édition Famille et l'imbrication y est activée par défaut (doc officielle). À essayer sur le PC du mainteneur |
 | Linux | Le système lui-même, avec KVM | Le cas le plus simple |
 | macOS | Une VM Linux lancée par l'app (Lima) | Sur puce Apple, seules les machines ARM tournent à vitesse normale |
+
+Par défaut, WSL2 ne prend que la moitié de la RAM du PC. L'app doit monter
+cette limite dans `.wslconfig`, avec l'accord de l'utilisateur, et faire
+charger les modules du noyau dont le lab a besoin.
 
 ### Les machines
 
@@ -87,9 +92,8 @@ vrai réseau.
 - Le stockage : la cible iSCSI du noyau Linux pour le SAN, Samba et NFS en
   conteneurs pour le NAS. TrueNAS demande 8 Go, il reste possible avec 32 Go.
 - Le WiFi : le module `mac80211_hwsim` du noyau simule des cartes WiFi,
-  hostapd fait le point d'accès, FreeRADIUS l'authentification. Deux notes de
-  recherche se contredisent sur la présence de ce module dans le noyau de
-  WSL2. À mesurer.
+  hostapd fait le point d'accès, FreeRADIUS l'authentification. Ce module est
+  dans le noyau 6.18 de WSL2, pas dans le 6.6. L'app doit vérifier la version.
 
 ## 3. L'agent
 
@@ -106,7 +110,7 @@ vrai réseau.
   range celles qui ne servent plus.
 - Pour l'accord, trois modes : `manual` (il demande), `smart` (un petit
   modèle juge le risque et ne demande que dans le doute), `off`. Une liste de
-  commandes dangereuses et de fichiers protégés reste active.
+  commandes reste bloquée même en mode `off`.
 
 ### Ce qu'on reprend
 
@@ -129,7 +133,8 @@ l'app.
 |---|---|---|
 | Clé API | L'app appelle le fournisseur. La clé reste dans le trousseau du système | Connu |
 | Modèle local | L'app parle à Ollama sur le PC | Connu. Le modèle prend de la RAM au lab |
-| Abonnement | L'app lance l'outil officiel installé sur le PC (Codex pour ChatGPT, Claude Code pour Claude) | Fait dans `natif/` d'OpenContact avec Codex. À vérifier pour Claude |
+| Abonnement ChatGPT | L'app lance Codex, l'outil officiel installé sur le PC | Fait dans `natif/` d'OpenContact |
+| Abonnement Claude | L'utilisateur branche son Claude Code ou son Claude Desktop sur le serveur MCP de l'app | La voie sûre d'après les règles d'Anthropic. L'IA parle dans la fenêtre de Claude |
 | Assistant extérieur | L'app expose un serveur MCP, et l'utilisateur y branche son propre assistant | Fait dans `natif/` d'OpenContact |
 
 ### Les outils de l'IA
@@ -155,6 +160,8 @@ L'app tient un journal de ce que l'IA a fait, sur le PC et dans le lab.
   L'app sauvegarde le lab juste avant.
 - Pendant la pose, l'app n'affiche pas ce que fait l'IA. GNS3 3.1 affiche les
   étapes, ce qui donne la réponse.
+- Dans GNS3, une panne est une description. Sur 858, 25 disent comment la
+  poser, et aucune ne dit comment vérifier la réparation.
 
 ### La vérification
 
@@ -205,6 +212,6 @@ Ce sont les pistes des recherches. Rien n'est choisi.
 
 ## 6. Avant de choisir
 
-L'ordre de construction, la licence et la pile dépendent des mesures. Elles
-sont listées dans [questions-ouvertes.md](questions-ouvertes.md), et leurs
-résultats iront dans `mesures.md`.
+L'ordre de construction, la licence et la pile dépendent des mesures. Ce qui
+est fait est dans [mesures.md](mesures.md). Ce qui reste se mesure sur le PC
+du mainteneur.

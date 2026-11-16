@@ -2,7 +2,8 @@
 
 Le 16 novembre 2026, le mainteneur a répondu à neuf séries de questions. Ses
 décisions sont dans [carnet.md](carnet.md) et reportées dans
-[projet.md](projet.md). Ce fichier garde ce qui reste, avec une
+[projet.md](projet.md). Ce qui pouvait se mesurer à distance l'a été le même
+jour ([mesures.md](mesures.md)). Ce fichier garde ce qui reste, avec une
 recommandation pour chaque point.
 
 ## Ce que Claude doit proposer
@@ -97,13 +98,27 @@ Recommandation : les passer en revue avec le brief de conception, écran par
 
 ### L'abonnement Claude
 
-La coquille native d'OpenContact utilise l'abonnement ChatGPT en lançant
-Codex, l'outil officiel. Pour Claude, la voie serait de lancer Claude Code.
-Les recherches du 13 novembre disent qu'Anthropic interdit aux apps tierces
-de se connecter à l'abonnement, et conseillent de passer par un serveur MCP.
+Le mainteneur veut l'abonnement dans l'app, comme OpenContact le fait avec
+Codex. Les règles d'Anthropic ont été lues le 16 novembre
+([mesures.md](mesures.md), partie 3). Une app tierce ne peut ni proposer la
+connexion claude.ai, ni faire passer des requêtes par l'abonnement. Lancer
+`claude -p` depuis l'app n'est pas interdit en toutes lettres, mais Anthropic
+annonce que ce mode n'utilisera plus l'abonnement par défaut.
 
-Recommandation : lire les conditions d'Anthropic, et garder les deux voies
-(outil officiel et serveur MCP) tant que ce n'est pas clair.
+Recommandation : pour Claude, l'abonnement passe par le serveur MCP de l'app,
+et l'IA parle alors dans la fenêtre de Claude. Dans le panneau de l'app : une
+clé API, un modèle local, ou l'abonnement ChatGPT par Codex. Si le mainteneur
+veut l'abonnement Claude dans le panneau, poser la question à Anthropic avant
+de le construire.
+
+### Le réglage de la RAM de WSL2
+
+Par défaut, WSL2 ne prend que la moitié de la RAM du PC, soit 16 Go sur 32.
+La limite se change dans le fichier `.wslconfig`, qui règle tout WSL2 sur le
+PC et pas seulement Opn-Display.
+
+Recommandation : l'app propose la nouvelle limite à l'installation, montre la
+ligne qu'elle va écrire, et ne touche au fichier qu'après un oui.
 
 ### Les images que l'IA télécharge seule
 
@@ -120,38 +135,15 @@ d'attaque. La formation est un motif admis, lu strictement.
 Recommandation : l'app ne contient pas Kali, elle le télécharge depuis sa
 source comme les autres images, et l'attaque reste enfermée dans le lab.
 
-### Les chiffres qui se contredisent dans les recherches
+## À mesurer sur le PC du mainteneur
 
-- Les pannes de GNS3 : 50 selon le rapport, 840 dans 51 fichiers selon une
-  note.
-- Le module de WiFi simulé dans le noyau de WSL2 : absent selon une note,
-  présent selon une autre.
-- WSL2 sur Windows 11 Famille : une réponse de Microsoft dit que la
-  fonctionnalité nécessaire n'y est pas, l'usage courant dit le contraire.
+Rien n'a encore été mesuré sur son PC (Windows 11 Famille, 32 Go). La liste
+est dans [mesures.md](mesures.md), partie 8. Les deux mesures qui pèsent le
+plus sur la suite : KVM dans WSL2, et ESXi dans KVM sous WSL2.
 
-## À mesurer
-
-Sur le PC du mainteneur (Windows 11 Famille, 32 Go) :
-
-- WSL2 s'installe-t-il, et KVM y est-il disponible ?
-- la RAM que prend l'environnement Linux à vide ;
-- le temps d'installation d'un Windows Server dans KVM sous WSL2, et sa
-  vitesse à l'usage ;
-- ESXi 8.0U3e démarre-t-il dans KVM sous WSL2, et peut-il lancer une VM ?
-- le module de WiFi simulé se charge-t-il ?
-- combien de machines tiennent ensemble dans 32 Go : AD, client, OPNsense,
-  Wazuh, Kali ;
-- la taille de l'installeur.
-
-À distance, depuis l'environnement cloud :
-
-- ce qu'Anthropic autorise pour l'abonnement ;
-- les versions et les licences à jour des outils de la pile ;
-- le format des pannes de GNS3 ;
-- ce qui peut s'essayer sous Linux sans le PC du mainteneur : conteneurs,
-  réseau virtuel, QEMU.
-
-Les résultats iront dans `mesures.md`.
+Recommandation : commencer par les trois lectures qui prennent deux minutes
+(version du noyau, KVM, WiFi simulé), avec un script qui ne change rien au
+PC.
 
 ## Le nom et le dépôt
 

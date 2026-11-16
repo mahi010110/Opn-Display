@@ -4,8 +4,9 @@ Opn-Display est un nom de travail. Rien n'est codé.
 
 Ce fichier dit ce que le mainteneur a décidé le 16 novembre 2026. Ce qui
 reste à discuter est dans [questions-ouvertes.md](questions-ouvertes.md),
-l'historique dans [carnet.md](carnet.md), et la façon de construire l'app
-dans [architecture.md](architecture.md).
+l'historique dans [carnet.md](carnet.md), la façon de construire l'app dans
+[architecture.md](architecture.md), et ce qui a été mesuré dans
+[mesures.md](mesures.md).
 
 ## 1. En une phrase
 
@@ -39,13 +40,14 @@ vérification.
 | Domaines | Surtout le réseau | Surtout le réseau | Aucun en particulier | Toute l'infrastructure |
 | IA | Un assistant et des pannes réseau, en version alpha (3.1) | Aucune | C'est un agent IA | Elle construit, casse, vérifie et enseigne |
 | L'IA agit sur le PC | Non | Non | Oui, avec des modes d'accord | Oui, réglable |
-| Pannes à réparer | Réseau seulement, et les étapes de la panne s'affichent | Non | Non | Un catalogue et des pannes inventées |
+| Pannes à réparer | 858 pannes de réseau décrites, et les étapes de la pose s'affichent | Non | Non | Un catalogue et des pannes inventées |
 | Vérifie la réparation | Pas documenté | Non | Non | Oui, l'IA avec ses tests |
 | Cours | Non | Non | Non | Oui |
 | Prix | Gratuit, GPL-3.0 | 7 machines en gratuit, 150 € par an en Pro | Gratuit, MIT | Gratuit et libre |
 
 Les faits sur GNS3, EVE-NG et Hermes Agent viennent des recherches du
-13 novembre 2026 (partie 9). Ils n'ont pas été revérifiés depuis.
+13 novembre 2026 (partie 9). Une partie a été revérifiée le 16 novembre
+([mesures.md](mesures.md)).
 
 ## 3. Ce que fait l'app
 
@@ -87,7 +89,9 @@ l'émulation.
 En juillet 2027, l'app accepte :
 
 - un abonnement (Claude, ChatGPT), par l'outil officiel de l'éditeur installé
-  sur le PC. La coquille native d'OpenContact le fait déjà avec Codex ;
+  sur le PC. La coquille native d'OpenContact le fait déjà avec Codex. Pour
+  Claude, les règles d'Anthropic limitent cette voie (voir
+  [questions-ouvertes.md](questions-ouvertes.md)) ;
 - une clé API ;
 - un modèle local (Ollama).
 
@@ -178,7 +182,8 @@ mainteneur.
 - L'app ne peut contenir ni Windows, ni ESXi, ni les images Cisco, ni Packet
   Tracer.
 - Le vrai WiFi radio et le Fibre Channel ne s'émulent pas. Le WiFi simulé ne
-  marche qu'entre machines Linux.
+  marche qu'entre machines Linux, et sous Windows il demande le noyau 6.18 de
+  WSL2.
 - Sur un Mac à puce Apple, Windows Server et ESXi sont trop lents pour
   servir.
 - Tout ne tourne pas en même temps. Avec 32 Go, un domaine AD, un pare-feu et

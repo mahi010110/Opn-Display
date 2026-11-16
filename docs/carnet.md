@@ -112,4 +112,23 @@ l'émulation, et Hermes Agent pour l'IA. La comparaison est dans
 ### La doc
 
 Écrite ce jour : [projet.md](projet.md), [architecture.md](architecture.md),
-[questions-ouvertes.md](questions-ouvertes.md) et ce carnet.
+[questions-ouvertes.md](questions-ouvertes.md) et ce carnet. Le mainteneur
+l'a validée (« C'est bon »).
+
+### Les mesures
+
+Faites le même jour depuis l'environnement cloud, à la demande du mainteneur.
+Le détail est dans [mesures.md](mesures.md), les sondes dans `mesures/`.
+
+- WSL2 marche sur Windows 11 Famille, avec KVM, le réseau virtuel et l'iSCSI
+  dans son noyau. Le WiFi simulé demande le noyau 6.18.
+- Par défaut, WSL2 ne prend que la moitié de la RAM du PC.
+- Anthropic interdit à une app tierce de proposer la connexion claude.ai ou
+  de faire passer des requêtes par l'abonnement. La voie sûre pour
+  l'abonnement Claude est le serveur MCP.
+- GNS3 a 858 pannes de réseau, sous forme de descriptions. Aucune ne dit
+  comment vérifier la réparation.
+- Sous Linux : 300 machines reliées en 4 secondes, 18 Mo par routeur FRR, un
+  disque de VM remis à zéro en moins d'une seconde.
+- Rien n'est mesuré sur le PC du mainteneur. Ce qui reste est dans
+  [mesures.md](mesures.md), partie 8.
