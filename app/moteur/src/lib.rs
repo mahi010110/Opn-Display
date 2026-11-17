@@ -2,6 +2,7 @@
 //! installe le Linux de l'app et Incus, et fait tourner le premier lab.
 
 mod format;
+pub mod ia;
 mod incus;
 pub mod installation;
 pub mod lab;

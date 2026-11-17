@@ -382,3 +382,22 @@ Un vrai modèle local, ici, pour essayer la boucle :
   doit donc être coupée par l'app au bout d'un temps donné.
 - D'ici, seule l'API d'Anthropic répond. Celles d'OpenAI et de Mistral, et
   le registre d'Ollama, sont bloqués.
+
+L'app avec ce modèle, lancée pour de vrai ici :
+
+- « Brancher et essayer » : Ollama répond « prête » en quelques secondes.
+- En Prof, « Fais le ping toi-même depuis pc1 vers 10.0.2.10 » : l'IA
+  demande `ping -c 3 10.0.2.10` sur pc1, l'app montre la carte d'accord, et
+  après « Autoriser » l'IA conclut que le routage entre les deux réseaux
+  est bon. Environ deux minutes sur les quatre processeurs d'ici.
+- En Coach, la même demande reçoit une question en retour (« Quel est l'IP
+  de pc2 ? »), comme le veut ce niveau.
+- Le petit modèle vouvoie parfois et met un emoji, malgré sa consigne. Un
+  modèle plus gros la suit mieux ; l'emoji est maintenant défendu dans la
+  consigne.
+
+Codex 0.169.0, installé ici par npm : il accepte les réglages de l'app (son
+shell coupé, le relais MCP branché) et lance le relais avec sa variable.
+Sans compte ChatGPT ni accès au réseau d'OpenAI, il s'arrête à l'appel du
+modèle. Ses messages « Reconnecting… » ne sont pas des échecs : l'app ne
+prend que `turn.failed` pour un échec.

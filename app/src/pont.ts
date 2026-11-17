@@ -1,7 +1,7 @@
 import { Channel, invoke } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
-import type { Etape, EtatLab, Rapport } from './types'
+import type { Branchement, Demande, Etape, EtatIa, EtatLab, EvenementIa, Liberte, Niveau, Rapport } from './types'
 
 export function verifierPc(): Promise<Rapport> {
   return invoke<Rapport>('verifier_pc')
@@ -97,4 +97,50 @@ export async function ouvrirTerminal(
       void invoke('redimensionner_terminal', { id, colonnes: c, lignes: l }).catch(() => undefined),
     fermer: () => void invoke('fermer_terminal', { id }).catch(() => undefined),
   }
+}
+
+export function etatIa(): Promise<EtatIa> {
+  return invoke<EtatIa>('etat_ia')
+}
+
+export function brancherIa(branchement: Branchement, cle: string | null): Promise<EtatIa> {
+  return invoke<EtatIa>('brancher_ia', { branchement, cle })
+}
+
+export function essayerIa(): Promise<string> {
+  return invoke<string>('essayer_ia')
+}
+
+export function modelesIa(branchement: Branchement, cle: string | null): Promise<string[]> {
+  return invoke<string[]>('modeles_ia', { branchement, cle })
+}
+
+export function reglerIa(niveau: Niveau, dansLeLab: Liberte): Promise<EtatIa> {
+  return invoke<EtatIa>('regler_ia', { niveau, dansLeLab })
+}
+
+export function parlerIa(texte: string): Promise<void> {
+  return invoke<void>('parler_ia', { texte })
+}
+
+export function repondreAccord(id: string, oui: boolean): Promise<void> {
+  return invoke<void>('repondre_accord', { id, oui })
+}
+
+export function arreterIa(): Promise<void> {
+  return invoke<void>('arreter_ia')
+}
+
+export function oublierConversation(): Promise<void> {
+  return invoke<void>('oublier_conversation')
+}
+
+export function suivreIa(
+  quandEvenement: (evenement: EvenementIa) => void,
+  quandAccord: (demande: Demande) => void,
+): Promise<UnlistenFn> {
+  return Promise.all([
+    listen<EvenementIa>('ia', (e) => quandEvenement(e.payload)),
+    listen<Demande>('ia-accord', (e) => quandAccord(e.payload)),
+  ]).then((arrets) => () => arrets.forEach((arreter) => arreter()))
 }

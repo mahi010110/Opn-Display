@@ -100,3 +100,40 @@ export interface EtatLab {
   lab: Lab
   machines: EtatMachine[]
 }
+
+export type Branchement =
+  | { sorte: 'openAi'; adresse: string; modele: string }
+  | { sorte: 'anthropic'; modele: string }
+  | { sorte: 'ollama'; adresse: string; modele: string }
+  | { sorte: 'chatGpt'; modele: string }
+
+export type Niveau = 'prof' | 'coach' | 'silencieuse'
+
+export type Liberte = 'libre' | 'avecAccord'
+
+export interface ReglagesIa {
+  branchement: Branchement | null
+  niveau: Niveau
+  dansLeLab: Liberte
+  essai: number | null
+}
+
+export interface EtatIa {
+  reglages: ReglagesIa
+  cleRangee: boolean
+  codexPresent: boolean
+  ollama: string[] | null
+}
+
+export type EvenementIa =
+  | { sorte: 'texte'; texte: string }
+  | { sorte: 'outil'; id: string; titre: string; detail: string }
+  | { sorte: 'resultat'; id: string; ok: boolean; apercu: string }
+  | { sorte: 'refus'; id: string }
+
+export interface Demande {
+  id: string
+  lieu: string
+  titre: string
+  detail: string
+}

@@ -1,6 +1,8 @@
 // Sans ça, Windows ouvre une console à côté de l'app.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod ia;
+
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -42,7 +44,7 @@ fn dossier_wsl(app: &AppHandle) -> Result<PathBuf, String> {
 
 /// Les commandes du moteur attendent Incus ou WSL : elles tournent à côté,
 /// jamais dans le fil de la fenêtre.
-async fn a_cote<T: Send + 'static>(
+pub(crate) async fn a_cote<T: Send + 'static>(
     travail: impl FnOnce() -> Result<T, String> + Send + 'static,
 ) -> Result<T, String> {
     tauri::async_runtime::spawn_blocking(travail)
@@ -51,7 +53,7 @@ async fn a_cote<T: Send + 'static>(
 }
 
 /// Le seul lab de l'étape 3.
-fn le_lab() -> Lab {
+pub(crate) fn le_lab() -> Lab {
     lab::premier_lab()
 }
 
@@ -260,11 +262,20 @@ fn fermer(app: &AppHandle) {
 }
 
 fn main() {
+    // Lancée par Codex comme serveur MCP, l'app ne fait que relayer les
+    // outils à l'app ouverte (moteur/src/ia/mcp.rs).
+    if let Ok(valeur) = std::env::var(moteur::ia::mcp::VARIABLE) {
+        if let Err(erreur) = moteur::ia::mcp::servir(&valeur) {
+            eprintln!("{erreur}");
+        }
+        return;
+    }
     tauri::Builder::default()
         .manage(Arret(Arc::new(AtomicBool::new(false))))
         .manage(Terminaux::default())
         .manage(Veilleur::default())
         .manage(Fermeture::default())
+        .manage(ia::Ia::default())
         .on_window_event(|fenetre, evenement| {
             if let WindowEvent::CloseRequested { api, .. } = evenement {
                 api.prevent_close();
@@ -290,7 +301,16 @@ fn main() {
             ecrire_terminal,
             redimensionner_terminal,
             fermer_terminal,
-            veiller
+            veiller,
+            ia::etat_ia,
+            ia::brancher_ia,
+            ia::essayer_ia,
+            ia::modeles_ia,
+            ia::regler_ia,
+            ia::parler_ia,
+            ia::repondre_accord,
+            ia::arreter_ia,
+            ia::oublier_conversation
         ])
         .run(tauri::generate_context!())
         .expect("l'app n'a pas pu démarrer");

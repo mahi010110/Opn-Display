@@ -4,6 +4,7 @@
 use std::io::{BufRead, BufReader, Read, Write};
 use std::process::{Child, Command, Output, Stdio};
 use std::thread;
+use std::time::{Duration, Instant};
 
 /// Le programme et ses arguments, tels qu'il faut les lancer d'ici.
 pub fn ligne(programme: &str, args: &[&str]) -> Vec<String> {
@@ -109,6 +110,52 @@ pub(crate) fn suivre(
     } else {
         Err(message(&erreurs, &[], statut.code()))
     }
+}
+
+/// Lance la commande et rend son code de sortie et ce qu'elle a écrit,
+/// sortie puis erreurs. Passé `delai`, elle est arrêtée.
+pub(crate) fn lancer_borne(
+    programme: &str,
+    args: &[&str],
+    delai: Duration,
+) -> Result<(Option<i32>, String), String> {
+    let mut enfant = lancer_long(programme, args)?;
+    let lire = |flux: Option<Box<dyn Read + Send>>| {
+        thread::spawn(move || {
+            let mut texte = Vec::new();
+            if let Some(mut flux) = flux {
+                let _ = flux.read_to_end(&mut texte);
+            }
+            texte
+        })
+    };
+    let sortie = lire(
+        enfant
+            .stdout
+            .take()
+            .map(|f| Box::new(f) as Box<dyn Read + Send>),
+    );
+    let erreurs = lire(
+        enfant
+            .stderr
+            .take()
+            .map(|f| Box::new(f) as Box<dyn Read + Send>),
+    );
+    let debut = Instant::now();
+    let statut = loop {
+        if let Some(statut) = enfant.try_wait().map_err(|e| pas_lance(programme, e))? {
+            break Some(statut);
+        }
+        if debut.elapsed() > delai {
+            let _ = enfant.kill();
+            let _ = enfant.wait();
+            break None;
+        }
+        thread::sleep(Duration::from_millis(50));
+    };
+    let mut texte = crate::sortie::texte(&sortie.join().unwrap_or_default());
+    texte.push_str(&crate::sortie::texte(&erreurs.join().unwrap_or_default()));
+    Ok((statut.and_then(|s| s.code()), texte))
 }
 
 /// Lance une commande qui dure, sa sortie et ses erreurs à lire.

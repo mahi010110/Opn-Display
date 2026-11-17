@@ -294,3 +294,27 @@ Testé dans l'environnement cloud avec un vrai Incus : le moteur (37 tests),
 l'app lancée pour de vrai, le lab créé, les pings à travers le routeur, une
 machine éteinte puis rallumée, la remise à zéro. Les écrans propres à
 Windows sont vus avec des réponses simulées.
+
+L'étape 4, commencée le 17 novembre 2026 :
+
+- l'IA se branche de trois façons : une clé API (OpenAI, Anthropic,
+  Mistral, OpenRouter, ou une autre adresse au format d'OpenAI), Ollama sur
+  le PC, ou l'abonnement ChatGPT par Codex. La clé reste dans le trousseau
+  du système ;
+- la boucle de l'agent est écrite à la main. Avec Codex, c'est lui qui fait
+  la boucle : son shell, ses fichiers et le web sont coupés, et il n'a que
+  les outils de l'app, par un relais MCP. L'app lancée avec `OPN_OUTILS`
+  fait ce relais, vers l'app ouverte, par 127.0.0.1 et un jeton ;
+- ses outils dans le lab : lire l'état du lab, lancer une commande dans une
+  machine, démarrer ou arrêter une machine. Une commande est coupée au bout
+  de 30 secondes, et sa sortie est bornée ;
+- « Avec accord », l'app montre chaque action avant de la faire, dans une
+  carte du panneau de l'IA. C'est l'app qui applique ce réglage ;
+- le panneau de l'IA est à droite du lab : le niveau, la discussion, ce
+  qu'elle a fait, et les cartes d'accord. Réglages a sa liste à gauche :
+  Brancher l'IA, Régler l'IA, Ton PC.
+
+Testé ici avec un vrai modèle local (Ollama et Qwen3 1.7B) : brancher, lui
+parler dans le lab, son accord demandé, la commande lancée dans pc1 et sa
+conclusion. Codex 0.169.0 accepte les réglages de l'app et lance le relais
+MCP ; le reste se vérifie avec un compte ChatGPT.

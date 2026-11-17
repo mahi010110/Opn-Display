@@ -11,3 +11,5 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 moteur = { path = "../moteur" }
+keyring = { version = "3", features = ["windows-native", "linux-native", "apple-native"] }
+serde_json = "1"

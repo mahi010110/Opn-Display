@@ -11,15 +11,24 @@ Le code d'Opn-Display. La pile est dans
   `linux.rs`. Les commandes qui tournent là où vivent les machines passent
   par `systeme.rs` : sous Windows, `wsl.exe --exec` dans Debian. Le lab est
   dans `lab.rs`, Incus dans `incus.rs`, les terminaux dans `terminal.rs`, la
-  veille sur Incus dans `veille.rs`.
+  veille sur Incus dans `veille.rs`. L'IA est dans `ia/` : la boucle de
+  l'agent (`mod.rs`), le format d'OpenAI qui sert aussi pour Ollama
+  (`openai.rs`), celui d'Anthropic (`anthropic.rs`), Codex pour l'abonnement
+  ChatGPT (`codex.rs`) avec son relais MCP (`mcp.rs`), et les outils du lab
+  avec l'accord de l'utilisateur (`outils.rs`).
 - `src-tauri/` : l'app de bureau. Elle expose le moteur aux écrans par ses
   commandes : `verifier_pc`, `installer`, `arreter_installation`,
   `retirer_linux`, `installer_wsl`, puis pour le lab `etat_lab`,
   `lancer_lab`, `arreter_lab`, `demarrer_machine`, `arreter_machine`,
-  `remettre_a_zero`, `veiller`, et pour les terminaux `ouvrir_terminal`,
-  `ecrire_terminal`, `redimensionner_terminal`, `fermer_terminal`. Les
-  évènements : `installation`, `lab-avance` et `lab`. Ce qu'affiche un
-  terminal passe par un canal, en octets.
+  `remettre_a_zero`, `veiller`, pour les terminaux `ouvrir_terminal`,
+  `ecrire_terminal`, `redimensionner_terminal`, `fermer_terminal`, et pour
+  l'IA `etat_ia`, `brancher_ia`, `essayer_ia`, `modeles_ia`, `regler_ia`,
+  `parler_ia`, `repondre_accord`, `arreter_ia`, `oublier_conversation`. Les
+  évènements : `installation`, `lab-avance`, `lab`, `ia` et `ia-accord`. Ce
+  qu'affiche un terminal passe par un canal, en octets. Les réglages de l'IA
+  sont dans `ia.json`, dans le dossier de configuration de l'app, et sa clé
+  dans le trousseau du système. Lancée avec la variable `OPN_OUTILS`, l'app
+  ne fait que relayer les outils pour Codex.
 - `src/` : les écrans, en React et TypeScript. Ils reprennent les maquettes
   validées (`../maquettes/`).
 - `src/kit/` : le matériel d'OpenContact, copié depuis son dépôt à la

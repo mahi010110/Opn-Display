@@ -437,3 +437,22 @@ Pour Codex, Claude a lu son code public : son propre shell se coupe
 (`features.shell_tool=false`), il reçoit les outils de l'app par MCP, et
 il raconte ce qu'il fait en JSON (`--json`). L'IA branchée par ChatGPT
 n'agit donc que par les outils de l'app, avec les mêmes accords.
+
+### L'étape 4 : l'IA se branche et agit dans le lab
+
+Codée le 17 novembre 2026 : les trois branchements, la boucle, les outils
+du lab, l'accord, le panneau de l'IA, Brancher l'IA et Régler l'IA. Ce que
+Claude a retenu en codant, que le mainteneur peut reprendre :
+
+- Quatre outils pour commencer : lire l'état du lab, lancer une commande,
+  démarrer et arrêter une machine. Lire ne demande jamais d'accord.
+- Une commande de l'IA est coupée au bout de 30 secondes, dans la machine
+  elle-même : le petit modèle avait demandé un ping sans fin.
+- « Dans le lab », le réglage par défaut est « Avec accord ».
+- « Sur ton PC » n'apparaît pas encore dans Régler l'IA : l'IA n'a pas
+  encore d'outil sur le PC.
+- Codex ne peut agir que par les outils de l'app. S'il essaie de lancer une
+  commande ou de toucher un fichier par lui-même, l'app l'arrête.
+- Sous Linux, la clé va dans le trousseau du noyau : elle ne survit pas à
+  un redémarrage. Sous Windows, elle va dans le gestionnaire
+  d'identification, et reste.

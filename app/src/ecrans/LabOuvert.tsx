@@ -1,14 +1,17 @@
 import { useCallback, useState } from 'react'
 
-import type { EtatLab, Marche, Rapport } from '../types'
+import type { EtatIa, EtatLab, Marche, Niveau, Rapport } from '../types'
 import { Console } from '../ui/Console'
 import type { Gestes } from '../ui/Coque'
 import { Dialogue } from '../ui/Dialogue'
 import { Jauge, texteMemoire } from '../ui/Jauge'
+import { PanneauIa } from '../ui/PanneauIa'
 import { Schema } from '../ui/Schema'
 import { go } from '../ui/TonPc'
 
-/** Le lab ouvert : le schéma en haut, les terminaux en bas. */
+const NOM_NIVEAU: Record<Niveau, string> = { prof: 'Prof', coach: 'Coach', silencieuse: 'Silencieuse' }
+
+/** Le lab ouvert : le schéma en haut, les terminaux en bas, l'IA à droite. */
 export function LabOuvert(props: {
   rapport: Rapport
   etat: EtatLab | null
@@ -17,6 +20,9 @@ export function LabOuvert(props: {
   gestes: Gestes
   visible: boolean
   onRetour: () => void
+  etatIa: EtatIa | null
+  onNiveau: (niveau: Niveau) => void
+  onBrancher: () => void
 }) {
   const [onglets, setOnglets] = useState<string[]>([])
   const [actif, setActif] = useState<string | null>(null)
@@ -73,7 +79,7 @@ export function LabOuvert(props: {
         </div>
       </div>
 
-      <main className="lab lab--seul">
+      <main className="lab">
         <div className="lab-gauche">
           <section className="oc-window">
             <header className="oc-window__bar oc-window__bar--inactive">
@@ -131,6 +137,8 @@ export function LabOuvert(props: {
             </div>
           </section>
         </div>
+
+        <PanneauIa etatIa={props.etatIa} onNiveau={props.onNiveau} onBrancher={props.onBrancher} />
       </main>
 
       <footer className="etat">
@@ -139,7 +147,16 @@ export function LabOuvert(props: {
           <Jauge part={memoire / (limiteGo * 1024 ** 3)} />
           {texteMemoire(memoire)} sur {go(Math.round(limiteGo))} Go
         </span>
-        {props.erreur && <span className="etat-fin etat-erreur">{props.erreur}</span>}
+        {props.erreur ? (
+          <span className="etat-fin etat-erreur">{props.erreur}</span>
+        ) : (
+          props.etatIa?.reglages.branchement && (
+            <span className="etat-fin">
+              IA : {NOM_NIVEAU[props.etatIa.reglages.niveau]},{' '}
+              {props.etatIa.reglages.dansLeLab === 'avecAccord' ? 'avec accord dans le lab' : 'libre dans le lab'}
+            </span>
+          )
+        )}
       </footer>
 
       {question && (

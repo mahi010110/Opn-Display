@@ -1356,18 +1356,10 @@ a.oc-btn {
   display: none;
 }
 
-/* Sans l'IA, le lab prend toute la largeur, et les terminaux, où l'on
-   passe son temps, un peu plus de hauteur. */
-.lab--seul {
-  grid-template-columns: minmax(0, 1fr);
-}
-.lab--seul .lab-gauche {
+/* Les terminaux, où l'on passe son temps, ont un peu plus de hauteur que
+   sur la maquette. */
+.lab .lab-gauche {
   grid-template-rows: minmax(0, 1fr) minmax(0, 1.25fr);
-}
-@media (min-width: 1600px) {
-  .lab--seul {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 button.machine {
@@ -1458,5 +1450,101 @@ button.machine {
   color: var(--status-danger);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---------- l'IA dans l'app ---------- */
+
+/* Le fil défile, et ses messages se posent en bas quand il est court. */
+.ia-fil {
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+.ia-fil > :first-child {
+  margin-top: auto;
+}
+.mot {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mot--erreur {
+  align-self: flex-start;
+  border-color: var(--status-danger);
+  color: var(--status-danger);
+  background: var(--surface-field);
+}
+.ia-niveau .ia-recommencer {
+  margin-left: auto;
+}
+.ia-vide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-13);
+}
+.ia-attente {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+}
+.trace {
+  flex: none;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-chrome);
+  font-size: var(--text-12);
+}
+.trace summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: 4px var(--space-3);
+  cursor: pointer;
+}
+.trace-titre {
+  flex: none;
+  font-weight: var(--weight-semibold);
+}
+.trace-detail {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+.trace-etat {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.trace--echec .trace-etat,
+.trace--refuse .trace-etat {
+  color: var(--status-danger);
+}
+.trace pre {
+  margin: 0;
+  max-height: 180px;
+  overflow: auto;
+  padding: 6px var(--space-3);
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.carte-detail {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.note.reussi {
+  color: var(--status-ok);
+}
+.choix-detail .rang .oc-input {
+  flex: 1;
+  min-width: 0;
 }
 

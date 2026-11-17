@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 
 import { LabOuvert } from '../ecrans/LabOuvert'
 import { MesLabs } from '../ecrans/MesLabs'
-import { Reglages } from '../ecrans/Reglages'
+import { Reglages, type Section } from '../ecrans/Reglages'
 import {
+  etatIa as lireEtatIa,
+  reglerIa,
   arreterLab,
   arreterMachine,
   demarrerMachine,
@@ -14,7 +16,7 @@ import {
   suivreMachines,
   veiller,
 } from '../pont'
-import type { EtatLab, Rapport } from '../types'
+import type { EtatIa, EtatLab, Niveau, Rapport } from '../types'
 
 type Ecran = 'labs' | 'lab' | 'reglages'
 
@@ -34,6 +36,8 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
   const [etat, setEtat] = useState<EtatLab | null>(null)
   const [occupe, setOccupe] = useState<string | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const [etatIa, setEtatIa] = useState<EtatIa | null>(null)
+  const [section, setSection] = useState<Section>('brancher')
 
   const rafraichir = useCallback(() => {
     etatLab()
@@ -43,6 +47,9 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
 
   useEffect(() => {
     veiller().catch(() => undefined)
+    lireEtatIa()
+      .then(setEtatIa)
+      .catch(() => undefined)
     rafraichir()
     const arrets: Array<() => void> = []
     suivreMachines(rafraichir).then((f) => arrets.push(f))
@@ -85,6 +92,17 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
     setEcran(vers)
   }
 
+  const changerNiveau = (niveau: Niveau) => {
+    reglerIa(niveau, etatIa?.reglages.dansLeLab ?? 'avecAccord')
+      .then(setEtatIa)
+      .catch(() => undefined)
+  }
+
+  const brancherLIa = () => {
+    setSection('brancher')
+    setEcran('reglages')
+  }
+
   const ouvrirLeLab = () => {
     setLabOuvert(true)
     setEcran('lab')
@@ -120,10 +138,22 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
             gestes={gestes}
             visible={ecran === 'lab'}
             onRetour={() => setEcran('labs')}
+            etatIa={etatIa}
+            onNiveau={changerNiveau}
+            onBrancher={brancherLIa}
           />
         </div>
       )}
-      {ecran === 'reglages' && <Reglages rapport={props.rapport} onRapport={props.onRapport} />}
+      {ecran === 'reglages' && (
+        <Reglages
+          rapport={props.rapport}
+          onRapport={props.onRapport}
+          etatIa={etatIa}
+          onEtatIa={setEtatIa}
+          section={section}
+          onSection={setSection}
+        />
+      )}
     </div>
   )
 }
