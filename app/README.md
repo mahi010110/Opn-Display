@@ -15,7 +15,9 @@ Le code d'Opn-Display. La pile est dans
   l'agent (`mod.rs`), le format d'OpenAI qui sert aussi pour Ollama
   (`openai.rs`), celui d'Anthropic (`anthropic.rs`), Codex pour l'abonnement
   ChatGPT (`codex.rs`) avec son relais MCP (`mcp.rs`), et les outils du lab
-  avec l'accord de l'utilisateur (`outils.rs`).
+  avec l'accord de l'utilisateur (`outils.rs`). Les pannes sont dans
+  `pannes.rs` : la pose, l'instantané du lab, les tests et le retour en
+  arrière. Le catalogue du premier lab est `pannes/premier-lab.json`.
 - `src-tauri/` : l'app de bureau. Elle expose le moteur aux écrans par ses
   commandes : `verifier_pc`, `installer`, `arreter_installation`,
   `retirer_linux`, `installer_wsl`, puis pour le lab `etat_lab`,
@@ -23,12 +25,15 @@ Le code d'Opn-Display. La pile est dans
   `remettre_a_zero`, `veiller`, pour les terminaux `ouvrir_terminal`,
   `ecrire_terminal`, `redimensionner_terminal`, `fermer_terminal`, et pour
   l'IA `etat_ia`, `brancher_ia`, `essayer_ia`, `modeles_ia`, `regler_ia`,
-  `parler_ia`, `repondre_accord`, `arreter_ia`, `oublier_conversation`. Les
-  évènements : `installation`, `lab-avance`, `lab`, `ia` et `ia-accord`. Ce
-  qu'affiche un terminal passe par un canal, en octets. Les réglages de l'IA
-  sont dans `ia.json`, dans le dossier de configuration de l'app, et sa clé
-  dans le trousseau du système. Lancée avec la variable `OPN_OUTILS`, l'app
-  ne fait que relayer les outils pour Codex.
+  `parler_ia`, `repondre_accord`, `arreter_ia`, `oublier_conversation`,
+  `inventer_panne`, et pour les pannes `catalogue_pannes`, `poser_panne`,
+  `panne_en_cours`, `indice_panne`, `verifier_panne`, `abandonner_panne`,
+  `fermer_panne`. Les évènements : `installation`, `lab-avance`, `lab`,
+  `ia`, `ia-accord` et `panne`. Ce qu'affiche un terminal passe par un
+  canal, en octets. Les réglages de l'IA sont dans `ia.json`, dans le
+  dossier de configuration de l'app, et sa clé dans le trousseau du système.
+  Lancée avec la variable `OPN_OUTILS`, l'app ne fait que relayer les outils
+  pour Codex.
 - `src/` : les écrans, en React et TypeScript. Ils reprennent les maquettes
   validées (`../maquettes/`).
 - `src/kit/` : le matériel d'OpenContact, copié depuis son dépôt à la
@@ -60,6 +65,20 @@ est une paire veth posée par l'app (`od1-c1a` et `od1-c1b`), dont chaque
 bout entre dans une machine comme carte réseau. Les adresses sont écrites
 dans la machine pour systemd-networkd, avant son premier démarrage. Sous
 Linux, poser un câble demande les droits de root.
+
+## Les pannes
+
+Une panne du catalogue dit ce que l'utilisateur constate, les commandes qui
+la posent, ses tests, ses indices et son explication. Un test est une
+commande qui réussit (code 0) quand tout marche.
+
+Avant de poser une panne, l'app prend un instantané Incus de chaque machine
+(`avant-panne`). Elle lance ensuite les commandes de pose, puis les tests :
+si aucun n'échoue, la panne n'a rien cassé et le lab revient à l'instantané.
+« Abandonner » y revient aussi. Une panne réparée efface l'instantané.
+
+Une panne inventée passe par l'outil `poser_une_panne`, que l'IA n'a que
+quand l'utilisateur en demande une. Elle prend le même chemin.
 
 ## Le fabriquer
 

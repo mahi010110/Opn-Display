@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-import type { EtatIa, EtatLab, Marche, Niveau, Rapport } from '../types'
+import type { EtatIa, EtatLab, Marche, Niveau, Rapport, VuePanne } from '../types'
 import { Console } from '../ui/Console'
 import type { Gestes } from '../ui/Coque'
 import { Dialogue } from '../ui/Dialogue'
@@ -23,6 +23,9 @@ export function LabOuvert(props: {
   etatIa: EtatIa | null
   onNiveau: (niveau: Niveau) => void
   onBrancher: () => void
+  panne: VuePanne | null
+  onPanne: (panne: VuePanne | null) => void
+  onAutrePanne: () => void
 }) {
   const [onglets, setOnglets] = useState<string[]>([])
   const [actif, setActif] = useState<string | null>(null)
@@ -138,7 +141,14 @@ export function LabOuvert(props: {
           </section>
         </div>
 
-        <PanneauIa etatIa={props.etatIa} onNiveau={props.onNiveau} onBrancher={props.onBrancher} />
+        <PanneauIa
+          etatIa={props.etatIa}
+          onNiveau={props.onNiveau}
+          onBrancher={props.onBrancher}
+          panne={props.panne}
+          onPanne={props.onPanne}
+          onAutrePanne={props.onAutrePanne}
+        />
       </main>
 
       <footer className="etat">

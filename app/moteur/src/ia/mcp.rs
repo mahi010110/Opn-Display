@@ -36,6 +36,7 @@ fn hasard() -> u64 {
 
 /// Écoute sur 127.0.0.1 les appels relayés, et les exécute avec `executer`.
 pub fn ecouter(
+    invention: bool,
     executer: impl Fn(Appel) -> String + Send + Sync + 'static,
 ) -> Result<Relais, String> {
     let ecoute = TcpListener::bind("127.0.0.1:0")
@@ -44,7 +45,7 @@ pub fn ecouter(
     let jeton = format!("{:016x}{:016x}", hasard(), hasard());
     // Une lettre devant : sans elle, Codex pourrait lire la valeur comme
     // un nombre ou une date TOML, et la changer.
-    let valeur = format!("p{port}j{jeton}");
+    let valeur = format!("p{port}j{jeton}{}", if invention { "i" } else { "" });
     let arret = Arc::new(AtomicBool::new(false));
     let (arret_ici, executer) = (arret.clone(), Arc::new(executer));
     let compteur = Arc::new(AtomicU64::new(0));
@@ -102,7 +103,7 @@ impl Drop for Relais {
 /// Côté programme lancé par Codex : le serveur MCP, sur l'entrée et la
 /// sortie standard, qui relaie à l'app.
 pub fn servir(valeur: &str) -> Result<(), String> {
-    let (port, jeton) = lire_valeur(valeur).ok_or("OPN_OUTILS est illisible.")?;
+    let (port, jeton, invention) = lire_valeur(valeur).ok_or("OPN_OUTILS est illisible.")?;
     let entree = std::io::stdin();
     let mut sortie = std::io::stdout();
     for ligne in entree.lock().lines().map_while(Result::ok) {
@@ -113,7 +114,7 @@ pub fn servir(valeur: &str) -> Result<(), String> {
         let Some(id) = message.get("id").cloned() else {
             continue;
         };
-        let resultat = traiter(&message, |nom, arguments| {
+        let resultat = traiter(&message, invention, |nom, arguments| {
             relayer(port, &jeton, nom, arguments)
         });
         let reponse = match resultat {
@@ -128,15 +129,20 @@ pub fn servir(valeur: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn lire_valeur(valeur: &str) -> Option<(u16, String)> {
+fn lire_valeur(valeur: &str) -> Option<(u16, String, bool)> {
     let reste = valeur.strip_prefix('p')?;
     let (port, jeton) = reste.split_once('j')?;
-    Some((port.parse().ok()?, jeton.to_string()))
+    let (jeton, invention) = match jeton.strip_suffix('i') {
+        Some(jeton) => (jeton, true),
+        None => (jeton, false),
+    };
+    Some((port.parse().ok()?, jeton.to_string(), invention))
 }
 
 /// Une requête MCP et sa réponse. `relayer` exécute un outil.
 pub(crate) fn traiter(
     message: &Value,
+    invention: bool,
     relayer: impl Fn(&str, &Value) -> Result<String, String>,
 ) -> Result<Value, (i64, String)> {
     match message["method"].as_str().unwrap_or_default() {
@@ -147,7 +153,7 @@ pub(crate) fn traiter(
         })),
         "ping" => Ok(json!({})),
         "tools/list" => Ok(json!({
-            "tools": definitions().iter().map(|o| json!({
+            "tools": definitions(invention).iter().map(|o| json!({
                 "name": o.nom, "description": o.description, "inputSchema": o.parametres,
             })).collect::<Vec<_>>(),
         })),
@@ -192,11 +198,20 @@ mod tests {
         let rien = |_: &str, _: &Value| Ok(String::new());
         let init = traiter(
             &json!({"method": "initialize", "params": {"protocolVersion": "2025-03-26"}}),
+            false,
             rien,
         )
         .unwrap();
         assert_eq!(init["protocolVersion"], "2025-03-26");
-        let liste = traiter(&json!({"method": "tools/list"}), rien).unwrap();
+        let liste = traiter(&json!({"method": "tools/list"}), false, rien).unwrap();
+        let avec_panne = traiter(&json!({"method": "tools/list"}), true, rien).unwrap();
+        assert!(
+            avec_panne["tools"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|o| o["name"] == "poser_une_panne")
+        );
         assert!(
             liste["tools"]
                 .as_array()
@@ -205,7 +220,7 @@ mod tests {
                 .any(|o| o["name"] == "lancer_commande")
         );
         assert_eq!(
-            traiter(&json!({"method": "resources/list"}), rien)
+            traiter(&json!({"method": "resources/list"}), false, rien)
                 .unwrap_err()
                 .0,
             -32601
@@ -214,9 +229,12 @@ mod tests {
 
     #[test]
     fn le_relais_execute_avec_le_bon_jeton_seulement() {
-        let relais =
-            ecouter(|appel| format!("{} {}", appel.nom, appel.arguments["machine"])).unwrap();
-        let (port, jeton) = lire_valeur(&relais.valeur).unwrap();
+        let relais = ecouter(false, |appel| {
+            format!("{} {}", appel.nom, appel.arguments["machine"])
+        })
+        .unwrap();
+        let (port, jeton, invention) = lire_valeur(&relais.valeur).unwrap();
+        assert!(!invention);
         assert_eq!(
             relayer(port, &jeton, "lancer_commande", &json!({"machine": "pc1"})),
             Ok("lancer_commande \"pc1\"".into())
@@ -227,6 +245,7 @@ mod tests {
         );
         let resultat = traiter(
             &json!({"method": "tools/call", "params": {"name": "etat_du_lab", "arguments": {}}}),
+            false,
             |nom, arguments| relayer(port, &jeton, nom, arguments),
         )
         .unwrap();

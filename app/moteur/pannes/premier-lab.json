@@ -1,0 +1,102 @@
+[
+  {
+    "id": "routeur-ne-transfere-plus",
+    "titre": "pc1 ne joint plus pc2.",
+    "famille": "Réseau",
+    "niveau": "facile",
+    "pose": [
+      {"machine": "routeur", "commande": "printf 'net.ipv4.ip_forward = 0\\n' > /etc/sysctl.d/90-opn-display.conf && sysctl -w net.ipv4.ip_forward=0"}
+    ],
+    "tests": [
+      {"nom": "pc1 joint pc2", "machine": "pc1", "commande": "ping -c 2 -W 1 10.0.2.10"},
+      {"nom": "pc2 joint pc1", "machine": "pc2", "commande": "ping -c 2 -W 1 10.0.1.10"},
+      {"nom": "Le routeur transfère encore après un redémarrage", "machine": "routeur", "commande": "grep -Eq '^ *net.ipv4.ip_forward *= *1' /etc/sysctl.d/*.conf /etc/sysctl.conf"}
+    ],
+    "indices": [
+      "pc1 joint-il son routeur ? Et pc2, joint-il le sien ?",
+      "Le routeur reçoit les paquets des deux côtés. Les fait-il passer d'un réseau à l'autre ?",
+      "Regarde net.ipv4.ip_forward sur le routeur, et le fichier qui le règle au démarrage."
+    ],
+    "explication": "Le routeur ne faisait plus passer les paquets d'un réseau à l'autre : net.ipv4.ip_forward était à 0, en direct et dans /etc/sysctl.d/90-opn-display.conf. Il faut le remettre à 1 avec sysctl -w, et dans le fichier pour que ça tienne après un redémarrage."
+  },
+  {
+    "id": "mauvaise-passerelle",
+    "titre": "pc2 ne joint plus rien hors de son réseau.",
+    "famille": "Réseau",
+    "niveau": "facile",
+    "pose": [
+      {"machine": "pc2", "commande": "sed -i 's/^Gateway=.*/Gateway=10.0.2.254/' /etc/systemd/network/eth0.network && networkctl reload && sleep 1 && ip route replace default via 10.0.2.254 dev eth0"}
+    ],
+    "tests": [
+      {"nom": "pc2 joint pc1", "machine": "pc2", "commande": "ping -c 2 -W 1 10.0.1.10"},
+      {"nom": "pc2 passe par le routeur", "machine": "pc2", "commande": "ip route show default | grep -q 'via 10.0.2.1 '"},
+      {"nom": "La passerelle tient après un redémarrage", "machine": "pc2", "commande": "grep -q '^Gateway=10.0.2.1$' /etc/systemd/network/eth0.network"}
+    ],
+    "indices": [
+      "pc2 joint-il le routeur, 10.0.2.1 ?",
+      "Pour sortir de son réseau, par où pc2 envoie-t-il ses paquets ?",
+      "Regarde sa route par défaut (ip route), et le fichier qui règle eth0."
+    ],
+    "explication": "La passerelle de pc2 était 10.0.2.254, une adresse où il n'y a personne. Sa route par défaut doit passer par le routeur, 10.0.2.1 : dans /etc/systemd/network/eth0.network (Gateway=10.0.2.1), puis networkctl reload."
+  },
+  {
+    "id": "interface-eteinte",
+    "titre": "Plus personne ne joint pc2.",
+    "famille": "Réseau",
+    "niveau": "facile",
+    "pose": [
+      {"machine": "routeur", "commande": "sed -i 's/^RequiredForOnline=no$/RequiredForOnline=no\\nActivationPolicy=down/' /etc/systemd/network/eth1.network && networkctl reload && ip link set eth1 down"}
+    ],
+    "tests": [
+      {"nom": "pc1 joint pc2", "machine": "pc1", "commande": "ping -c 2 -W 1 10.0.2.10"},
+      {"nom": "Le routeur joint pc2", "machine": "routeur", "commande": "ping -c 2 -W 1 10.0.2.10"},
+      {"nom": "eth1 se rallume au démarrage du routeur", "machine": "routeur", "commande": "! grep -q '^ActivationPolicy=down' /etc/systemd/network/eth1.network"}
+    ],
+    "indices": [
+      "Le routeur lui-même joint-il pc2 ?",
+      "Regarde l'état des interfaces du routeur (ip link).",
+      "eth1 est éteinte. Regarde aussi ce que dit son fichier de réglage."
+    ],
+    "explication": "L'interface eth1 du routeur, côté pc2, était éteinte, et son réglage demandait de la laisser éteinte (ActivationPolicy=down dans /etc/systemd/network/eth1.network). Il faut retirer cette ligne, puis networkctl reload, ou ip link set eth1 up."
+  },
+  {
+    "id": "mauvaise-adresse",
+    "titre": "pc1 ne joint plus rien, pas même le routeur.",
+    "famille": "Réseau",
+    "niveau": "moyen",
+    "pose": [
+      {"machine": "pc1", "commande": "sed -i 's/^Address=.*/Address=10.0.10.10\\/24/' /etc/systemd/network/eth0.network && networkctl reload && sleep 1 && ip addr flush dev eth0 && networkctl reconfigure eth0"}
+    ],
+    "tests": [
+      {"nom": "pc1 joint le routeur", "machine": "pc1", "commande": "ping -c 2 -W 1 10.0.1.1"},
+      {"nom": "pc1 joint pc2", "machine": "pc1", "commande": "ping -c 2 -W 1 10.0.2.10"},
+      {"nom": "L'adresse tient après un redémarrage", "machine": "pc1", "commande": "grep -q '^Address=10.0.1.10/24$' /etc/systemd/network/eth0.network"}
+    ],
+    "indices": [
+      "pc1 joint-il sa passerelle, 10.0.1.1 ?",
+      "Quelle adresse a pc1 ? Est-elle dans le réseau de son câble ?",
+      "Compare l'adresse de pc1 (ip -br a) au réseau 10.0.1.0/24, puis regarde son fichier de réglage."
+    ],
+    "explication": "pc1 avait l'adresse 10.0.10.10/24 au lieu de 10.0.1.10/24 : il n'était plus dans le réseau de son câble, et ne voyait plus sa passerelle. Il faut corriger Address= dans /etc/systemd/network/eth0.network, puis networkctl reload."
+  },
+  {
+    "id": "mauvais-masque",
+    "titre": "pc2 ne joint plus pc1, mais joint toujours le routeur.",
+    "famille": "Réseau",
+    "niveau": "moyen",
+    "pose": [
+      {"machine": "pc2", "commande": "sed -i 's/^Address=.*/Address=10.0.2.10\\/8/' /etc/systemd/network/eth0.network && networkctl reload && sleep 1 && ip addr flush dev eth0 && networkctl reconfigure eth0"}
+    ],
+    "tests": [
+      {"nom": "pc2 joint pc1", "machine": "pc2", "commande": "ping -c 2 -W 1 10.0.1.10"},
+      {"nom": "pc2 a le bon masque", "machine": "pc2", "commande": "ip -o -4 addr show dev eth0 | grep -q '10.0.2.10/24'"},
+      {"nom": "Le masque tient après un redémarrage", "machine": "pc2", "commande": "grep -q '^Address=10.0.2.10/24$' /etc/systemd/network/eth0.network"}
+    ],
+    "indices": [
+      "pc2 passe-t-il par le routeur pour joindre 10.0.1.10 ?",
+      "Pour pc2, 10.0.1.10 est-il dans son propre réseau ? Regarde sa table de routage.",
+      "Regarde le masque de l'adresse de pc2 (ip -br a)."
+    ],
+    "explication": "pc2 avait le masque /8 au lieu de /24 : il croyait que tout 10.x.x.x était dans son réseau, et cherchait pc1 directement sur son câble, sans passer par le routeur. Il faut remettre 10.0.2.10/24 dans /etc/systemd/network/eth0.network, puis networkctl reload."
+  }
+]

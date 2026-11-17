@@ -3,19 +3,30 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::mpsc::{self, RecvTimeoutError, Sender};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use moteur::ia::{self, Branchement, Conversation, Demande, Execution, Liberte, Niveau};
+use moteur::ia::{self, Branchement, Conversation, Demande, Execution, Inventer, Liberte, Niveau};
+use moteur::pannes::{Difficulte, Panne};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State};
 
+use crate::pannes::{self, VuePanne};
 use crate::{a_cote, le_lab};
 
 const SERVICE: &str = "opn-display";
 const OLLAMA: &str = "http://127.0.0.1:11434/v1";
+/// Au-delà, l'invention s'arrête : chaque essai raté coûte une sauvegarde
+/// et un retour en arrière du lab, et un modèle local met des minutes.
+const ESSAIS_D_INVENTION: usize = 3;
+
+/// Une panne à inventer : son niveau, et les poses qui n'ont pas pris.
+struct Invention {
+    niveau: Difficulte,
+    ratees: Arc<AtomicUsize>,
+}
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
@@ -191,6 +202,63 @@ pub async fn regler_ia(
 /// ses demandes d'accord par `ia-accord`.
 #[tauri::command]
 pub async fn parler_ia(app: AppHandle, texte: String) -> Result<(), String> {
+    tour(app, texte, None).await
+}
+
+/// L'IA invente une panne et la pose, sans rien montrer de ce qu'elle fait.
+/// Rien quand l'utilisateur l'a arrêtée.
+#[tauri::command]
+pub async fn inventer_panne(
+    app: AppHandle,
+    niveau: Difficulte,
+) -> Result<Option<VuePanne>, String> {
+    if pannes::deja_posee(&app) {
+        return Err("Une panne est déjà posée. Répare-la ou abandonne-la d'abord.".into());
+    }
+    let ratees = Arc::new(AtomicUsize::new(0));
+    let invention = Invention {
+        niveau,
+        ratees: ratees.clone(),
+    };
+    tour(
+        app.clone(),
+        "Invente la panne et pose-la.".into(),
+        Some(invention),
+    )
+    .await?;
+    if let Some(vue) = pannes::panne_en_cours(app.state()).filter(|vue| vue.inventee()) {
+        return Ok(Some(vue));
+    }
+    if ratees.load(Ordering::SeqCst) >= ESSAIS_D_INVENTION {
+        return Err(format!(
+            "L'IA n'a pas réussi à poser une panne en {ESSAIS_D_INVENTION} essais. Essaie encore, ou prends une panne du catalogue."
+        ));
+    }
+    if app.state::<Ia>().arret.load(Ordering::SeqCst) {
+        return Ok(None);
+    }
+    Err(
+        "L'IA n'a pas réussi à poser une panne. Essaie encore, ou prends une panne du catalogue."
+            .into(),
+    )
+}
+
+fn consigne_d_invention(niveau: Difficulte) -> String {
+    let mot = match niveau {
+        Difficulte::Facile => "facile : une seule chose cassée, qu'on voit vite",
+        Difficulte::Moyen => "moyen : une seule chose cassée, moins visible",
+        Difficulte::Difficile => "difficile : deux choses cassées, ou une cause loin du symptôme",
+    };
+    format!(
+        "L'utilisateur demande une panne inventée, de niveau {mot}. Regarde d'abord le lab avec \
+         tes outils, puis pose la panne avec l'outil poser_une_panne. Elle doit être réaliste \
+         pour un administrateur d'infrastructure, réparable depuis les terminaux du lab, et tenir \
+         après un redémarrage si possible. Ne coupe jamais l'accès aux machines. Une fois la \
+         panne posée, réponds seulement : prête."
+    )
+}
+
+async fn tour(app: AppHandle, texte: String, invention: Option<Invention>) -> Result<(), String> {
     let ia_etat = app.state::<Ia>();
     if ia_etat.occupee.swap(true, Ordering::SeqCst) {
         return Err("L'IA répond déjà.".into());
@@ -209,23 +277,59 @@ pub async fn parler_ia(app: AppHandle, texte: String) -> Result<(), String> {
             return Err("La clé de l'IA manque. Range-la dans Réglages.".into());
         }
         let lab = le_lab();
-        let consigne = ia::consigne(reglages.niveau, &ia::description_du_lab(&lab));
+        let mut consigne = ia::consigne(reglages.niveau, &ia::description_du_lab(&lab));
+        if let Some(contexte) = pannes::contexte(&app_tour) {
+            consigne.push_str("\n\n");
+            consigne.push_str(&contexte);
+        }
+        let discret = invention.is_some();
+        if let Some(invention) = &invention {
+            consigne.push_str("\n\n");
+            consigne.push_str(&consigne_d_invention(invention.niveau));
+        }
         let app_accord = app_tour.clone();
         let arret_accord = arret.clone();
+        let app_panne = app_tour.clone();
         let execution = Execution {
             lab,
             liberte: reglages.dans_le_lab,
             accorder: Arc::new(move |demande: &Demande| {
                 demander_accord(&app_accord, &accords, &arret_accord, demande)
             }),
+            inventer: invention.map(|Invention { niveau, ratees }| {
+                let arret = arret.clone();
+                Arc::new(move |mut panne: Panne| {
+                    panne.niveau = niveau;
+                    panne.famille = "Inventée".into();
+                    match pannes::poser_et_retenir(&app_panne, panne) {
+                        Ok(_) => Ok("La panne est posée, et ses tests échouent comme prévu. \
+                                     Réponds seulement : prête."
+                            .to_string()),
+                        Err(erreur) => {
+                            if ratees.fetch_add(1, Ordering::SeqCst) + 1 >= ESSAIS_D_INVENTION {
+                                arret.store(true, Ordering::SeqCst);
+                            } else {
+                                let _ = app_panne.emit("lab-avance", "L'IA invente une panne");
+                            }
+                            Err(erreur)
+                        }
+                    }
+                }) as Inventer
+            }),
         };
         let ia_etat = app_tour.state::<Ia>();
-        let mut conversation = ia_etat
-            .conversation
-            .lock()
-            .map_err(|e| e.to_string())?
-            .take()
-            .unwrap_or_default();
+        // L'invention a sa propre conversation : rien ne reste dans celle
+        // de l'utilisateur, et rien ne s'affiche.
+        let mut conversation = if discret {
+            Conversation::default()
+        } else {
+            ia_etat
+                .conversation
+                .lock()
+                .map_err(|e| e.to_string())?
+                .take()
+                .unwrap_or_default()
+        };
         let resultat = ia::parler(
             &branchement,
             cle.as_deref(),
@@ -234,11 +338,13 @@ pub async fn parler_ia(app: AppHandle, texte: String) -> Result<(), String> {
             &texte,
             &execution,
             &mut |evenement| {
-                let _ = app_tour.emit("ia", evenement);
+                if !discret {
+                    let _ = app_tour.emit("ia", evenement);
+                }
             },
             &arret,
         );
-        if let Ok(mut place) = ia_etat.conversation.lock() {
+        if !discret && let Ok(mut place) = ia_etat.conversation.lock() {
             *place = Some(conversation);
         }
         resultat

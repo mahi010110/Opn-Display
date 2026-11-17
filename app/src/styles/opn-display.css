@@ -421,6 +421,12 @@ a.oc-btn {
   color: var(--on-accent);
   box-shadow: var(--bevel-down);
 }
+.segments button:disabled {
+  cursor: default;
+}
+.segments button:disabled:not([aria-pressed="true"]) {
+  color: var(--text-disabled);
+}
 
 .ia-fil {
   flex: 1;
@@ -1546,5 +1552,24 @@ button.machine {
 .choix-detail .rang .oc-input {
   flex: 1;
   min-width: 0;
+}
+
+/* ---------- les pannes ---------- */
+
+.carte-gestes .a-gauche {
+  margin-right: auto;
+}
+.en-cours-panne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--status-danger);
+  background: var(--surface-window);
+  font-size: var(--text-13);
+}
+.ia-epingle .tests li {
+  font-size: var(--text-13);
 }
 

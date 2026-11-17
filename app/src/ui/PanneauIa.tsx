@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
 import { arreterIa, oublierConversation, parlerIa, repondreAccord, suivreIa } from '../pont'
-import type { Demande, EtatIa, Niveau } from '../types'
+import type { Demande, EtatIa, Niveau, VuePanne } from '../types'
+import { CartePanne } from './CartePanne'
 
 type EtatOutil = 'enCours' | 'fait' | 'echec' | 'refuse'
 
@@ -10,6 +11,7 @@ type Entree =
   | { sorte: 'ia'; texte: string }
   | { sorte: 'outil'; id: string; titre: string; detail: string; etat: EtatOutil; apercu: string }
   | { sorte: 'erreur'; texte: string }
+  | { sorte: 'note'; texte: string }
 
 const NIVEAUX: { niveau: Niveau; nom: string }[] = [
   { niveau: 'prof', nom: 'Prof' },
@@ -29,12 +31,17 @@ export function PanneauIa(props: {
   etatIa: EtatIa | null
   onNiveau: (niveau: Niveau) => void
   onBrancher: () => void
+  panne: VuePanne | null
+  onPanne: (panne: VuePanne | null) => void
+  onAutrePanne: () => void
 }) {
   const [entrees, setEntrees] = useState<Entree[]>([])
   const [demandes, setDemandes] = useState<Demande[]>([])
   const [texte, setTexte] = useState('')
   const [occupee, setOccupee] = useState(false)
   const fil = useRef<HTMLDivElement>(null)
+  const posee = props.panne?.posee
+  const dernierePosee = useRef(posee)
 
   useEffect(() => {
     let arreter: (() => void) | undefined
@@ -76,6 +83,16 @@ export function PanneauIa(props: {
     fil.current?.scrollTo({ top: fil.current.scrollHeight })
   }, [entrees, demandes, occupee])
 
+  // Une nouvelle panne repart d'une discussion vide : l'IA ne mélange pas
+  // l'ancienne panne et la nouvelle.
+  useEffect(() => {
+    if (posee !== undefined && posee !== dernierePosee.current && !occupee) {
+      void oublierConversation()
+      setEntrees([])
+    }
+    dernierePosee.current = posee
+  }, [posee, occupee])
+
   const branchee = props.etatIa?.reglages.branchement != null
 
   const envoyer = (evenement: FormEvent) => {
@@ -96,6 +113,10 @@ export function PanneauIa(props: {
   const repondre = (demande: Demande, oui: boolean) => {
     void repondreAccord(demande.id, oui)
     setDemandes((avant) => avant.filter((d) => d.id !== demande.id))
+  }
+
+  const dire = (texte: string, sorte: 'ia' | 'note') => {
+    setEntrees((avant) => [...avant, { sorte, texte }])
   }
 
   const recommencer = () => {
@@ -131,6 +152,16 @@ export function PanneauIa(props: {
             </div>
           )}
 
+          {props.panne && (
+            <CartePanne
+              panne={props.panne}
+              niveau={props.etatIa?.reglages.niveau ?? 'coach'}
+              onPanne={props.onPanne}
+              onDire={dire}
+              onAutre={props.onAutrePanne}
+            />
+          )}
+
           <div className="ia-fil" ref={fil}>
             {!branchee && (
               <div className="ia-vide">
@@ -157,6 +188,12 @@ export function PanneauIa(props: {
                 case 'erreur':
                   return (
                     <p key={i} className="mot mot--erreur">
+                      {entree.texte}
+                    </p>
+                  )
+                case 'note':
+                  return (
+                    <p key={i} className="note">
                       {entree.texte}
                     </p>
                   )

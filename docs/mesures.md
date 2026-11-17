@@ -185,6 +185,8 @@ feront dans l'app, quand elle existera.
   Aucun témoignage trouvé pour cet empilement.
 - AD, client, OPNsense, Wazuh et Kali ensemble : la RAM réelle.
 - La taille de l'installeur.
+- Une panne inventée par un modèle local : le temps qu'elle prend, et quel
+  modèle la pose bien.
 
 Les trois premières sont des lectures, sans rien installer de plus que WSL2.
 Les autres demandent de télécharger des images.
@@ -401,3 +403,29 @@ shell coupé, le relais MCP branché) et lance le relais avec sa variable.
 Sans compte ChatGPT ni accès au réseau d'OpenAI, il s'arrête à l'appel du
 modèle. Ses messages « Reconnecting… » ne sont pas des échecs : l'app ne
 prend que `turn.failed` pour un échec.
+
+## 14. Les pannes du premier lab
+
+Mesuré le 17 novembre 2026 dans l'environnement cloud, avec un vrai Incus,
+pour la suite de l'étape 4.
+
+- Les cinq pannes du catalogue se posent en 8 à 14 s : l'instantané, les
+  commandes, puis les tests. La plus longue démarre aussi le lab. Juste
+  après la pose, chacun de leurs tests échoue. Le lab revenu à
+  l'instantané, ils passent tous.
+- L'instantané des trois machines prend 4 s (11 s au premier essai), le
+  retour 4 s, l'effacement 2,5 s. Le retour redémarre une machine qui
+  tourne : ses terminaux se ferment, et l'app propose de les rouvrir.
+- Dans l'app lancée pour de vrai, la passerelle de pc2 changée : « Pas
+  encore », 0 test sur 3. La route corrigée à chaud : 2 sur 3, le test du
+  fichier de systemd-networkd échoue toujours. Le fichier corrigé : 3 sur 3.
+- Qwen3 1.7B, sur les quatre processeurs d'ici, à qui l'app demande une
+  panne inventée : 1 min 30 pour lire le lab, 1 min 50 pour poser une panne
+  qui ne cassait rien (l'app l'a retirée), puis plus de 5 min pour la
+  réponse suivante, que l'app a coupée. Ce modèle est trop lent pour
+  inventer une panne ici.
+- Le même chemin avec un faux modèle, qui donne toujours la même réponse :
+  une panne inventée posée en 12 s, puis réparée et vérifiée dans l'app.
+  Avec trois poses qui ne cassent rien, l'app arrête l'IA au bout de 43 s.
+  « Arrêter » pendant qu'un modèle met deux minutes à répondre : l'app rend
+  la main en une demi-seconde.

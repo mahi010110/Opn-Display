@@ -137,3 +137,37 @@ export interface Demande {
   titre: string
   detail: string
 }
+
+export type Difficulte = 'facile' | 'moyen' | 'difficile'
+
+export interface ResumePanne {
+  id: string
+  titre: string
+  famille: string
+  niveau: Difficulte
+}
+
+export interface ResultatTest {
+  nom: string
+  machine: string
+  commande: string
+  reussi: boolean
+  sortie: string
+}
+
+export interface VerificationPanne {
+  reparee: boolean
+  tests: ResultatTest[]
+  explication: string | null
+}
+
+export interface VuePanne {
+  titre: string
+  niveau: Difficulte
+  inventee: boolean
+  posee: number
+  tests: number
+  indices: number
+  indicesDonnes: number
+  verification: VerificationPanne | null
+}

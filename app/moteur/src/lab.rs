@@ -349,6 +349,38 @@ fn arreter_les(lab: &Lab, noms: &[String]) -> Result<(), String> {
     Ok(())
 }
 
+/// Lance une commande sh en root dans une machine qui tourne. Elle est
+/// coupée dans la machine au bout de `secondes` : arrêter seulement incus
+/// laisserait tourner un ping sans fin. Rend le code de sortie (124 si elle
+/// a été coupée, rien si incus lui-même a dû être arrêté) et la sortie.
+pub(crate) fn commande_dans(
+    lab: &Lab,
+    machine: &str,
+    commande: &str,
+    secondes: u64,
+) -> Result<(Option<i32>, String), String> {
+    let projet = projet(lab);
+    let delai = secondes.to_string();
+    systeme::lancer_borne(
+        "incus",
+        &[
+            "exec",
+            machine,
+            "--project",
+            &projet,
+            "--",
+            "timeout",
+            "-k",
+            "2",
+            &delai,
+            "sh",
+            "-c",
+            commande,
+        ],
+        std::time::Duration::from_secs(secondes + 10),
+    )
+}
+
 /// Arrête tout de suite les machines en marche. Pour la fermeture de l'app.
 pub fn arreter_vite(lab: &Lab) {
     let projet = projet(lab);

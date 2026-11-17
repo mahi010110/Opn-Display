@@ -1,7 +1,20 @@
 import { Channel, invoke } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
-import type { Branchement, Demande, Etape, EtatIa, EtatLab, EvenementIa, Liberte, Niveau, Rapport } from './types'
+import type {
+  Branchement,
+  Demande,
+  Difficulte,
+  Etape,
+  EtatIa,
+  EtatLab,
+  EvenementIa,
+  Liberte,
+  Niveau,
+  Rapport,
+  ResumePanne,
+  VuePanne,
+} from './types'
 
 export function verifierPc(): Promise<Rapport> {
   return invoke<Rapport>('verifier_pc')
@@ -143,4 +156,37 @@ export function suivreIa(
     listen<EvenementIa>('ia', (e) => quandEvenement(e.payload)),
     listen<Demande>('ia-accord', (e) => quandAccord(e.payload)),
   ]).then((arrets) => () => arrets.forEach((arreter) => arreter()))
+}
+
+export function cataloguePannes(): Promise<ResumePanne[]> {
+  return invoke<ResumePanne[]>('catalogue_pannes')
+}
+
+export function poserPanne(id: string): Promise<VuePanne> {
+  return invoke<VuePanne>('poser_panne', { id })
+}
+
+/** La panne inventée, ou rien si l'utilisateur a arrêté l'IA. */
+export function inventerPanne(niveau: Difficulte): Promise<VuePanne | null> {
+  return invoke<VuePanne | null>('inventer_panne', { niveau })
+}
+
+export function panneEnCours(): Promise<VuePanne | null> {
+  return invoke<VuePanne | null>('panne_en_cours')
+}
+
+export function indicePanne(): Promise<string> {
+  return invoke<string>('indice_panne')
+}
+
+export function verifierPanne(): Promise<VuePanne> {
+  return invoke<VuePanne>('verifier_panne')
+}
+
+export function abandonnerPanne(): Promise<void> {
+  return invoke<void>('abandonner_panne')
+}
+
+export function fermerPanne(): Promise<void> {
+  return invoke<void>('fermer_panne')
 }

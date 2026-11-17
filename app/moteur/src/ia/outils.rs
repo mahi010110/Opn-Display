@@ -5,15 +5,15 @@
 //! (`docs/architecture.md`, partie 3).
 
 use std::sync::Arc;
-use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use super::{Appel, Evenement};
 use crate::lab::{self, Lab, Marche, Sorte};
-use crate::systeme;
+use crate::pannes::Panne;
 
+#[derive(Clone)]
 pub struct Outil {
     pub nom: String,
     pub description: String,
@@ -46,9 +46,9 @@ const SORTIE_MAX: usize = 6000;
 /// Ce que l'écran montre d'un résultat.
 const APERCU_MAX: usize = 1500;
 
-pub fn definitions() -> Vec<Outil> {
+pub fn definitions(invention: bool) -> Vec<Outil> {
     let machine = json!({"type": "string", "description": "Le nom de la machine, par exemple pc1"});
-    vec![
+    let mut outils = vec![
         Outil {
             nom: "etat_du_lab".into(),
             description: "Décrit le lab : ses machines, si elles tournent, leurs interfaces, \
@@ -79,7 +79,37 @@ pub fn definitions() -> Vec<Outil> {
             description: "Arrête une machine du lab.".into(),
             parametres: json!({"type": "object", "properties": {"machine": machine}, "required": ["machine"]}),
         },
-    ]
+    ];
+    if invention {
+        let commande = json!({
+            "type": "object",
+            "properties": {"machine": {"type": "string"}, "commande": {"type": "string"}},
+            "required": ["machine", "commande"],
+        });
+        outils.push(Outil {
+            nom: "poser_une_panne".into(),
+            description: "Pose une panne dans le lab. L'app sauvegarde le lab, lance les commandes de \
+                          pose, puis les tests : au moins un test doit échouer, sinon la panne n'a pas \
+                          pris et le lab revient comme avant."
+                .into(),
+            parametres: json!({
+                "type": "object",
+                "properties": {
+                    "titre": {"type": "string", "description": "Ce que l'utilisateur va constater, jamais la cause. Par exemple : pc1 ne joint plus pc2."},
+                    "pose": {"type": "array", "items": commande, "description": "Les commandes qui cassent quelque chose, dans l'ordre. Préfère une panne qui tient après un redémarrage."},
+                    "tests": {"type": "array", "items": {
+                        "type": "object",
+                        "properties": {"nom": {"type": "string"}, "machine": {"type": "string"}, "commande": {"type": "string"}},
+                        "required": ["nom", "machine", "commande"],
+                    }, "description": "Des commandes qui réussissent (code 0) quand tout marche, et dont au moins une échoue tant que la panne est là. Donne une fin à chaque commande (ping -c 2 -W 1)."},
+                    "indices": {"type": "array", "items": {"type": "string"}, "description": "Trois indices, du plus vague au plus précis, sans jamais donner la cause."},
+                    "explication": {"type": "string", "description": "La cause, et comment la réparer."},
+                },
+                "required": ["titre", "pose", "tests", "indices", "explication"],
+            }),
+        });
+    }
+    outils
 }
 
 fn nom_de_sorte(sorte: Sorte) -> &'static str {
@@ -141,6 +171,9 @@ pub fn description_du_lab(le_lab: &Lab) -> String {
     texte
 }
 
+/// Pose une panne inventée par l'IA, et rend ce qu'elle lira.
+pub type Inventer = Arc<dyn Fn(Panne) -> Result<String, String> + Send + Sync>;
+
 /// Ce qu'il faut pour exécuter les outils : le lab, le réglage, et de quoi
 /// demander l'accord de l'utilisateur.
 #[derive(Clone)]
@@ -149,12 +182,23 @@ pub struct Execution {
     pub liberte: Liberte,
     /// Montre la demande et attend la réponse de l'utilisateur.
     pub accorder: Arc<dyn Fn(&Demande) -> bool + Send + Sync>,
+    /// Pendant que l'IA invente une panne : elle a l'outil pour la poser,
+    /// et rien de ce qu'elle fait ne s'affiche, pour ne pas donner la
+    /// réponse. L'utilisateur a demandé la panne : il n'y a pas d'accord à
+    /// demander.
+    pub inventer: Option<Inventer>,
 }
 
 impl Execution {
     /// Exécute un appel d'outil, après l'accord s'il le faut, et rend ce que
     /// l'IA lira.
     pub fn executer(&self, appel: &Appel, signaler: &mut dyn FnMut(Evenement)) -> String {
+        let discret = self.inventer.is_some();
+        if appel.nom == "poser_une_panne" {
+            return self.poser_une_panne(&appel.arguments);
+        }
+        let mut rien = |_: Evenement| {};
+        let signaler: &mut dyn FnMut(Evenement) = if discret { &mut rien } else { signaler };
         let texte = |nom: &str| {
             appel.arguments[nom]
                 .as_str()
@@ -180,7 +224,7 @@ impl Execution {
             titre: titre.clone(),
             detail: detail.clone(),
         });
-        if agit && self.liberte == Liberte::AvecAccord {
+        if agit && self.liberte == Liberte::AvecAccord && !discret {
             let demande = Demande {
                 id: appel.id.clone(),
                 lieu: "Dans le lab".into(),
@@ -216,32 +260,33 @@ impl Execution {
         contenu
     }
 
+    fn poser_une_panne(&self, arguments: &Value) -> String {
+        let Some(inventer) = &self.inventer else {
+            return "Tu ne peux poser une panne que quand l'utilisateur en demande une.".into();
+        };
+        let mut panne: Panne = match serde_json::from_value(json!({
+            "id": "inventee",
+            "titre": arguments["titre"],
+            "pose": arguments["pose"],
+            "tests": arguments["tests"],
+            "indices": arguments.get("indices").cloned().unwrap_or(json!([])),
+            "explication": arguments["explication"],
+        })) {
+            Ok(panne) => panne,
+            Err(e) => return format!("La panne est mal décrite : {e}. Recommence."),
+        };
+        panne.inventee = true;
+        match inventer(panne) {
+            Ok(message) => message,
+            Err(erreur) => format!("{erreur} Essaie une autre panne."),
+        }
+    }
+
     fn commande(&self, machine: &str, commande: &str) -> Result<String, String> {
         if commande.trim().is_empty() {
             return Err("La commande est vide.".into());
         }
-        let projet = lab::projet(&self.lab);
-        let delai = DELAI_COMMANDE.to_string();
-        // timeout arrête la commande dans la machine elle-même : arrêter
-        // seulement incus laisserait tourner un ping sans fin.
-        let (code, sortie) = systeme::lancer_borne(
-            "incus",
-            &[
-                "exec",
-                machine,
-                "--project",
-                &projet,
-                "--",
-                "timeout",
-                "-k",
-                "2",
-                &delai,
-                "sh",
-                "-c",
-                commande,
-            ],
-            Duration::from_secs(DELAI_COMMANDE + 10),
-        )?;
+        let (code, sortie) = lab::commande_dans(&self.lab, machine, commande, DELAI_COMMANDE)?;
         let sortie = borner(sortie.trim_end(), SORTIE_MAX);
         Ok(match code {
             Some(124) | None => {
@@ -275,6 +320,7 @@ mod tests {
             lab: lab::premier_lab(),
             liberte,
             accorder: Arc::new(move |_| oui),
+            inventer: None,
         }
     }
 
@@ -327,7 +373,7 @@ mod tests {
 
     #[test]
     fn les_outils_ont_un_schema() {
-        for outil in definitions() {
+        for outil in definitions(true) {
             assert_eq!(outil.parametres["type"], "object", "{}", outil.nom);
         }
     }

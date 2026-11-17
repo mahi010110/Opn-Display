@@ -6,6 +6,7 @@ pub mod ia;
 mod incus;
 pub mod installation;
 pub mod lab;
+pub mod pannes;
 mod rapport;
 pub mod sortie;
 mod systeme;

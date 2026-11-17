@@ -318,3 +318,33 @@ Testé ici avec un vrai modèle local (Ollama et Qwen3 1.7B) : brancher, lui
 parler dans le lab, son accord demandé, la commande lancée dans pc1 et sa
 conclusion. Codex 0.169.0 accepte les réglages de l'app et lance le relais
 MCP ; le reste se vérifie avec un compte ChatGPT.
+
+La suite de l'étape 4, les pannes :
+
+- le premier lab a un catalogue de cinq pannes réseau
+  (`app/moteur/pannes/premier-lab.json`) : ce que l'utilisateur constate,
+  les commandes qui la posent, trois tests, trois indices et l'explication ;
+- avant chaque panne, l'app prend un instantané Incus du lab
+  (`avant-panne`). « Abandonner » y revient, une panne réparée l'efface. Une
+  panne dont tous les tests passent juste après la pose n'a rien cassé :
+  l'app revient à l'instantané ;
+- l'écran Pannes montre le catalogue, et propose une panne inventée par
+  l'IA, au niveau choisi. L'IA la pose avec l'outil `poser_une_panne`, dans
+  une conversation à part, sans rien montrer de ce qu'elle fait. Après trois
+  poses qui n'ont rien cassé, elle s'arrête ;
+- la panne posée est épinglée en haut du panneau de l'IA, avec « Un
+  indice », « C'est réparé » et « Abandonner ». Les noms des tests restent
+  cachés jusqu'à la réparation : ils donneraient la réponse ;
+- « C'est réparé » relance les tests écrits à la pose, et l'app montre
+  chacun avec son résultat. L'IA n'en ajoute pas encore au moment de
+  vérifier ;
+- l'IA connaît la panne posée et sa cause. En Coach, elle ne la donne pas.
+  En Silencieuse, elle n'en parle pas, et « Un indice » n'apparaît pas ;
+- « Arrêter » coupe l'IA tout de suite, même au milieu d'une réponse du
+  modèle.
+
+Testé ici avec un vrai Incus : les cinq pannes posées, leurs tests en
+échec, puis le retour à l'instantané. Dans l'app lancée pour de vrai : une
+panne posée, un indice, la vérification avant et après la réparation,
+« Abandonner », et une panne inventée avec un faux modèle
+([mesures.md](mesures.md), partie 14).

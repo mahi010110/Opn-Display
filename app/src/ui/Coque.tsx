@@ -2,9 +2,14 @@ import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 
 import { LabOuvert } from '../ecrans/LabOuvert'
 import { MesLabs } from '../ecrans/MesLabs'
+import { Pannes } from '../ecrans/Pannes'
 import { Reglages, type Section } from '../ecrans/Reglages'
 import {
+  arreterIa,
   etatIa as lireEtatIa,
+  inventerPanne,
+  panneEnCours,
+  poserPanne,
   reglerIa,
   arreterLab,
   arreterMachine,
@@ -16,9 +21,9 @@ import {
   suivreMachines,
   veiller,
 } from '../pont'
-import type { EtatIa, EtatLab, Niveau, Rapport } from '../types'
+import type { Difficulte, EtatIa, EtatLab, Niveau, Rapport, VuePanne } from '../types'
 
-type Ecran = 'labs' | 'lab' | 'reglages'
+type Ecran = 'labs' | 'lab' | 'pannes' | 'reglages'
 
 /** Ce que les écrans peuvent demander au lab. */
 export interface Gestes {
@@ -38,6 +43,8 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
   const [erreur, setErreur] = useState<string | null>(null)
   const [etatIa, setEtatIa] = useState<EtatIa | null>(null)
   const [section, setSection] = useState<Section>('brancher')
+  const [panne, setPanne] = useState<VuePanne | null>(null)
+  const [invention, setInvention] = useState(false)
 
   const rafraichir = useCallback(() => {
     etatLab()
@@ -49,6 +56,9 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
     veiller().catch(() => undefined)
     lireEtatIa()
       .then(setEtatIa)
+      .catch(() => undefined)
+    panneEnCours()
+      .then(setPanne)
       .catch(() => undefined)
     rafraichir()
     const arrets: Array<() => void> = []
@@ -103,6 +113,29 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
     setEcran('reglages')
   }
 
+  const poser = (pose: () => Promise<VuePanne | null>, debut: string) => {
+    setErreur(null)
+    setOccupe(debut)
+    pose()
+      .then((vue) => {
+        if (vue === null) return
+        setPanne(vue)
+        rafraichir()
+        setLabOuvert(true)
+        setEcran('lab')
+      })
+      .catch((e) => setErreur(String(e)))
+      .finally(() => {
+        setOccupe(null)
+        setInvention(false)
+      })
+  }
+
+  const inventer = (niveau: Difficulte) => {
+    setInvention(true)
+    poser(() => inventerPanne(niveau), "L'IA invente une panne")
+  }
+
   const ouvrirLeLab = () => {
     setLabOuvert(true)
     setEcran('lab')
@@ -113,8 +146,11 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
       <header className="barre">
         <span className="marque">Opn-Display</span>
         <nav className="menu" aria-label="Menu">
-          <a href="#" aria-current={ecran !== 'reglages' ? 'page' : undefined} onClick={aller('labs')}>
+          <a href="#" aria-current={ecran === 'labs' || ecran === 'lab' ? 'page' : undefined} onClick={aller('labs')}>
             <i className="ic i-labs" aria-hidden="true"></i>Labs
+          </a>
+          <a href="#" aria-current={ecran === 'pannes' ? 'page' : undefined} onClick={aller('pannes')}>
+            <i className="ic i-pannes" aria-hidden="true"></i>Pannes
           </a>
         </nav>
         <div className="barre-fin">
@@ -141,8 +177,26 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
             etatIa={etatIa}
             onNiveau={changerNiveau}
             onBrancher={brancherLIa}
+            panne={panne}
+            onPanne={setPanne}
+            onAutrePanne={() => setEcran('pannes')}
           />
         </div>
+      )}
+      {ecran === 'pannes' && (
+        <Pannes
+          etatIa={etatIa}
+          panne={panne}
+          nomDuLab={etat?.lab.nom ?? ''}
+          occupe={occupe}
+          erreur={erreur}
+          invention={invention}
+          onPoser={(id) => poser(() => poserPanne(id), 'Pose de la panne')}
+          onInventer={inventer}
+          onArreter={() => void arreterIa()}
+          onBrancher={brancherLIa}
+          onOuvrirLab={ouvrirLeLab}
+        />
       )}
       {ecran === 'reglages' && (
         <Reglages

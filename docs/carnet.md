@@ -456,3 +456,31 @@ Claude a retenu en codant, que le mainteneur peut reprendre :
 - Sous Linux, la clé va dans le trousseau du noyau : elle ne survit pas à
   un redémarrage. Sous Windows, elle va dans le gestionnaire
   d'identification, et reste.
+
+### L'étape 4 : les pannes
+
+Le mainteneur a choisi « Oui, les pannes » pour la suite de l'étape 4.
+Codées le 17 novembre 2026 : le catalogue du premier lab, l'écran Pannes,
+la panne épinglée dans le panneau de l'IA, la vérification et les pannes
+inventées par l'IA. Ce que Claude a retenu en codant, que le mainteneur
+peut reprendre :
+
+- Cinq pannes réseau pour le premier lab, trois faciles et deux moyennes.
+  Chacune a trois tests, dont un qui vérifie que la réparation tient après
+  un redémarrage.
+- Avant chaque panne, du catalogue ou inventée, l'app prend un instantané
+  du lab. « Abandonner » y revient.
+- Une panne dont les tests passent juste après la pose n'a rien cassé :
+  l'app la retire.
+- Les noms des tests restent cachés jusqu'à la réparation : « La passerelle
+  tient après un redémarrage » donnerait la réponse. Avant, la carte dit
+  seulement combien de tests passent.
+- « C'est réparé » relance les tests écrits à la pose. Le verdict vient des
+  tests, pas d'une réponse du modèle. L'IA n'ajoute pas encore de test au
+  moment de vérifier.
+- En Silencieuse, « Un indice » n'apparaît pas.
+- Une panne inventée s'arrête après trois poses qui n'ont rien cassé.
+- « Arrêter » rend la main tout de suite, même quand le modèle met des
+  minutes à répondre.
+- Une nouvelle panne repart d'une discussion vide avec l'IA, pour qu'elle
+  ne mélange pas l'ancienne panne et la nouvelle.

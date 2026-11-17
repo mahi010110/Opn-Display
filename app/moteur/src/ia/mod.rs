@@ -14,11 +14,14 @@ mod openai;
 pub mod outils;
 
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc::{self, RecvTimeoutError};
+use std::thread;
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub use outils::{Demande, Execution, Liberte, description_du_lab};
+pub use outils::{Demande, Execution, Inventer, Liberte, description_du_lab};
 
 /// D'où vient le modèle.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -180,30 +183,39 @@ pub fn parler(
     conversation
         .messages
         .push(Message::Utilisateur(texte.to_string()));
-    let definitions = outils::definitions();
+    let definitions = outils::definitions(execution.inventer.is_some());
     for _ in 0..TOURS_MAX {
         if arret.load(Ordering::Relaxed) {
             return Ok(());
         }
-        let reponse = match branchement {
+        let (branchement, cle, consigne) = (
+            branchement.clone(),
+            cle.map(str::to_string),
+            consigne.to_string(),
+        );
+        let (messages, outils) = (conversation.messages.clone(), definitions.clone());
+        let appel = move || match &branchement {
             Branchement::OpenAi { adresse, modele } | Branchement::Ollama { adresse, modele } => {
                 openai::appeler(
                     adresse,
-                    cle,
+                    cle.as_deref(),
                     modele,
-                    consigne,
-                    &conversation.messages,
-                    &definitions,
-                )?
+                    &consigne,
+                    &messages,
+                    &outils,
+                )
             }
             Branchement::Anthropic { modele } => anthropic::appeler(
-                cle.unwrap_or_default(),
+                cle.as_deref().unwrap_or_default(),
                 modele,
-                consigne,
-                &conversation.messages,
-                &definitions,
-            )?,
+                &consigne,
+                &messages,
+                &outils,
+            ),
             Branchement::ChatGpt { .. } => unreachable!(),
+        };
+        let Some(reponse) = sans_bloquer(arret, appel)? else {
+            return Ok(());
         };
         if !reponse.texte.trim().is_empty() {
             signaler(Evenement::Texte {
@@ -232,6 +244,31 @@ pub fn parler(
     Err(format!(
         "L'IA s'est arrêtée après {TOURS_MAX} tours sans conclure."
     ))
+}
+
+/// Attend la réponse du modèle à côté, pour qu'« Arrêter » réponde tout de
+/// suite : un modèle local peut mettre des minutes. L'appel abandonné finit
+/// seul, et sa réponse est perdue.
+fn sans_bloquer<T: Send + 'static>(
+    arret: &AtomicBool,
+    appel: impl FnOnce() -> Result<T, String> + Send + 'static,
+) -> Result<Option<T>, String> {
+    let (envoi, reception) = mpsc::channel();
+    thread::spawn(move || {
+        let _ = envoi.send(appel());
+    });
+    loop {
+        if arret.load(Ordering::Relaxed) {
+            return Ok(None);
+        }
+        match reception.recv_timeout(Duration::from_millis(200)) {
+            Ok(resultat) => return resultat.map(Some),
+            Err(RecvTimeoutError::Timeout) => {}
+            Err(RecvTimeoutError::Disconnected) => {
+                return Err("L'appel au modèle s'est interrompu.".into());
+            }
+        }
+    }
 }
 
 /// Les modèles que propose un branchement, pour la liste de Réglages.
@@ -268,6 +305,24 @@ pub fn codex_present() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn arreter_n_attend_pas_le_modele() {
+        let arret = std::sync::Arc::new(AtomicBool::new(false));
+        let arreter = arret.clone();
+        thread::spawn(move || {
+            thread::sleep(Duration::from_millis(100));
+            arreter.store(true, Ordering::Relaxed);
+        });
+        let debut = std::time::Instant::now();
+        let reponse = sans_bloquer(&arret, || {
+            thread::sleep(Duration::from_secs(5));
+            Ok(())
+        });
+        assert_eq!(reponse, Ok(None));
+        assert!(debut.elapsed() < Duration::from_secs(2));
+        assert_eq!(sans_bloquer(&AtomicBool::new(false), || Ok(7)), Ok(Some(7)));
+    }
 
     #[test]
     fn la_consigne_dit_le_niveau_et_le_lab() {

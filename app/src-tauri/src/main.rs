@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod ia;
+mod pannes;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -276,6 +277,7 @@ fn main() {
         .manage(Veilleur::default())
         .manage(Fermeture::default())
         .manage(ia::Ia::default())
+        .manage(pannes::Pannes::default())
         .on_window_event(|fenetre, evenement| {
             if let WindowEvent::CloseRequested { api, .. } = evenement {
                 api.prevent_close();
@@ -310,7 +312,15 @@ fn main() {
             ia::parler_ia,
             ia::repondre_accord,
             ia::arreter_ia,
-            ia::oublier_conversation
+            ia::oublier_conversation,
+            ia::inventer_panne,
+            pannes::catalogue_pannes,
+            pannes::poser_panne,
+            pannes::panne_en_cours,
+            pannes::indice_panne,
+            pannes::verifier_panne,
+            pannes::abandonner_panne,
+            pannes::fermer_panne
         ])
         .run(tauri::generate_context!())
         .expect("l'app n'a pas pu démarrer");
