@@ -162,7 +162,7 @@ impl Drop for Terminal {
 mod tests {
     use super::*;
     use std::sync::mpsc;
-    use std::time::Duration;
+    use std::time::{Duration, Instant};
 
     /// Le même chemin que les terminaux du lab, avec un programme qui
     /// existe partout. Sous Windows, il passe par ConPTY, comme wsl.exe.
@@ -174,7 +174,7 @@ mod tests {
         let ligne = ["sh", "-c", "echo bonjour; stty size"];
         let ligne: Vec<String> = ligne.iter().map(|m| m.to_string()).collect();
 
-        let (octets, recus) = mpsc::channel();
+        let (octets, recus) = mpsc::channel::<Vec<u8>>();
         let (fini, fin) = mpsc::channel();
         let terminal = lancer(
             &ligne,
@@ -188,12 +188,30 @@ mod tests {
             },
         )
         .unwrap();
-        fin.recv_timeout(Duration::from_secs(20))
-            .expect("le programme ne s'est pas arrêté");
+        let limite = Instant::now() + Duration::from_secs(20);
+        let mut recu = Vec::new();
+        let mut repondu = false;
+        while fin.try_recv().is_err() {
+            assert!(
+                Instant::now() < limite,
+                "le programme ne s'est pas arrêté, reçu : {:?}",
+                String::from_utf8_lossy(&recu)
+            );
+            if let Ok(o) = recus.recv_timeout(Duration::from_millis(100)) {
+                recu.extend(o);
+            }
+            // ConPTY demande où est le curseur (ESC [6n) et attend la
+            // réponse avant de lancer le programme. Dans l'app, xterm.js
+            // répond de lui-même.
+            if !repondu && recu.windows(4).any(|w| w == b"\x1b[6n") {
+                terminal.ecrire(b"\x1b[1;1R").unwrap();
+                repondu = true;
+            }
+        }
         drop(terminal);
         std::thread::sleep(Duration::from_millis(300));
-        let texte =
-            String::from_utf8_lossy(&recus.try_iter().flatten().collect::<Vec<u8>>()).into_owned();
+        recu.extend(recus.try_iter().flatten());
+        let texte = String::from_utf8_lossy(&recu).into_owned();
         assert!(texte.contains("bonjour"), "reçu : {texte:?}");
         #[cfg(not(windows))]
         assert!(texte.contains("30 100"), "reçu : {texte:?}");
