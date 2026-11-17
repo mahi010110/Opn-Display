@@ -382,4 +382,6 @@ mainteneur peut reprendre :
   version de Debian et le WiFi simulé auraient été mal lus.
 
 Montré au mainteneur en captures : l'app lancée pour de vrai sous Linux, et
-les écrans Windows avec des réponses simulées.
+les écrans Windows avec des réponses simulées. Il a répondu « Oui, ils me
+vont ». Avant l'étape 4, il essaie l'installeur sur son PC (« J'essaie
+l'installeur »).

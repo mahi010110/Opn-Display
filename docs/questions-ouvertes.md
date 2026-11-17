@@ -21,8 +21,8 @@ marche et peut se montrer.
    qui manquent. Codée le 17 novembre 2026, dans `app/`, à essayer sur le PC
    du mainteneur.
 3. Un premier lab : deux ou trois machines Linux en conteneurs, reliées, avec
-   leurs terminaux dans l'app. Codée le 17 novembre 2026, avec Incus, à
-   essayer sur le PC du mainteneur.
+   leurs terminaux dans l'app. Codée le 17 novembre 2026, avec Incus. Les
+   écrans sont validés. Le mainteneur l'essaie sur son PC avant l'étape 4.
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
    réparation. Avec ses réglages et ses garde-fous.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT.
