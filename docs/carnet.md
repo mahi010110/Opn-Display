@@ -386,6 +386,9 @@ les écrans Windows avec des réponses simulées. Il a répondu « Oui, ils me
 vont ». Avant l'étape 4, il essaie l'installeur sur son PC (« J'essaie
 l'installeur »).
 
+Les fabrications sur GitHub ont réussi : les tests du moteur passent sous
+Windows, et l'installeur de l'étape 3 pèse 2,7 Mo.
+
 ### Une vraie infra, comme les concurrents ou mieux
 
 Le mainteneur : « n'oublie pas les détails qui font la différence et la
