@@ -347,3 +347,11 @@ Le reste :
 
 À mesurer sur le PC du mainteneur : Incus et systemd dans WSL2, le
 téléchargement de l'image Debian 13 et le temps de création d'une machine.
+
+Lu le 17 novembre 2026 dans le code de wsl.exe
+([microsoft/WSL, WslClient.cpp](https://github.com/microsoft/WSL/blob/master/src/windows/common/WslClient.cpp)) :
+sans `--exec`, la commande passe par le shell de l'utilisateur
+(`$SHELL -c`), qui relit ses `$` et ses guillemets. Avec `--exec`, les
+arguments sont découpés comme sous Windows (`CommandLineToArgvW`) et passés
+tels quels. Microsoft lance lui-même `wsl.exe -u root --exec /usr/bin/id`.
+L'app passe toujours par `--exec`.

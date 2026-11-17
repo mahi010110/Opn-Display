@@ -32,8 +32,9 @@ jobs:
 
       - run: npm ci
 
+      # --nocapture : le rapport du PC de GitHub s'affiche dans le journal.
       - name: Tests du moteur
-        run: cargo test -p moteur
+        run: cargo test -p moteur -- --nocapture
 
       - name: Installeur
         run: npx tauri build --bundles nsis

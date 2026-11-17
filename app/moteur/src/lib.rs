@@ -31,3 +31,16 @@ pub fn verifier() -> Rapport {
     #[cfg(not(any(windows, target_os = "linux")))]
     return rapport::non_pris_en_charge();
 }
+
+#[cfg(all(test, windows))]
+mod tests {
+    /// Sur le Windows de GitHub, sans WSL2 : le rapport se fait quand même.
+    #[test]
+    fn le_rapport_se_fait_sous_windows() {
+        let rapport = super::verifier();
+        assert_eq!(rapport.plateforme, super::Plateforme::Windows);
+        assert!(rapport.systeme.starts_with("Windows"));
+        assert!(rapport.verifications.len() >= 4);
+        eprintln!("{rapport:#?}");
+    }
+}

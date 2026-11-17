@@ -36,7 +36,7 @@ pub fn ouvrir(
     machine: &str,
     colonnes: u16,
     lignes: u16,
-    mut recevoir: impl FnMut(Vec<u8>) + Send + 'static,
+    recevoir: impl FnMut(Vec<u8>) + Send + 'static,
     fin: impl FnOnce() + Send + 'static,
 ) -> Result<Terminal, String> {
     if !lab.machines.iter().any(|m| m.nom == machine) {
@@ -57,6 +57,18 @@ pub fn ouvrir(
             "-l",
         ],
     );
+    lancer(&ligne, colonnes, lignes, recevoir, fin)
+}
+
+/// Lance `ligne` dans un pseudo-terminal : ConPTY sous Windows, un pty
+/// sous Linux.
+fn lancer(
+    ligne: &[String],
+    colonnes: u16,
+    lignes: u16,
+    mut recevoir: impl FnMut(Vec<u8>) + Send + 'static,
+    fin: impl FnOnce() + Send + 'static,
+) -> Result<Terminal, String> {
     let paire = native_pty_system()
         .openpty(taille(colonnes, lignes))
         .map_err(|e| format!("Le terminal ne s'ouvre pas : {e}"))?;
@@ -143,5 +155,47 @@ impl Terminal {
 impl Drop for Terminal {
     fn drop(&mut self) {
         let _ = self.tueur.kill();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::mpsc;
+    use std::time::Duration;
+
+    /// Le même chemin que les terminaux du lab, avec un programme qui
+    /// existe partout. Sous Windows, il passe par ConPTY, comme wsl.exe.
+    #[test]
+    fn un_programme_tourne_dans_le_pseudo_terminal() {
+        #[cfg(windows)]
+        let ligne = ["cmd.exe", "/c", "echo bonjour"];
+        #[cfg(not(windows))]
+        let ligne = ["sh", "-c", "echo bonjour; stty size"];
+        let ligne: Vec<String> = ligne.iter().map(|m| m.to_string()).collect();
+
+        let (octets, recus) = mpsc::channel();
+        let (fini, fin) = mpsc::channel();
+        let terminal = lancer(
+            &ligne,
+            100,
+            30,
+            move |o| {
+                let _ = octets.send(o);
+            },
+            move || {
+                let _ = fini.send(());
+            },
+        )
+        .unwrap();
+        fin.recv_timeout(Duration::from_secs(20))
+            .expect("le programme ne s'est pas arrêté");
+        drop(terminal);
+        std::thread::sleep(Duration::from_millis(300));
+        let texte =
+            String::from_utf8_lossy(&recus.try_iter().flatten().collect::<Vec<u8>>()).into_owned();
+        assert!(texte.contains("bonjour"), "reçu : {texte:?}");
+        #[cfg(not(windows))]
+        assert!(texte.contains("30 100"), "reçu : {texte:?}");
     }
 }
