@@ -142,12 +142,7 @@ pub(crate) fn telecharger_image(
         match operation.statut {
             Statut::EnCours => progres(operation.avance),
             Statut::Reussie => break,
-            Statut::Echec => {
-                return Err(format!(
-                    "Le téléchargement de l'image a échoué : {}",
-                    operation.erreur
-                ));
-            }
+            Statut::Echec => return Err(echec_du_telechargement(&operation.erreur)),
         }
     }
     if !image_presente() {
@@ -197,6 +192,29 @@ fn lire_operation(reponse: &str) -> Result<Operation, String> {
             .as_str()
             .and_then(avance),
     })
+}
+
+/// L'échec dit en clair quand c'est le réseau, avec le dernier mot d'Incus.
+fn echec_du_telechargement(erreur: &str) -> String {
+    let reseau = [
+        "Forbidden",
+        "dial tcp",
+        "no such host",
+        "i/o timeout",
+        "connection refused",
+        "network is unreachable",
+    ]
+    .iter()
+    .any(|signe| erreur.contains(signe));
+    if reseau {
+        let dernier_mot = erreur.rsplit(": ").next().unwrap_or(erreur);
+        format!(
+            "Le serveur d'images d'Incus ({SERVEUR_IMAGES}) ne répond pas. Vérifie la connexion \
+             à Internet, puis réessaie. Incus dit : {dernier_mot}"
+        )
+    } else {
+        format!("Le téléchargement de l'image a échoué : {erreur}")
+    }
 }
 
 /// « rootfs: 45% (12.34MB/s) » donne 0,45.
@@ -328,6 +346,17 @@ mod tests {
         assert_eq!(echec.statut, Statut::Echec);
         assert_eq!(echec.erreur, "Failed getting remote image info");
         assert!(lire_operation("Error: pas une opération").is_err());
+    }
+
+    #[test]
+    fn dit_en_clair_quand_le_reseau_manque() {
+        // Relevé le 17 novembre 2026, serveur d'images bloqué.
+        let erreur = "Failed getting remote image info: Failed getting image: Failed parsing \
+                      stream: Get \"https://images.linuxcontainers.org/streams/v1/index.json\": Forbidden";
+        let message = echec_du_telechargement(erreur);
+        assert!(message.starts_with("Le serveur d'images d'Incus"));
+        assert!(message.ends_with("Incus dit : Forbidden"));
+        assert!(echec_du_telechargement("Image not found").contains("Image not found"));
     }
 
     #[test]

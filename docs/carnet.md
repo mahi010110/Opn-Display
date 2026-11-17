@@ -411,3 +411,16 @@ Le mainteneur a retenu les quatre recommandations :
   après le réseau. L'ordre passe à douze étapes ;
 - les images d'autres constructeurs : « Oui, si la licence le permet » ;
 - les interfaces web du lab : « Dans l'app ».
+
+### L'étape 3 essayée sur le PC du mainteneur
+
+Le mainteneur, le 17 novembre 2026 : « Fait tes tests et continue », puis
+« j'ai testé, tout fonctionne bien ». L'installeur de l'étape 3 tourne sur
+son PC (Windows 11 Famille, 32 Go) : Debian dans WSL2, Incus, l'image des
+machines et le premier lab. Le rapport de « Ton PC » donnera les chiffres
+(noyau, KVM, WiFi simulé) pour [mesures.md](mesures.md).
+
+Claude a testé ce qu'il pouvait de son côté : l'installation sous Linux
+pour de vrai (l'échec du téléchargement, puis « Réessayer »), le
+pseudo-terminal et le rapport sur le Windows de GitHub, et le comportement
+de `wsl.exe --exec`, lu dans son code.

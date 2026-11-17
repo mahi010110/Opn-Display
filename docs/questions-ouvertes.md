@@ -18,11 +18,12 @@ marche et peut se montrer.
    le matériel d'OpenContact.
 2. L'app s'ouvre et vérifie le PC : WSL2, le noyau, KVM, le WiFi simulé, la
    RAM. Elle installe son environnement Linux. Cette étape donne les mesures
-   qui manquent. Codée le 17 novembre 2026, dans `app/`, à essayer sur le PC
-   du mainteneur.
+   qui manquent. Codée le 17 novembre 2026, dans `app/`, et essayée par le
+   mainteneur sur son PC.
 3. Un premier lab : deux ou trois machines Linux en conteneurs, reliées, avec
    leurs terminaux dans l'app. Codée le 17 novembre 2026, avec Incus. Les
-   écrans sont validés. Le mainteneur l'essaie sur son PC avant l'étape 4.
+   écrans sont validés, et le mainteneur l'a essayée sur son PC : « tout
+   fonctionne bien ».
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
    réparation. Avec ses réglages et ses garde-fous.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
