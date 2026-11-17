@@ -1,11 +1,15 @@
-//! Sous Linux, l'app utilise le système lui-même : rien à installer.
+//! Sous Linux, l'app utilise le système lui-même, et son Incus.
 
 use std::fs;
 use std::path::Path;
 
 use sysinfo::System;
 
-use crate::rapport::{LinuxApp, Memoire, Plateforme, Rapport, Verification, machine};
+use crate::incus;
+use crate::installation::{Etape, EtatEtape, Pas};
+use crate::rapport::{
+    Blocage, LinuxApp, Memoire, Plateforme, Rapport, Verification, machine, machines,
+};
 
 pub(crate) fn verifier() -> Rapport {
     let machine = machine();
@@ -54,12 +58,20 @@ pub(crate) fn verifier() -> Rapport {
     } else {
         Verification::manque("WiFi simulé", "non, le module mac80211_hwsim manque")
     });
+    let etat = incus::etat();
+    let (etat_machines, ligne) = machines(&etat, false);
+    verifications.push(ligne);
+    let blocage = match etat {
+        incus::Etat::Absent => Some(Blocage::IncusAbsent),
+        incus::Etat::Muet(_) => Some(Blocage::IncusMuet),
+        _ => None,
+    };
 
     Rapport {
         plateforme: Plateforme::Linux,
         systeme,
         verifications,
-        blocage: None,
+        blocage,
         memoire: Memoire {
             totale_go: machine.totale_go,
             libre_go: machine.libre_go,
@@ -68,9 +80,33 @@ pub(crate) fn verifier() -> Rapport {
         },
         processeur: machine.processeur,
         linux_app: LinuxApp::Systeme,
+        machines: etat_machines,
         noyau: Some(noyau),
         kvm: Some(kvm_ouvert),
         wifi_simule: Some(wifi),
+    }
+}
+
+/// Prépare l'Incus du système : la place des machines. L'image vient après.
+pub(crate) fn preparer_incus(signaler: &mut dyn FnMut(Etape)) -> Result<(), String> {
+    let mut dire = |etat, detail: String| {
+        signaler(Etape {
+            pas: Pas::Incus,
+            etat,
+            detail,
+            avance: None,
+        })
+    };
+    dire(EtatEtape::EnCours, "la place des machines".into());
+    match incus::attendre(5).and_then(|version| incus::preparer_pool().map(|_| version)) {
+        Ok(version) => {
+            dire(EtatEtape::Fait, format!("Incus {version}"));
+            Ok(())
+        }
+        Err(erreur) => {
+            dire(EtatEtape::Erreur, erreur.clone());
+            Err(erreur)
+        }
     }
 }
 
@@ -127,6 +163,6 @@ mod tests {
     fn le_rapport_se_fait_sans_erreur() {
         let rapport = verifier();
         assert_eq!(rapport.plateforme, Plateforme::Linux);
-        assert_eq!(rapport.verifications.len(), 5);
+        assert_eq!(rapport.verifications.len(), 6);
     }
 }

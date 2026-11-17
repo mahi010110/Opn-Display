@@ -5,17 +5,38 @@ import { Fenetre } from '../ui/Fenetre'
 import { Page } from '../ui/Page'
 import { go, TonPc } from '../ui/TonPc'
 
+/** La première ouverture : ce que le PC sait faire, ce que l'app installe. */
 export function Ouverture(props: { rapport: Rapport; onInstaller: (memoireGo: number | null) => void }) {
-  const { totaleGo, wslGo, propositionGo } = props.rapport.memoire
+  const { rapport } = props
+  const { totaleGo, wslGo, propositionGo } = rapport.memoire
   const [plusDeMemoire, setPlusDeMemoire] = useState(false)
+  const toutAInstaller = rapport.plateforme === 'windows' && rapport.linuxApp === 'aInstaller'
+  const sousLinux = rapport.plateforme === 'linux'
+
+  const titre = sousLinux ? "Ce que l'app prépare" : toutAInstaller ? "Ce que l'app installe" : "Ce qu'il reste à installer"
+  const etat = toutAInstaller
+    ? "Rien n'est installé pour l'instant."
+    : sousLinux
+      ? "Incus est là, l'app doit encore s'y préparer."
+      : 'Debian est installé, il reste Incus.'
 
   return (
-    <Page titre="Avant ton premier lab" etat="Rien n'est installé pour l'instant.">
-      <TonPc verifications={props.rapport.verifications} />
+    <Page titre="Avant ton premier lab" etat={etat}>
+      <TonPc verifications={rapport.verifications} />
 
-      <Fenetre titre="Ce que l'app installe" active bloc>
-        <p className="lu">Un Linux à elle, Debian, rangé dans WSL2. Les machines de tes labs tournent dedans.</p>
-        {propositionGo !== null && wslGo !== null && (
+      <Fenetre titre={titre} active bloc>
+        {toutAInstaller && (
+          <p className="lu">
+            Un Linux à elle, Debian, rangé dans WSL2, avec Incus, qui y fait tourner les machines de tes labs.
+          </p>
+        )}
+        {!toutAInstaller && !sousLinux && (
+          <p className="lu">Incus, qui fait tourner les machines de tes labs dans Debian, et l'image de ces machines.</p>
+        )}
+        {sousLinux && (
+          <p className="lu">Une place pour ses machines dans l'Incus de ton Linux, et l'image Debian de ces machines.</p>
+        )}
+        {toutAInstaller && propositionGo !== null && wslGo !== null && (
           <fieldset className="oc-fieldset">
             <legend>Un réglage de Windows</legend>
             <p>
@@ -40,9 +61,9 @@ export function Ouverture(props: { rapport: Rapport; onInstaller: (memoireGo: nu
         <div className="pied">
           <button
             className="oc-btn oc-btn--primary"
-            onClick={() => props.onInstaller(plusDeMemoire ? propositionGo : null)}
+            onClick={() => props.onInstaller(toutAInstaller && plusDeMemoire ? propositionGo : null)}
           >
-            Installer
+            {sousLinux ? 'Préparer' : 'Installer'}
           </button>
         </div>
       </Fenetre>

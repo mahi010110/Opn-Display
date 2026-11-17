@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { arreterInstallation, installer, suivreInstallation } from '../pont'
-import type { Etape, EtatEtape, Rapport } from '../types'
+import type { Etape, EtatEtape, Pas, Rapport } from '../types'
 import { Fenetre } from '../ui/Fenetre'
 import { Page } from '../ui/Page'
 import { TonPc } from '../ui/TonPc'
@@ -15,18 +15,30 @@ const CLASSE: Record<EtatEtape, string> = {
 
 const PAVES = 16
 
+function nom(pas: Pas, memoireGo: number | null, rapport: Rapport): string {
+  switch (pas) {
+    case 'telecharger':
+      return 'Télécharger Debian'
+    case 'importer':
+      return "L'installer dans WSL2"
+    case 'memoire':
+      return memoireGo !== null ? `Passer WSL2 à ${memoireGo} Go` : 'Garder la mémoire de WSL2'
+    case 'demarrer':
+      return 'Premier démarrage'
+    case 'incus':
+      return rapport.plateforme === 'windows' ? 'Installer Incus' : 'Préparer Incus'
+    case 'image':
+      return "Télécharger l'image des machines"
+  }
+}
+
 export function Installation(props: {
   rapport: Rapport
+  pas: Pas[]
   memoireGo: number | null
   onFini: (rapport: Rapport) => void
 }) {
-  const noms = [
-    'Télécharger Debian',
-    "L'installer dans WSL2",
-    props.memoireGo !== null ? `Passer WSL2 à ${props.memoireGo} Go` : 'Garder la mémoire de WSL2',
-    'Premier démarrage',
-  ]
-  const [etapes, setEtapes] = useState<(Etape | null)[]>(noms.map(() => null))
+  const [etapes, setEtapes] = useState<Partial<Record<Pas, Etape>>>({})
   const [erreur, setErreur] = useState<string | null>(null)
   const [arret, setArret] = useState(false)
   const [essai, setEssai] = useState(0)
@@ -39,7 +51,7 @@ export function Installation(props: {
     setErreur(null)
     setArret(false)
     suivreInstallation((etape) => {
-      setEtapes((avant) => avant.map((e, i) => (i === etape.numero ? etape : e)))
+      setEtapes((avant) => ({ ...avant, [etape.pas]: etape }))
     })
       .then((arreter) => {
         arreterDEcouter = arreter
@@ -57,10 +69,10 @@ export function Installation(props: {
     }
   }, [essai, props.memoireGo])
 
-  const enCours = etapes.findIndex((e) => e?.etat === 'enCours')
+  const enCours = props.pas.findIndex((pas) => etapes[pas]?.etat === 'enCours')
   const etat = erreur
     ? "L'installation s'est arrêtée."
-    : `Installation en cours, étape ${Math.max(enCours, 0) + 1} sur ${noms.length}`
+    : `Installation en cours, étape ${Math.max(enCours, 0) + 1} sur ${props.pas.length}`
 
   return (
     <Page titre="Avant ton premier lab" etat={etat}>
@@ -68,11 +80,11 @@ export function Installation(props: {
 
       <Fenetre titre="Installation" active bloc>
         <ul className="etapes">
-          {noms.map((nom, i) => {
-            const etape = etapes[i]
+          {props.pas.map((pas) => {
+            const etape = etapes[pas]
             return (
-              <li key={nom} className={etape ? CLASSE[etape.etat] : ''}>
-                {nom}
+              <li key={pas} className={etape ? CLASSE[etape.etat] : ''}>
+                {nom(pas, props.memoireGo, props.rapport)}
                 {etape?.etat === 'enCours' && etape.avance !== null && <Avance part={etape.avance} />}
                 {etape && etape.detail !== '' && <small>{etape.detail}</small>}
               </li>

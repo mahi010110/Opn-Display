@@ -1,59 +1,80 @@
-//! Le fichier `.wslconfig` règle tout WSL2 sur le PC. L'app n'y change que
-//! la ligne `memory`, et seulement avec l'accord de l'utilisateur.
+//! Les réglages de WSL. `.wslconfig` règle tout WSL2 sur le PC : l'app n'y
+//! change que la ligne `memory`, et seulement avec l'accord de
+//! l'utilisateur. `/etc/wsl.conf` règle le seul Linux de l'app : l'app y
+//! allume systemd, qui fait tourner Incus.
 
 /// La mémoire donnée à WSL2, en Go, si le fichier la fixe.
 pub fn memoire(contenu: &str) -> Option<f64> {
-    let mut section = String::new();
-    for ligne in contenu.lines() {
-        let ligne = sans_commentaire(ligne).trim();
-        if let Some(nom) = entete(ligne) {
-            section = nom;
-        } else if section == "wsl2"
-            && let Some(valeur) = valeur_memoire(ligne)
-        {
-            return taille_en_go(valeur);
-        }
-    }
-    None
+    valeur(contenu, "wsl2", "memory").and_then(taille_en_go)
 }
 
 /// Le même contenu, avec `memory=<go>GB` dans la section `[wsl2]`. Le reste
 /// du fichier ne bouge pas.
 pub fn avec_memoire(contenu: &str, go: u32) -> String {
+    avec_reglage(contenu, "wsl2", "memory", &format!("memory={go}GB"))
+}
+
+/// Vrai si `/etc/wsl.conf` démarre Debian avec systemd.
+pub fn systemd_actif(contenu: &str) -> bool {
+    valeur(contenu, "boot", "systemd").is_some_and(|v| v.eq_ignore_ascii_case("true"))
+}
+
+/// Le même `/etc/wsl.conf`, avec systemd au démarrage.
+pub fn avec_systemd(contenu: &str) -> String {
+    avec_reglage(contenu, "boot", "systemd", "systemd=true")
+}
+
+fn valeur<'a>(contenu: &'a str, section_voulue: &str, cle: &str) -> Option<&'a str> {
+    let mut section = String::new();
+    for ligne in contenu.lines() {
+        let ligne = sans_commentaire(ligne).trim();
+        if let Some(nom) = entete(ligne) {
+            section = nom;
+        } else if section == section_voulue
+            && let Some(valeur) = valeur_de(ligne, cle)
+        {
+            return Some(valeur);
+        }
+    }
+    None
+}
+
+/// Pose `nouvelle` à la place de la ligne `cle` de la section, ou juste sous
+/// son en-tête, ou dans une section ajoutée à la fin.
+fn avec_reglage(contenu: &str, section_voulue: &str, cle: &str, nouvelle: &str) -> String {
     let fin = if contenu.contains("\r\n") {
         "\r\n"
     } else {
         "\n"
     };
-    let nouvelle = format!("memory={go}GB");
     let mut lignes: Vec<String> = contenu.lines().map(str::to_string).collect();
 
     let mut section = String::new();
-    let mut entete_wsl2 = None;
+    let mut entete_voulu = None;
     let mut remplacee = false;
     for (i, ligne) in lignes.iter_mut().enumerate() {
         let propre = sans_commentaire(ligne).trim().to_string();
         if let Some(nom) = entete(&propre) {
-            if nom == "wsl2" && entete_wsl2.is_none() {
-                entete_wsl2 = Some(i);
+            if nom == section_voulue && entete_voulu.is_none() {
+                entete_voulu = Some(i);
             }
             section = nom;
-        } else if section == "wsl2" && valeur_memoire(&propre).is_some() {
-            *ligne = nouvelle.clone();
+        } else if section == section_voulue && valeur_de(&propre, cle).is_some() {
+            *ligne = nouvelle.to_string();
             remplacee = true;
             break;
         }
     }
 
     if !remplacee {
-        match entete_wsl2 {
-            Some(i) => lignes.insert(i + 1, nouvelle),
+        match entete_voulu {
+            Some(i) => lignes.insert(i + 1, nouvelle.to_string()),
             None => {
                 if lignes.last().is_some_and(|l| !l.trim().is_empty()) {
                     lignes.push(String::new());
                 }
-                lignes.push("[wsl2]".into());
-                lignes.push(nouvelle);
+                lignes.push(format!("[{section_voulue}]"));
+                lignes.push(nouvelle.to_string());
             }
         }
     }
@@ -85,11 +106,9 @@ fn entete(ligne: &str) -> Option<String> {
     Some(nom.trim().to_lowercase())
 }
 
-fn valeur_memoire(ligne: &str) -> Option<&str> {
-    let (cle, valeur) = ligne.split_once('=')?;
-    cle.trim()
-        .eq_ignore_ascii_case("memory")
-        .then(|| valeur.trim())
+fn valeur_de<'a>(ligne: &'a str, cle: &str) -> Option<&'a str> {
+    let (nom, valeur) = ligne.split_once('=')?;
+    nom.trim().eq_ignore_ascii_case(cle).then(|| valeur.trim())
 }
 
 fn taille_en_go(valeur: &str) -> Option<f64> {
@@ -147,6 +166,20 @@ mod tests {
             avec_memoire("[wsl2]\nprocessors=4\n", 24),
             "[wsl2]\nmemory=24GB\nprocessors=4\n"
         );
+    }
+
+    #[test]
+    fn allume_systemd_dans_wsl_conf() {
+        assert!(!systemd_actif(""));
+        assert!(!systemd_actif("[boot]\nsystemd=false\n"));
+        assert!(systemd_actif("[boot]\nsystemd = true\n"));
+        assert!(!systemd_actif("[user]\nsystemd=true\n"));
+        assert_eq!(avec_systemd(""), "[boot]\nsystemd=true\n");
+        assert_eq!(
+            avec_systemd("[network]\nhostname=lab\n[boot]\nsystemd=false\n"),
+            "[network]\nhostname=lab\n[boot]\nsystemd=true\n"
+        );
+        assert!(systemd_actif(&avec_systemd("[boot]\ncommand=echo\n")));
     }
 
     #[test]

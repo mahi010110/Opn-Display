@@ -12,13 +12,15 @@ use sha2::{Digest, Sha256};
 
 use crate::format::texte_go;
 use crate::installation::{
-    Etape, EtatEtape, Fin, Image, LISTE_DES_IMAGES, Options, extension, image_debian,
+    Etape, EtatEtape, Fin, Image, LISTE_DES_IMAGES, Options, Pas, avance_apt, extension,
+    image_debian,
 };
 use crate::rapport::{
-    Blocage, Fabricant, LinuxApp, Memoire, Plateforme, Rapport, Verification, machine,
+    Blocage, Fabricant, LinuxApp, Machines, Memoire, Plateforme, Rapport, Verification, machine,
+    machines,
 };
 use crate::sortie::{self, VersionWsl};
-use crate::{NOM_DISTRIBUTION, wslconfig};
+use crate::{NOM_DISTRIBUTION, incus, systeme, wslconfig};
 
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 const PF_VIRT_FIRMWARE_ENABLED: u32 = 21;
@@ -33,12 +35,16 @@ const CHERCHER_HWSIM: &str = r#"m=/lib/modules/$(uname -r); grep -qs '/mac80211_
 
 fn commande(programme: &str) -> Command {
     let mut commande = Command::new(programme);
+    sans_console(&mut commande);
+    commande
+}
+
+pub(crate) fn sans_console(commande: &mut Command) {
     // Sans ce drapeau, chaque appel à wsl.exe ou reg.exe ouvre une console
     // qui clignote devant l'app.
     commande.creation_flags(CREATE_NO_WINDOW);
     // Sinon wsl.exe répond en UTF-16.
     commande.env("WSL_UTF8", "1");
-    commande
 }
 
 fn lancer(programme: &str, args: &[&str]) -> Option<Output> {
@@ -61,7 +67,9 @@ fn texte_erreur(sortie: &Output) -> String {
 }
 
 fn dans_debian(commande_linux: &[&str]) -> Option<Output> {
-    let mut args = vec!["-d", NOM_DISTRIBUTION, "-u", "root", "--"];
+    // --exec : sans lui, le shell de Debian relirait la ligne, et ses $
+    // seraient remplacés avant d'arriver à la commande.
+    let mut args = vec!["-d", NOM_DISTRIBUTION, "-u", "root", "--exec"];
     args.extend_from_slice(commande_linux);
     lancer("wsl.exe", &args)
 }
@@ -138,6 +146,7 @@ pub(crate) fn verifier() -> Rapport {
     let wsl_go = memoire_wsl(totale);
     let mut noyau = wsl.as_ref().and_then(|v| v.noyau.clone());
     let (mut kvm, mut wifi) = (None, None);
+    let mut lab_machines = Machines::AInstaller;
 
     if installe {
         let os = reponse_debian(&["sh", "-c", ". /etc/os-release && echo \"$PRETTY_NAME\""]);
@@ -145,6 +154,9 @@ pub(crate) fn verifier() -> Rapport {
             Some(nom) => Verification::ok("Le Linux de l'app", nom),
             None => Verification::manque("Le Linux de l'app", "installé, mais il ne répond pas"),
         });
+        let (etat_machines, ligne) = machines(&incus::etat(), true);
+        verifications.push(ligne);
+        lab_machines = etat_machines;
         if let Some(version) = reponse_debian(&["uname", "-r"]) {
             noyau = Some(version);
         }
@@ -199,6 +211,7 @@ pub(crate) fn verifier() -> Rapport {
         },
         processeur: machine.processeur,
         linux_app,
+        machines: lab_machines,
         noyau,
         kvm,
         wifi_simule: wifi,
@@ -324,9 +337,9 @@ pub(crate) fn installer(
 ) -> Result<Fin, String> {
     let arrete = || arret.load(Ordering::Relaxed);
     let mut importe_ici = false;
-    let mut dire = |numero: usize, etat: EtatEtape, detail: String, avance: Option<f64>| {
+    let mut dire = |pas: Pas, etat: EtatEtape, detail: String, avance: Option<f64>| {
         signaler(Etape {
-            numero,
+            pas,
             etat,
             detail,
             avance,
@@ -334,10 +347,20 @@ pub(crate) fn installer(
     };
 
     if debian_installe() {
-        dire(0, EtatEtape::Saute, "Debian est déjà là".into(), None);
-        dire(1, EtatEtape::Saute, String::new(), None);
+        dire(
+            Pas::Telecharger,
+            EtatEtape::Saute,
+            "Debian est déjà là".into(),
+            None,
+        );
+        dire(Pas::Importer, EtatEtape::Saute, String::new(), None);
     } else {
-        dire(0, EtatEtape::EnCours, "la liste des images".into(), None);
+        dire(
+            Pas::Telecharger,
+            EtatEtape::EnCours,
+            "la liste des images".into(),
+            None,
+        );
         let agent = agent();
         let archive = lire_texte(&agent, LISTE_DES_IMAGES)
             .and_then(|liste| image_debian(&liste, cfg!(target_arch = "aarch64")))
@@ -355,7 +378,7 @@ pub(crate) fn installer(
                             None => format!("{} Mo", recus >> 20),
                         };
                         dire(
-                            0,
+                            Pas::Telecharger,
                             EtatEtape::EnCours,
                             detail,
                             total.map(|t| recus as f64 / t as f64),
@@ -367,14 +390,19 @@ pub(crate) fn installer(
             Ok(Some(archive)) => archive,
             Ok(None) => return Ok(Fin::Arretee),
             Err(erreur) => {
-                dire(0, EtatEtape::Erreur, erreur.clone(), None);
+                dire(Pas::Telecharger, EtatEtape::Erreur, erreur.clone(), None);
                 return Err(erreur);
             }
         };
         let taille = fs::metadata(&archive).map(|m| m.len() >> 20).unwrap_or(0);
-        dire(0, EtatEtape::Fait, format!("{taille} Mo"), Some(1.0));
+        dire(
+            Pas::Telecharger,
+            EtatEtape::Fait,
+            format!("{taille} Mo"),
+            Some(1.0),
+        );
 
-        dire(1, EtatEtape::EnCours, String::new(), None);
+        dire(Pas::Importer, EtatEtape::EnCours, String::new(), None);
         let disque = options.dossier.join("disque");
         let import = fs::create_dir_all(&disque)
             .map_err(|e| e.to_string())
@@ -391,16 +419,16 @@ pub(crate) fn installer(
         match import {
             Ok(sortie) if sortie.status.success() => {
                 importe_ici = true;
-                dire(1, EtatEtape::Fait, String::new(), None)
+                dire(Pas::Importer, EtatEtape::Fait, String::new(), None)
             }
             Ok(sortie) => {
                 let erreur = format!("WSL a refusé l'import : {}", texte_erreur(&sortie));
-                dire(1, EtatEtape::Erreur, erreur.clone(), None);
+                dire(Pas::Importer, EtatEtape::Erreur, erreur.clone(), None);
                 return Err(erreur);
             }
             Err(e) => {
                 let erreur = format!("wsl.exe ne s'est pas lancé : {e}");
-                dire(1, EtatEtape::Erreur, erreur.clone(), None);
+                dire(Pas::Importer, EtatEtape::Erreur, erreur.clone(), None);
                 return Err(erreur);
             }
         }
@@ -413,44 +441,127 @@ pub(crate) fn installer(
     match options.memoire_go {
         Some(go) => {
             let ligne = format!("memory={go}GB");
-            dire(2, EtatEtape::EnCours, ligne.clone(), None);
+            dire(Pas::Memoire, EtatEtape::EnCours, ligne.clone(), None);
             if let Err(erreur) = regler_memoire(go) {
-                dire(2, EtatEtape::Erreur, erreur.clone(), None);
+                dire(Pas::Memoire, EtatEtape::Erreur, erreur.clone(), None);
                 return Err(erreur);
             }
             // La nouvelle limite ne vaut qu'après un redémarrage de WSL2.
             let _ = lancer("wsl.exe", &["--shutdown"]);
-            dire(2, EtatEtape::Fait, ligne, None);
+            dire(Pas::Memoire, EtatEtape::Fait, ligne, None);
         }
-        None => dire(2, EtatEtape::Saute, String::new(), None),
+        None => dire(Pas::Memoire, EtatEtape::Saute, String::new(), None),
     }
 
     if arrete() {
         return defaire(importe_ici, &options.dossier);
     }
 
-    dire(3, EtatEtape::EnCours, String::new(), None);
+    dire(Pas::Demarrer, EtatEtape::EnCours, String::new(), None);
     match dans_debian(&["uname", "-r"]) {
         Some(sortie) if sortie.status.success() => {
             dire(
-                3,
+                Pas::Demarrer,
                 EtatEtape::Fait,
                 format!("noyau {}", texte_sortie(&sortie).trim()),
                 None,
             );
-            Ok(Fin::Installe)
         }
         Some(sortie) => {
             let erreur = format!("Debian ne démarre pas : {}", texte_erreur(&sortie));
-            dire(3, EtatEtape::Erreur, erreur.clone(), None);
-            Err(erreur)
+            dire(Pas::Demarrer, EtatEtape::Erreur, erreur.clone(), None);
+            return Err(erreur);
         }
         None => {
             let erreur = "wsl.exe ne s'est pas lancé.".to_string();
-            dire(3, EtatEtape::Erreur, erreur.clone(), None);
+            dire(Pas::Demarrer, EtatEtape::Erreur, erreur.clone(), None);
+            return Err(erreur);
+        }
+    }
+
+    if arrete() {
+        return defaire(importe_ici, &options.dossier);
+    }
+
+    let resultat = installer_incus(
+        &mut |etat, detail, avance| dire(Pas::Incus, etat, detail, avance),
+        arret,
+    );
+    match resultat {
+        Ok(true) => Ok(Fin::Installe),
+        Ok(false) => defaire(importe_ici, &options.dossier),
+        Err(erreur) => {
+            dire(Pas::Incus, EtatEtape::Erreur, erreur.clone(), None);
             Err(erreur)
         }
     }
+}
+
+/// Installe Incus dans Debian, et systemd qui le fait tourner. Rend faux si
+/// l'utilisateur a arrêté l'installation en route. apt-get, lui, va au bout :
+/// l'arrêter au milieu abîmerait Debian.
+fn installer_incus(
+    dire: &mut dyn FnMut(EtatEtape, String, Option<f64>),
+    arret: &AtomicBool,
+) -> Result<bool, String> {
+    let arrete = || arret.load(Ordering::Relaxed);
+    if !reussit_dans_debian(&["sh", "-c", "command -v incus"]) {
+        dire(EtatEtape::EnCours, "la liste des paquets".into(), None);
+        systeme::lancer("apt-get", &["update"])
+            .map_err(|e| format!("apt-get ne trouve pas les paquets de Debian : {e}"))?;
+        if arrete() {
+            return Ok(false);
+        }
+        dire(EtatEtape::EnCours, "systemd et Incus".into(), Some(0.0));
+        systeme::suivre(
+            "env",
+            &[
+                "DEBIAN_FRONTEND=noninteractive",
+                "apt-get",
+                "install",
+                "-y",
+                "--no-install-recommends",
+                "-o",
+                "APT::Status-Fd=1",
+                "systemd",
+                "systemd-sysv",
+                "incus",
+            ],
+            &mut |ligne| {
+                if let Some(avance) = avance_apt(ligne) {
+                    dire(EtatEtape::EnCours, "systemd et Incus".into(), Some(avance));
+                }
+            },
+        )
+        .map_err(|e| format!("Incus ne s'installe pas : {e}"))?;
+    }
+    if arrete() {
+        return Ok(false);
+    }
+
+    let conf = systeme::lancer("cat", &["/etc/wsl.conf"]).unwrap_or_default();
+    if !wslconfig::systemd_actif(&conf) {
+        dire(
+            EtatEtape::EnCours,
+            "systemd au démarrage de Debian".into(),
+            None,
+        );
+        systeme::lancer_avec(
+            "tee",
+            &["/etc/wsl.conf"],
+            Some(wslconfig::avec_systemd(&conf).as_bytes()),
+        )
+        .map_err(|e| format!("/etc/wsl.conf ne s'écrit pas : {e}"))?;
+        // systemd ne démarre qu'avec Debian : Debian s'arrête, et repart à la
+        // commande suivante.
+        let _ = lancer("wsl.exe", &["--terminate", NOM_DISTRIBUTION]);
+    }
+
+    dire(EtatEtape::EnCours, "le démarrage d'Incus".into(), None);
+    let version = incus::attendre(90)?;
+    incus::preparer_pool()?;
+    dire(EtatEtape::Fait, format!("Incus {version}"), None);
+    Ok(true)
 }
 
 /// Arrêté par l'utilisateur : ce que cette installation a mis dans WSL2

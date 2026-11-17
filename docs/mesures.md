@@ -295,3 +295,55 @@ Ce qu'on en tire :
 - Docker et nos bridges ne vont pas ensemble sans règles en plus.
 - À mesurer sur le PC du mainteneur : Incus dans WSL2, ses images, ses VM
   et un stockage plus rapide (btrfs).
+
+## 12. Le premier lab dans Incus
+
+Mesuré le 17 novembre 2026 dans l'environnement cloud, avec Incus 6.0.0 et
+une image fabriquée ici : Ubuntu 24.04 avec systemd, réglée comme l'image
+Debian 13 d'Incus. Pour l'étape 3.
+
+Les câbles :
+
+- Un câble est une paire veth. Chaque bout entre dans une machine comme une
+  carte réseau (`nictype=physical`), sous le nom eth0 ou eth1.
+- Le ping passe de pc1 à pc2 à travers le routeur, alors que les règles de
+  Docker (FORWARD à DROP) sont en place : une paire veth ne passe par aucun
+  bridge, ni par iptables.
+- Une machine qui s'arrête rend son bout de câble au système, sous son nom.
+  En face, l'interface dit NO-CARRIER, comme un câble branché sur une
+  machine éteinte.
+- Une machine qui redémarre d'elle-même (`reboot`) garde ses câbles.
+- Les paires veth disparaissent quand le système redémarre, WSL compris :
+  l'app les repose avant de démarrer les machines (essayé en les retirant à
+  la main).
+
+Les temps :
+
+| Geste | Temps |
+|---|---|
+| Créer une machine | 0,3 s |
+| Lancer le premier lab, avec la création des trois machines | 4,1 s |
+| Arrêter une machine | 0,8 s |
+| Arrêter le lab | 1 s |
+| Redémarrer depuis la machine | environ 4 s |
+| Remettre le lab à zéro | 8 s |
+| Fermer l'app, les machines s'arrêtent avec elle | 2,8 s |
+
+Le reste :
+
+- Une machine du lab prend environ 14 Mo de mémoire en marche.
+- `incus file push` depuis l'entrée crée le fichier en 0600, et
+  systemd-networkd ne le lit plus. Avec `--mode 0644`, il le lit.
+- Un terminal ouvert par `incus exec` dans un pseudo-terminal : la variable
+  TERM passe, et la taille du terminal suit celle de la fenêtre.
+- L'image Debian 13 d'Incus règle son réseau avec systemd-networkd, en DHCP
+  sur eth0, et ses noms avec systemd-resolved. Lu dans la définition des
+  images d'Incus,
+  [lxc-ci, images/debian.yaml](https://github.com/lxc/lxc-ci/blob/main/images/debian.yaml).
+- Le paquet incus 6.0.0-1, celui qu'Ubuntu 24.04 a repris de Debian, ne
+  tire pas QEMU : les VM demanderont un paquet de plus. Le site des paquets
+  de Debian n'est pas joignable d'ici, la version de Debian 13 (6.0.4) reste
+  à vérifier.
+
+À mesurer sur le PC du mainteneur : Incus et systemd dans WSL2, le
+téléchargement de l'image Debian 13 et le temps de création d'une machine.

@@ -7,5 +7,6 @@ export default defineConfig({
   clearScreen: false,
   server: { port: 1420, strictPort: true },
   envPrefix: ['VITE_', 'TAURI_ENV_'],
-  build: { target: 'es2021' },
+  // Le terminal (xterm.js) pèse son poids ; l'app se charge depuis le disque.
+  build: { target: 'es2021', chunkSizeWarningLimit: 1500 },
 })

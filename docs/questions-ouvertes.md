@@ -18,9 +18,11 @@ marche et peut se montrer.
    le matériel d'OpenContact.
 2. L'app s'ouvre et vérifie le PC : WSL2, le noyau, KVM, le WiFi simulé, la
    RAM. Elle installe son environnement Linux. Cette étape donne les mesures
-   qui manquent. En cours depuis le 17 novembre 2026, dans `app/`.
+   qui manquent. Codée le 17 novembre 2026, dans `app/`, à essayer sur le PC
+   du mainteneur.
 3. Un premier lab : deux ou trois machines Linux en conteneurs, reliées, avec
-   leurs terminaux dans l'app.
+   leurs terminaux dans l'app. Codée le 17 novembre 2026, avec Incus, à
+   essayer sur le PC du mainteneur.
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
    réparation. Avec ses réglages et ses garde-fous.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT.
@@ -41,9 +43,16 @@ Mesuré le 17 novembre 2026 ([mesures.md](mesures.md), partie 11). Docker
 lance des conteneurs d'application, sans systemd. Incus lance des machines
 Linux entières, avec systemd, et sait aussi faire les VM et les instantanés.
 
-Recommandation : Incus, dans le Debian de l'app. Docker plus tard, seulement
-pour des images qui n'existent qu'en Docker, avec des règles pour ne pas
-couper les câbles du lab.
+Décidé le 17 novembre 2026 : les deux. Incus pour les machines, dans le
+Debian de l'app. Docker plus tard, seulement pour des images qui n'existent
+qu'en Docker, avec des règles pour ne pas couper les câbles du lab.
+
+Reste ouvert : sous Linux, poser un câble (une paire veth) demande les
+droits de root. L'app de l'étape 3 les a dans le Debian de WSL2, pas sur un
+Linux où elle tourne sous le compte de l'utilisateur. À régler avec la
+version Linux publique. Recommandation : sous Linux aussi, faire tourner le
+lab dans un Linux à l'app (un conteneur ou une VM Incus), où elle est root,
+comme sous Windows.
 
 ### La licence
 

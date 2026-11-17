@@ -2,6 +2,7 @@ use serde::Serialize;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
 
 use crate::format::{go, texte_go};
+use crate::incus;
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -37,7 +38,6 @@ impl Verification {
         Self::nouvelle(nom, Etat::Manque, detail)
     }
 
-    #[cfg_attr(not(windows), allow(dead_code))]
     pub(crate) fn inconnu(nom: &str, detail: impl Into<String>) -> Self {
         Self::nouvelle(nom, Etat::Inconnu, detail)
     }
@@ -87,6 +87,10 @@ pub enum Blocage {
     SansVirtualisation,
     /// WSL2 n'est pas installé, ou pas encore activé.
     WslAbsent,
+    /// Sous Linux, Incus n'est pas installé.
+    IncusAbsent,
+    /// Sous Linux, Incus ne répond pas, ou le compte n'y a pas accès.
+    IncusMuet,
     SystemeNonPrisEnCharge,
 }
 
@@ -102,6 +106,46 @@ pub enum LinuxApp {
     Aucun,
 }
 
+/// Où en est Incus, qui fait tourner les machines du lab.
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum Machines {
+    /// Incus manque. Sous Windows, l'installation le pose.
+    AInstaller,
+    /// Incus est installé, mais il ne répond pas.
+    Muettes,
+    /// Incus répond ; il manque la place des machines ou leur image.
+    APreparer,
+    Pretes,
+}
+
+/// La ligne de « Ton PC » qui dit où en est Incus.
+pub(crate) fn machines(etat: &incus::Etat, sous_windows: bool) -> (Machines, Verification) {
+    const NOM: &str = "Les machines du lab";
+    match etat {
+        incus::Etat::Pret { version } => (
+            Machines::Pretes,
+            Verification::ok(NOM, format!("Incus {version}")),
+        ),
+        incus::Etat::APreparer { version } => (
+            Machines::APreparer,
+            Verification::inconnu(NOM, format!("Incus {version}, encore à préparer")),
+        ),
+        incus::Etat::Absent if sous_windows => (
+            Machines::AInstaller,
+            Verification::inconnu(NOM, "Incus, à installer"),
+        ),
+        incus::Etat::Absent => (
+            Machines::AInstaller,
+            Verification::manque(NOM, "Incus n'est pas installé"),
+        ),
+        incus::Etat::Muet(_) => (
+            Machines::Muettes,
+            Verification::manque(NOM, "Incus ne répond pas"),
+        ),
+    }
+}
+
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Rapport {
@@ -112,6 +156,7 @@ pub struct Rapport {
     pub processeur: Processeur,
     pub memoire: Memoire,
     pub linux_app: LinuxApp,
+    pub machines: Machines,
     pub noyau: Option<String>,
     pub kvm: Option<bool>,
     pub wifi_simule: Option<bool>,
@@ -192,6 +237,7 @@ pub(crate) fn non_pris_en_charge() -> Rapport {
         },
         processeur: machine.processeur,
         linux_app: LinuxApp::Aucun,
+        machines: Machines::AInstaller,
         noyau: None,
         kvm: None,
         wifi_simule: None,

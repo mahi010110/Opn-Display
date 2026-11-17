@@ -350,3 +350,36 @@ fabrique l'installeur Windows (« Oui, vas-y »).
   bouton rouge à part sur l'écran « Ton PC », et une question avant d'agir.
   L'installation peut aussi s'arrêter en cours de route, comme sur la
   maquette : ce qu'elle avait mis dans WSL2 repart.
+
+### Les machines du lab, et l'étape 3
+
+Claude a mesuré Docker et Incus dans l'environnement cloud
+([mesures.md](mesures.md), partie 11), et recommandait Incus. Le mainteneur
+a choisi « Les deux » : Incus pour les machines, Docker plus tard pour les
+images qui n'existent qu'en Docker. Il a donné son feu vert pour l'étape 3
+(« Oui, vas-y »), avant d'avoir essayé l'installeur de l'étape 2.
+
+### L'étape 3 : le premier lab
+
+Codée le 17 novembre 2026. Ce que Claude a retenu en codant, que le
+mainteneur peut reprendre :
+
+- Le premier lab : pc1, un routeur, pc2, deux réseaux, les adresses posées
+  au départ. Le ping de pc1 à pc2 passe dès le lancement.
+- Un câble est une paire veth, comme le disait déjà `architecture.md`. Elle
+  passe tout, y compris LACP pour l'étape du réseau, et les règles de
+  Docker ne la coupent pas.
+- Un projet Incus par lab. L'image Debian 13 est téléchargée une fois, pour
+  tous les labs.
+- Le menu ne montre que Labs et Réglages : Cours, Pannes et Progression
+  arriveront avec ce qui les fait marcher. Le panneau de l'IA aussi.
+- Sans le panneau de l'IA, les terminaux prennent un peu plus de hauteur
+  que sur la maquette.
+- « Ton PC » passe dans Réglages, comme sur la maquette `reglages-pc`.
+- Fermer l'app arrête les machines du lab.
+- Un défaut de l'étape 2 est corrigé : sans `--exec`, wsl.exe faisait
+  relire les commandes par le shell de Debian, qui remplaçait leurs `$`. La
+  version de Debian et le WiFi simulé auraient été mal lus.
+
+Montré au mainteneur en captures : l'app lancée pour de vrai sous Linux, et
+les écrans Windows avec des réponses simulées.

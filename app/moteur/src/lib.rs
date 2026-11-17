@@ -1,10 +1,15 @@
-//! Le moteur d'Opn-Display : ce qui fait tourner le lab. Pour l'instant, il
-//! vérifie le PC et installe le Linux de l'app.
+//! Le moteur d'Opn-Display : ce qui fait tourner le lab. Il vérifie le PC,
+//! installe le Linux de l'app et Incus, et fait tourner le premier lab.
 
 mod format;
+mod incus;
 pub mod installation;
+pub mod lab;
 mod rapport;
 pub mod sortie;
+mod systeme;
+pub mod terminal;
+pub mod veille;
 pub mod wslconfig;
 
 #[cfg(target_os = "linux")]

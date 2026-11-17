@@ -1345,3 +1345,118 @@ a.oc-btn {
     font-size: var(--text-14);
   }
 }
+
+/* ---------- l'app installée ---------- */
+
+/* Un écran gardé monté, qui laisse ses morceaux dans la grille de l'app. */
+.ecran-garde {
+  display: contents;
+}
+.ecran-garde[hidden] {
+  display: none;
+}
+
+/* Sans l'IA, le lab prend toute la largeur, et les terminaux, où l'on
+   passe son temps, un peu plus de hauteur. */
+.lab--seul {
+  grid-template-columns: minmax(0, 1fr);
+}
+.lab--seul .lab-gauche {
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1.25fr);
+}
+@media (min-width: 1600px) {
+  .lab--seul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+button.machine {
+  appearance: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.port {
+  position: absolute;
+  transform: translate(-50%, -150%);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.onglet {
+  display: inline-flex;
+  border-right: 1px solid var(--border-soft);
+}
+.onglets .onglet button {
+  border-right: 0;
+}
+.onglet--actif {
+  background: var(--titlebar-bg);
+  color: var(--titlebar-text);
+}
+.onglets .onglet--actif button {
+  color: inherit;
+}
+.onglets .onglet-fermer {
+  padding: 0 6px 0 0;
+}
+.onglets .onglet-fermer .ic {
+  width: 12px;
+  height: 12px;
+}
+
+.ecran--terminaux {
+  position: relative;
+  padding: 0;
+  justify-content: center;
+}
+.ecran-vide {
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  color: color-mix(in srgb, var(--titlebar-text) 68%, transparent);
+}
+.console {
+  position: absolute;
+  inset: 0;
+}
+.console[hidden] {
+  display: none;
+}
+.console-xterm {
+  position: absolute;
+  inset: 6px 4px 6px 10px;
+}
+.console-xterm .xterm-viewport {
+  background: transparent;
+}
+.console-etat {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: color-mix(in srgb, var(--titlebar-bg) 88%, transparent);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+}
+.console-etat--bas {
+  inset: auto 0 0 0;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-4);
+}
+.etat-erreur {
+  color: var(--status-danger);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

@@ -213,15 +213,15 @@ Choisie le 17 novembre 2026 :
 | Écrans | React et TypeScript, dans la page web de Tauri | Les composants du kit d'OpenContact sont en React. React Flow dessine le schéma du lab. Le mainteneur a laissé Claude choisir « le meilleur, avec le plus de potentiel » |
 | Linux de l'app | Debian, dans WSL2 sous Windows et dans une VM Lima sous macOS. Sous Linux, le système lui-même | Stable, sans compte. FRR, QEMU, Open vSwitch et mstpd sont dans ses paquets |
 | Matériel d'OpenContact | Copié dans le code, avec sa version notée | Comme pour les maquettes. Aucun script |
+| Machines du lab | Incus, dans le Debian de l'app. Docker plus tard, pour les images qui n'existent qu'en Docker | Une machine Incus est un vrai Linux avec systemd. Incus fait aussi les instantanés et les VM ([mesures.md](mesures.md), partie 11) |
+| Terminaux | xterm.js 6 dans l'écran, un pseudo-terminal côté Rust (portable-pty, ConPTY sous Windows) | Le plus répandu. Choisi à l'étape 3 ([mesures.md](mesures.md), partie 12) |
 
 Encore à choisir, chacun à son étape, après mesure :
 
 | Partie | Piste | Pourquoi |
 |---|---|---|
-| Conteneurs | Docker ou containerd, commandé depuis Rust (bollard) | Connu, documenté |
 | VM | QEMU, commandé par QMP et l'agent invité | Ce que font GNS3 et EVE-NG |
 | Agent | Une boucle en Rust (rig-core ou genai) | Pas de Python à embarquer. Si le serveur MCP se fait un jour : rmcp |
-| Terminaux | xterm.js | Le plus répandu |
 | Écran des VM | noVNC, branché sur QEMU | Marche pour Windows comme pour Linux |
 | Données locales | SQLite | Un seul fichier, sur le PC |
 | Distribution | GitHub Releases | Gratuit. La signature Windows peut l'être aussi, Apple coûte 99 $ par an |
@@ -256,3 +256,28 @@ Testé dans l'environnement cloud : le moteur sous Linux (21 tests), l'app
 lancée pour de vrai sous Linux, et les écrans propres à Windows avec des
 réponses simulées. La partie Windows se compile ici, mais ne tourne que sur
 un PC Windows.
+
+L'étape 3, commencée le 17 novembre 2026 :
+
+- l'installation pose aussi Incus. Sous Windows : systemd allumé dans
+  Debian (`/etc/wsl.conf`), puis `apt-get install incus`. Sous Linux,
+  l'Incus du système sert. Puis la place des machines (un pool `dir`) et
+  l'image Debian 13 d'Incus, rangée sous le nom `opn-display-debian-13` ;
+- le premier lab est écrit dans le moteur : pc1 et pc2, chacun dans son
+  réseau, et un routeur entre les deux, les adresses posées. Il a son
+  projet Incus, `opn-display-premier-lab` ;
+- un câble est une paire veth, posée par l'app, dont chaque bout entre dans
+  une machine. Les réglages réseau sont des fichiers de systemd-networkd,
+  écrits dans la machine avant son premier démarrage ;
+- l'écran du lab reprend la maquette : le schéma, les terminaux en onglets,
+  la barre d'état avec la RAM du lab. Le panneau de l'IA arrivera avec
+  elle, à l'étape 4 ;
+- une veille écoute Incus (`incus monitor`) : une machine éteinte depuis son
+  terminal passe en trame sur le schéma. Sous Windows, elle garde Debian
+  éveillé tant que l'app est ouverte ;
+- fermer l'app arrête les machines du lab.
+
+Testé dans l'environnement cloud avec un vrai Incus : le moteur (37 tests),
+l'app lancée pour de vrai, le lab créé, les pings à travers le routeur, une
+machine éteinte puis rallumée, la remise à zéro. Les écrans propres à
+Windows sont vus avec des réponses simulées.

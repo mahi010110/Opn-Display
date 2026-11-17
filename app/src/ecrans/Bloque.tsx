@@ -17,6 +17,17 @@ export function Bloque(props: { rapport: Rapport; onVerifier: () => void }) {
     case 'wslAbsent':
       contenu = <WslAbsent />
       break
+    case 'incusAbsent':
+      contenu = <IncusAbsent />
+      break
+    case 'incusMuet':
+      contenu = (
+        <p className="lu">
+          Incus est installé, mais il ne répond pas à l'app. Vérifie que son service tourne, et que ton compte est dans
+          le groupe incus-admin.
+        </p>
+      )
+      break
     case 'sansVirtualisation':
       contenu = (
         <p className="lu">
@@ -66,6 +77,25 @@ function VirtualisationCoupee(props: { fabricant: Fabricant; processeur: string 
         </li>
         <li>
           <span>Enregistre, redémarre, puis rouvre l'app.</span>
+        </li>
+      </ol>
+    </>
+  )
+}
+
+function IncusAbsent() {
+  return (
+    <>
+      <p className="lu">Sous Linux, les machines des labs tournent avec Incus. Il n'est pas installé.</p>
+      <ol className="numeros">
+        <li>
+          <span>Installe le paquet incus avec le gestionnaire de paquets de ton Linux.</span>
+        </li>
+        <li>
+          <span>Ajoute ton compte au groupe incus-admin, puis ouvre une nouvelle session.</span>
+        </li>
+        <li>
+          <span>Rouvre l'app.</span>
         </li>
       </ol>
     </>

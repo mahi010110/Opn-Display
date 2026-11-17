@@ -1,10 +1,13 @@
-//! L'installation du Linux de l'app. Sous Windows, c'est Debian importé dans
-//! WSL2. Sous Linux, il n'y a rien à installer.
+//! L'installation de ce qui fait tourner les machines. Sous Windows, c'est
+//! Debian importé dans WSL2, puis Incus dans Debian. Sous Linux, Incus est
+//! celui du système : l'app y prépare sa place et l'image des machines.
 
 use std::path::{Path, PathBuf};
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::{Deserialize, Serialize};
+
+use crate::incus;
 
 /// La liste des distributions de WSL, tenue par Microsoft. Celle de Debian
 /// est fabriquée par le projet Debian, avec son empreinte SHA-256.
@@ -20,11 +23,23 @@ pub enum EtatEtape {
     Erreur,
 }
 
+/// Les étapes, dans l'ordre. Sous Linux, il n'y a que les deux dernières.
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum Pas {
+    Telecharger,
+    Importer,
+    Memoire,
+    Demarrer,
+    Incus,
+    Image,
+}
+
 /// Où en est une étape de l'installation. `avance` va de 0 à 1.
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Etape {
-    pub numero: usize,
+    pub pas: Pas,
     pub etat: EtatEtape,
     pub detail: String,
     pub avance: Option<f64>,
@@ -45,7 +60,7 @@ pub enum Fin {
     Arretee,
 }
 
-/// Installe le Linux de l'app, et dit où il en est à chaque étape. `arret`
+/// Installe ce qui manque, et dit où il en est à chaque étape. `arret`
 /// passe à vrai quand l'utilisateur arrête l'installation.
 pub fn installer(
     options: &Options,
@@ -53,11 +68,76 @@ pub fn installer(
     arret: &AtomicBool,
 ) -> Result<Fin, String> {
     #[cfg(windows)]
-    return crate::windows::installer(options, signaler, arret);
-    #[cfg(not(windows))]
-    {
-        let _ = (options, signaler, arret);
-        Err("Sur ce système, l'app n'a rien à installer.".into())
+    let fin = crate::windows::installer(options, signaler, arret)?;
+    #[cfg(target_os = "linux")]
+    let fin = {
+        let _ = options;
+        crate::linux::preparer_incus(signaler)?;
+        Fin::Installe
+    };
+    #[cfg(not(any(windows, target_os = "linux")))]
+    let fin = {
+        let _ = (options, &signaler, arret);
+        return Err("Opn-Display ne tourne pas encore sur ce système.".into());
+    };
+    if fin == Fin::Arretee || arret.load(Ordering::Relaxed) {
+        return Ok(Fin::Arretee);
+    }
+    telecharger_image(signaler, arret)
+}
+
+/// L'étape de l'image : Debian 13 pour les machines, téléchargé par Incus.
+fn telecharger_image(signaler: &mut dyn FnMut(Etape), arret: &AtomicBool) -> Result<Fin, String> {
+    let mut dire = |etat, detail: String, avance| {
+        signaler(Etape {
+            pas: Pas::Image,
+            etat,
+            detail,
+            avance,
+        })
+    };
+    if incus::image_presente() {
+        dire(EtatEtape::Saute, "déjà là".into(), None);
+        return Ok(Fin::Installe);
+    }
+    dire(EtatEtape::EnCours, "Debian 13".into(), None);
+    let resultat = incus::telecharger_image(arret, &mut |avance| {
+        let detail = match avance {
+            Some(a) => format!("Debian 13, {} %", (a * 100.0).round()),
+            None => "Debian 13".into(),
+        };
+        dire(EtatEtape::EnCours, detail, avance)
+    });
+    match resultat {
+        Ok(Some(taille)) => {
+            dire(
+                EtatEtape::Fait,
+                format!("Debian 13, {} Mo", taille >> 20),
+                Some(1.0),
+            );
+            Ok(Fin::Installe)
+        }
+        Ok(None) => Ok(Fin::Arretee),
+        Err(erreur) => {
+            dire(EtatEtape::Erreur, erreur.clone(), None);
+            Err(erreur)
+        }
+    }
+}
+
+/// Où en est apt-get, d'après les lignes de `APT::Status-Fd` : le
+/// téléchargement compte pour la première moitié, l'installation pour la
+/// seconde.
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) fn avance_apt(ligne: &str) -> Option<f64> {
+    let mut morceaux = ligne.splitn(4, ':');
+    let sorte = morceaux.next()?;
+    let pourcent: f64 = morceaux.nth(1)?.trim().parse().ok()?;
+    let part = (pourcent / 100.0).clamp(0.0, 1.0);
+    match sorte {
+        "dlstatus" => Some(part / 2.0),
+        "pmstatus" => Some(0.5 + part / 2.0),
+        _ => None,
     }
 }
 
@@ -181,6 +261,17 @@ mod tests {
         let sans = r#"{"ModernDistributions": {"Ubuntu": []}}"#;
         assert!(image_debian(sans, false).is_err());
         assert!(image_debian("pas du json", false).is_err());
+    }
+
+    #[test]
+    fn suit_apt_get() {
+        assert_eq!(
+            avance_apt("dlstatus:3:50.0000:Retrieving file 3 of 40"),
+            Some(0.25)
+        );
+        assert_eq!(avance_apt("pmstatus:incus:100:Installed incus"), Some(1.0));
+        assert_eq!(avance_apt("pmstatus:dpkg-exec:0:Running dpkg"), Some(0.5));
+        assert_eq!(avance_apt("Reading package lists..."), None);
     }
 
     #[test]
