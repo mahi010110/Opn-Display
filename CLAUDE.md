@@ -81,6 +81,11 @@ Le produit :
   sur le PC et elle le commande : Packet Tracer, VMware Workstation, Cisco
   Modeling Labs, les bacs à sable du cloud.
 - L'émulation se construit d'abord, le pilotage ensuite.
+- Le réseau se fait en libre : cœur, distribution, accès, EtherChannel en
+  LACP, RSTP, MSTP, VRRP. L'IA dit l'équivalent Cisco. Le vrai Cisco
+  (HSRP, PVST+, PAgP, les commandes Cisco des switchs) passe par Packet
+  Tracer ou CML, au pilotage : Cisco interdit de faire tourner ses images
+  ailleurs.
 - Les trois références : GNS3 et EVE-NG pour l'émulation, Hermes Agent pour
   l'IA.
 - Gratuit et libre. La licence est à choisir : le mainteneur décidera plus

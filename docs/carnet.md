@@ -298,3 +298,17 @@ laissé la main sur les maquettes :
 - un lab qui ne tient pas dans la mémoire libre.
 
 Les maquettes comptent 30 écrans. Restent ceux du pilotage, plus tard.
+
+### Le réseau façon Cisco
+
+Le mainteneur a demandé si l'app fait HSRP, EtherChannel, PVST+, RSTP, et le
+modèle cœur, distribution, accès. Claude a vérifié chez Cisco et dans les
+logiciels libres ([mesures.md](mesures.md), partie 10).
+
+- Dans l'app, en libre : cœur, distribution et accès, VLAN, EtherChannel en
+  LACP, RSTP, MSTP, VRRP, OSPF, BGP.
+- Le vrai Cisco (HSRP, PVST+, PAgP, les commandes Cisco des switchs) passe
+  par Packet Tracer ou CML. Cisco interdit de faire tourner ses images
+  ailleurs. CML-Free est gratuit, avec 5 machines Cisco à la fois.
+- Le mainteneur garde l'ordre : le réseau en libre d'abord, Packet Tracer et
+  CML à l'étape du pilotage. L'IA dit à chaque fois l'équivalent Cisco.

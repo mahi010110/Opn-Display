@@ -1,6 +1,7 @@
-# Les mesures du 16 novembre 2026
+# Les mesures
 
-Faites avant de choisir la pile, l'ordre de construction et la licence.
+Les parties 1 à 9 ont été faites le 16 novembre 2026, avant de choisir la
+pile, l'ordre de construction et la licence. La partie 10 date du 17.
 
 Tout a été fait depuis l'environnement cloud : une machine Linux de 4
 processeurs et 15 Go, sans KVM. Rien n'a été mesuré sur le PC du mainteneur.
@@ -204,3 +205,51 @@ Les autres demandent de télécharger des images.
   peut s'inspirer de sa forme.
 - Hermes garde une liste d'actions bloquées même en mode libre. C'est le
   garde-fou retenu pour Opn-Display.
+
+## 10. Le réseau façon Cisco
+
+Lu le 17 novembre 2026, après une question du mainteneur : l'app fait-elle
+HSRP, EtherChannel, PVST+, RSTP, et le modèle cœur, distribution, accès ?
+
+HSRP, PVST+ et PAgP sont propres à Cisco. LACP, VRRP, RSTP et MSTP sont des
+normes. Le modèle cœur, distribution, accès est une façon de câbler, il ne
+dépend d'aucun protocole.
+
+Ce que dit Cisco :
+
+- Les images de Cisco Modeling Labs (CML) ne servent pas hors de CML sans
+  licence : « Downloading these VM images and using them outside Cisco
+  Modeling Labs without a proper license is prohibited »
+  ([VM Images for CML Labs](https://developer.cisco.com/docs/modeling-labs/vm-images-for-cml-labs/)).
+- CML-Free existe depuis la version 2.8 : gratuit, sans licence, 5 machines
+  à la fois. Ses images comprennent IOL, IOL-L2 et ASAv
+  ([CML-Free](https://developer.cisco.com/docs/modeling-labs/cml-free/)).
+
+Ce que fait le logiciel libre :
+
+- VRRP : FRR le fait avec vrrpd, en versions 2 et 3, à partir du noyau
+  Linux 5.1 ([doc de FRR](https://docs.frrouting.org/en/latest/vrrp.html)).
+  Le noyau de WSL2 est en 6.6 ou 6.18 (partie 1).
+- RSTP et MSTP : mstpd les ajoute aux bridges Linux. Son auteur prévient
+  que la partie MSTP est peu testée ([mstpd](https://github.com/mstpd/mstpd)).
+- PVST+ : une distribution, ALT Linux, l'annonce pour mstpd. Un ticket du
+  projet montre qu'il ne parle pas avec un switch Cisco en Rapid-PVST
+  ([ticket 80](https://github.com/mstpd/mstpd/issues/80)).
+- Open vSwitch a RSTP dans son code
+  ([rstp.h](https://sources.debian.org/src/openvswitch/3.6.0-5/lib/rstp.h)),
+  et sa FAQ dit que sa partie spanning tree est peu testée.
+- LACP : le bonding de Linux et Open vSwitch le font.
+
+À mesurer à l'étape du réseau :
+
+- RSTP et MSTP avec mstpd, sur un lab de plusieurs switchs ;
+- VRRP avec FRR, dans le noyau de WSL2 ;
+- PVST+ face à un switch Cisco, quand le pilotage de Packet Tracer ou de CML
+  sera là.
+
+Ce qu'on en tire :
+
+- Dans l'app, le réseau se fait en libre, avec les normes. L'IA donne
+  l'équivalent Cisco : VRRP pour HSRP, MSTP pour PVST+, LACP pour PAgP.
+- Le vrai Cisco passe par Packet Tracer ou CML, pilotés. CML-Free suffit
+  pour un petit lab Cisco de 5 machines.

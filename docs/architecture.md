@@ -83,6 +83,10 @@ veth par câble, des bridges ou Open vSwitch pour les switchs, tc et netem
 pour dégrader un lien. Par défaut, le réseau du lab n'a aucune route vers le
 vrai réseau.
 
+Les protocoles : le bonding de Linux ou Open vSwitch pour LACP, mstpd pour
+RSTP et MSTP, FRR pour VRRP, OSPF et BGP. Ce qu'on sait de chacun est dans
+[mesures.md](mesures.md), partie 10.
+
 ### ESXi, le stockage, le WiFi
 
 - ESXi : une VM QEMU avec la virtualisation imbriquée. Sous Windows, ça fait
@@ -191,7 +195,8 @@ L'app tient un journal de ce que l'IA a fait, sur le PC et dans le lab.
 Il vient après l'émulation. Chaque logiciel a déjà de quoi être commandé :
 
 - VMware Workstation : `vmrun` et une API REST ;
-- Cisco Modeling Labs : une API REST ;
+- Cisco Modeling Labs : une API REST. CML-Free est gratuit, avec 5 machines
+  Cisco à la fois ;
 - Packet Tracer : un canal prévu pour les extensions. L'IA peut y charger un
   lab, mais voit mal ce que l'utilisateur y fait, le logiciel est fermé ;
 - le cloud : les outils en ligne de commande des hébergeurs, avec les accès

@@ -111,8 +111,9 @@ Mac.
 
 ### Le pilotage
 
-Le mainteneur a dit : l'émulation d'abord, le pilotage ensuite. Il n'a pas
-dit quels logiciels, ni si c'est avant ou après juillet 2027.
+Le mainteneur a dit : l'émulation d'abord, le pilotage ensuite. Il l'a
+confirmé le 17 novembre pour le réseau Cisco : HSRP, PVST+ et les commandes
+Cisco des switchs viennent avec le pilotage de Packet Tracer et de CML.
 
 Recommandation : décider quand l'émulation tourne.
 

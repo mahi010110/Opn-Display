@@ -60,7 +60,9 @@ L'app fait tourner elle-même les machines du lab, comme GNS3 et EVE-NG. Pour
 juillet 2027, le mainteneur veut tout ce qui peut s'émuler :
 
 - des serveurs Linux et leurs services (web, DNS, DHCP, SSH, partages) ;
-- le réseau : routeurs, switchs, VLAN, routage, NAT ;
+- le réseau : routeurs et switchs, cœur, distribution et accès, VLAN et
+  trunks, routage entre VLAN, EtherChannel en LACP, RSTP et MSTP, VRRP,
+  OSPF, BGP, NAT ;
 - Windows Server et Active Directory ;
 - les pare-feu et la sécurité : OPNsense, VPN, Wazuh, une machine Kali ;
 - ESXi ;
@@ -75,6 +77,11 @@ Ce que l'app ne peut pas émuler, elle le fait faire à un logiciel installé
 sur le PC, et elle le commande : Packet Tracer, VMware Workstation, Cisco
 Modeling Labs, les bacs à sable du cloud. Le pilotage se construit après
 l'émulation.
+
+Le vrai Cisco en fait partie : HSRP, PVST+, PAgP et les commandes Cisco des
+switchs passent par Packet Tracer ou Cisco Modeling Labs. Cisco interdit de
+faire tourner ses images ailleurs. CML-Free est gratuit, avec 5 machines
+Cisco à la fois ([mesures.md](mesures.md), partie 10).
 
 ### L'IA supervise
 
@@ -221,6 +228,8 @@ mainteneur.
 
 - L'app ne peut contenir ni Windows, ni ESXi, ni les images Cisco, ni Packet
   Tracer.
+- HSRP, PVST+, PAgP et les commandes Cisco des switchs ne tournent pas dans
+  l'app. Ils passent par Packet Tracer ou CML, pilotés.
 - Le vrai WiFi radio et le Fibre Channel ne s'émulent pas. Le WiFi simulé ne
   marche qu'entre machines Linux, et sous Windows il demande le noyau 6.18 de
   WSL2.
