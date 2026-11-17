@@ -199,8 +199,6 @@ Chacune se rattache aux écrans du lab sans les alourdir. Leur place est dans
   switch, ni serveur, ni pare-feu. Claude en a pris dans le reste de
   pixelarticons ([../maquettes/README.md](../maquettes/README.md)).
 - Le logo. Opn-Display est un nom de travail.
-- La façon dont le matériel d'OpenContact arrive dans ce dépôt
-  ([questions-ouvertes.md](questions-ouvertes.md)).
 
 ## 10. Comment travailler
 

@@ -1,6 +1,7 @@
 # Architecture
 
-Une proposition. Rien n'est codé. Les premières mesures sont dans
+Une proposition, sauf la pile de la partie 5, choisie le 17 novembre 2026.
+Rien n'est codé. Les premières mesures sont dans
 [mesures.md](mesures.md). Rien n'est encore mesuré sur le PC du mainteneur.
 
 Les pistes viennent des recherches du 13 novembre 2026 et des trois outils
@@ -202,15 +203,21 @@ Il vient après l'émulation. Chaque logiciel a déjà de quoi être commandé :
 - le cloud : les outils en ligne de commande des hébergeurs, avec les accès
   de l'utilisateur.
 
-## 5. La pile proposée
+## 5. La pile
 
-Ce sont les pistes des recherches. Rien n'est choisi.
+Choisie le 17 novembre 2026 :
+
+| Partie | Choix | Pourquoi |
+|---|---|---|
+| App de bureau, moteur et IA | Tauri 2, en Rust | Déjà utilisé dans `natif/` d'OpenContact et prévu pour Opn-Link. Installeur léger. Un seul langage pour l'app, le moteur et l'IA |
+| Écrans | React et TypeScript, dans la page web de Tauri | Les composants du kit d'OpenContact sont en React. React Flow dessine le schéma du lab. Le mainteneur a laissé Claude choisir « le meilleur, avec le plus de potentiel » |
+| Linux de l'app | Debian, dans WSL2 sous Windows et dans une VM Lima sous macOS. Sous Linux, le système lui-même | Stable, sans compte. FRR, QEMU, Open vSwitch et mstpd sont dans ses paquets |
+| Matériel d'OpenContact | Copié dans le code, avec sa version notée | Comme pour les maquettes. Aucun script |
+
+Encore à choisir, chacun à son étape, après mesure :
 
 | Partie | Piste | Pourquoi |
 |---|---|---|
-| App de bureau | Tauri 2, en Rust | Déjà utilisé dans `natif/` d'OpenContact et prévu pour Opn-Link. Installeur léger |
-| Interface | Une page web dans Tauri | Le matériel « Utilitaire 98 » d'OpenContact est fait pour le web (des jetons CSS). Les briques de terminal et de schéma existent aussi pour le web |
-| Environnement Linux | WSL2 sous Windows, Lima sous macOS | Aucune VM à gérer soi-même |
 | Conteneurs | Docker ou containerd, commandé depuis Rust (bollard) | Connu, documenté |
 | VM | QEMU, commandé par QMP et l'agent invité | Ce que font GNS3 et EVE-NG |
 | Agent | Une boucle en Rust (rig-core ou genai) | Pas de Python à embarquer. Si le serveur MCP se fait un jour : rmcp |
@@ -221,6 +228,6 @@ Ce sont les pistes des recherches. Rien n'est choisi.
 
 ## 6. Avant de choisir
 
-L'ordre de construction, la licence et la pile dépendent des mesures. Ce qui
-est fait est dans [mesures.md](mesures.md). Ce qui reste se mesure sur le PC
+Le reste de la pile se choisit à chaque étape, après mesure. Ce qui est
+mesuré est dans [mesures.md](mesures.md). Ce qui reste se mesure sur le PC
 du mainteneur, par l'app elle-même.

@@ -105,6 +105,11 @@ Le produit :
   une vérification ou un cours.
 - Les écrans validés en maquette sont listés dans `maquettes/README.md`. Un
   écran nouveau part de `maquettes/` et de `maquettes/opn-display.css`.
+- La technique : Tauri 2 et Rust pour l'app, le moteur et l'IA ; React et
+  TypeScript pour les écrans ; Debian pour le Linux de l'app ; le matériel
+  d'OpenContact copié dans le code, avec sa version notée. Le reste de la
+  pile se choisit à chaque étape, après mesure (`docs/architecture.md`,
+  partie 5).
 - Le nom est un nom de travail. Le dépôt est privé, le mainteneur décidera
   plus tard quand l'ouvrir.
 
@@ -164,10 +169,10 @@ confiance », il peut revenir dessus.
 
 ## Ce qui n'est pas décidé
 
-- L'architecture et la pile. `docs/architecture.md` est une proposition.
+- Le reste de la pile : conteneurs, VM, bibliothèque de l'IA. Chacun à son
+  étape, après mesure.
 - La licence.
-- La question à Anthropic sur l'abonnement Claude, et la façon dont le
-  matériel d'OpenContact arrive dans ce dépôt.
+- La question à Anthropic sur l'abonnement Claude.
 - Les écrans du pilotage, quand il viendra.
 - Le lien avec OpenContact et Opn-Link, après la première version.
 - Rien n'est mesuré sur le PC du mainteneur.

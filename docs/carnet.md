@@ -312,3 +312,19 @@ logiciels libres ([mesures.md](mesures.md), partie 10).
   ailleurs. CML-Free est gratuit, avec 5 machines Cisco à la fois.
 - Le mainteneur garde l'ordre : le réseau en libre d'abord, Packet Tracer et
   CML à l'étape du pilotage. L'IA dit à chaque fois l'équivalent Cisco.
+
+### La technique
+
+Claude a présenté quatre choix pour commencer à coder. Le mainteneur a
+répondu :
+
+- l'app de bureau, le moteur et l'IA : Tauri 2 et Rust ;
+- le Linux de l'app : Debian, dans WSL2 sous Windows et dans une VM sur Mac ;
+- le matériel d'OpenContact : copié dans le code, avec sa version notée ;
+- les écrans : « Le meilleur et avec le plus de potentiel qui nous
+  convienne ». Claude retient React et TypeScript : les composants du kit
+  d'OpenContact sont en React, React Flow dessine le schéma du lab, et c'est
+  ce qui a le plus de briques toutes faites.
+
+Le reste de la pile (conteneurs, VM, bibliothèque de l'IA) se choisit à
+chaque étape, après mesure.

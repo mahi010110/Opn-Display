@@ -70,13 +70,9 @@ dans [../maquettes/README.md](../maquettes/README.md), avec les 30 écrans
 dessinés jusqu'au 17 novembre. Restent les écrans du pilotage, qui se
 dessineront quand le pilotage viendra.
 
-Pour les maquettes, le matériel a été copié à la main dans `maquettes/kit/`,
-avec l'accord du mainteneur. Reste à dire comment il arrivera dans l'app, et
-comment il suivra les changements d'OpenContact. Opn-Link le prend par un
-script, et ici il n'y a pas de script.
-
-Recommandation : le décider quand on code le premier écran. Une piste : un
-sous-module git qui pointe sur le dépôt d'OpenContact.
+Le matériel arrive dans l'app comme dans les maquettes : copié dans le
+code, avec la version d'OpenContact notée. Quand OpenContact change, Claude
+recopie et note la nouvelle version. Décidé le 17 novembre 2026.
 
 ## Les souhaits qui butent sur une limite
 
