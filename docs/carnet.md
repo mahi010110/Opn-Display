@@ -385,3 +385,26 @@ Montré au mainteneur en captures : l'app lancée pour de vrai sous Linux, et
 les écrans Windows avec des réponses simulées. Il a répondu « Oui, ils me
 vont ». Avant l'étape 4, il essaie l'installeur sur son PC (« J'essaie
 l'installeur »).
+
+### Une vraie infra, comme les concurrents ou mieux
+
+Le mainteneur : « n'oublie pas les détails qui font la différence et la
+qualité. Je ne connais pas tout, donc à toi de savoir, mais il faut que ce
+soit comme les concurrents, voire mieux, de façon générale et dans les
+détails. Je souhaite que ce soit complet, et surtout qu'une véritable infra
+puisse tourner et être émulée, que ce soit au niveau de l'équilibrage de
+charge, la redondance, la sécurité, les ports, les racks et tout ce que
+j'ai oublié. »
+
+Claude a relevé ce que font GNS3, EVE-NG, Packet Tracer et CML, et fait
+l'inventaire d'une vraie infra dans [infra-complete.md](infra-complete.md).
+Quatre points sont posés au mainteneur dans
+[questions-ouvertes.md](questions-ouvertes.md).
+
+Le mainteneur a retenu les quatre recommandations :
+
+- les baies : « Une vue physique », comme Packet Tracer, avec le réseau ;
+- les services et la haute disponibilité : « Une étape à part », juste
+  après le réseau. L'ordre passe à douze étapes ;
+- les images d'autres constructeurs : « Oui, si la licence le permet » ;
+- les interfaces web du lab : « Dans l'app ».

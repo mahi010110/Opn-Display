@@ -25,14 +25,23 @@ marche et peut se montrer.
    écrans sont validés. Le mainteneur l'essaie sur son PC avant l'étape 4.
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
    réparation. Avec ses réglages et ses garde-fous.
-5. Le réseau : routeurs, switchs, VLAN, routage, NAT.
-6. Les VM : Windows Server et Active Directory. Dès qu'une VM tourne, on
-   essaie ESXi, pour savoir tôt s'il marche sous Windows.
-7. Les pare-feu et la sécurité : OPNsense, VPN, Wazuh, Kali.
-8. Le stockage et le WiFi simulé.
-9. ESXi, si l'essai de l'étape 6 a marché.
-10. macOS, l'installeur et la version publique.
-11. Le pilotage.
+5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
+   capture d'un câble, les câbles qu'on coupe et qu'on dégrade, et la vue
+   des baies.
+6. Les services et la haute disponibilité, en conteneurs : DNS, DHCP, web,
+   bases de données, équilibrage de charge, redondance, supervision,
+   journaux, sauvegarde.
+7. Les VM : Windows Server et Active Directory, et les images d'autres
+   constructeurs que l'utilisateur fournit. Dès qu'une VM tourne, on essaie
+   ESXi, pour savoir tôt s'il marche sous Windows.
+8. Les pare-feu et la sécurité : OPNsense, VPN, Wazuh, Suricata, Kali.
+9. Le stockage et le WiFi simulé.
+10. ESXi, si l'essai de l'étape 7 a marché.
+11. macOS, l'installeur et la version publique.
+12. Le pilotage.
+
+Les étapes 5 et 6 et les ajouts des étapes 7 et 8 viennent de la demande
+d'une vraie infra, le 17 novembre 2026 ([infra-complete.md](infra-complete.md)).
 
 Chaque famille de machines arrive avec ses pannes et ses cours. La version
 Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
@@ -53,6 +62,30 @@ Linux où elle tourne sous le compte de l'utilisateur. À régler avec la
 version Linux publique. Recommandation : sous Linux aussi, faire tourner le
 lab dans un Linux à l'app (un conteneur ou une VM Incus), où elle est root,
 comme sous Windows.
+
+### Une vraie infra
+
+Le mainteneur veut une infra complète, comme les concurrents ou mieux
+(17 novembre 2026). L'inventaire est dans
+[infra-complete.md](infra-complete.md).
+
+Décidé le même jour, sur les recommandations de Claude :
+
+1. Les baies : une vue physique à côté du schéma, comme celle de Packet
+   Tracer. Baies 42U, faces avant et ports, câbles et leur longueur,
+   alimentations A et B, onduleur, pannes physiques. Elle arrive avec le
+   réseau, à l'étape 5.
+2. Les services et la haute disponibilité : une étape à part, la 6, juste
+   après le réseau. Tout tourne en conteneurs, avant les VM.
+3. Les images d'autres constructeurs (MikroTik, VyOS, Fortinet, Palo Alto) :
+   l'app les fait tourner quand l'utilisateur les fournit et que la licence
+   le permet, comme GNS3 et EVE-NG. Cisco reste au pilotage.
+4. Les interfaces web du lab (OPNsense, Zabbix, GLPI, Wazuh) : elles
+   s'ouvrent dans l'app, qui fait le pont entre Windows et le réseau du lab.
+
+Reste ouvert : l'accès du lab au vrai Internet. Recommandation : coupé par
+défaut, ouvert sur demande le temps d'installer des paquets, et dit à
+l'écran tant qu'il est ouvert.
 
 ### La licence
 

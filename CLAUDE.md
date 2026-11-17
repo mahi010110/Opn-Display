@@ -105,9 +105,17 @@ Le produit :
 - Gratuit et libre. La licence est à choisir : le mainteneur décidera plus
   tard. Claude recommande MIT ou Apache-2.0.
 - L'ordre de construction : les maquettes, puis l'app qui vérifie le PC, puis
-  un petit lab Linux, puis l'IA, puis les autres familles de machines, puis
-  macOS et la version publique, puis le pilotage. Le détail est dans
-  `docs/questions-ouvertes.md`.
+  un petit lab Linux, puis l'IA, puis le réseau avec la vue des baies, puis
+  les services et la haute disponibilité, puis les autres familles de
+  machines, puis macOS et la version publique, puis le pilotage. Le détail
+  est dans `docs/questions-ouvertes.md`.
+- Une vraie infra, complète, comme les concurrents ou mieux, dans les
+  détails aussi : l'équilibrage de charge, la redondance, la sécurité, les
+  ports, les baies (17 novembre 2026). L'inventaire est dans
+  `docs/infra-complete.md`.
+- Les baies sont une vue physique à côté du schéma. Les images d'autres
+  constructeurs tournent quand l'utilisateur les fournit et que la licence
+  le permet. Les interfaces web du lab s'ouvrent dans l'app.
 - Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
   ses jetons, ses polices, ses icônes, ses composants et les règles de son
   kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.

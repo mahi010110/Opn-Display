@@ -69,6 +69,22 @@ juillet 2027, le mainteneur veut tout ce qui peut s'émuler :
 - un SAN et un NAS (iSCSI, NFS, SMB) ;
 - le WiFi simulé.
 
+Le 17 novembre 2026, il a ajouté : « il faut que ce soit comme les
+concurrents, voire mieux, de façon générale et dans les détails », et
+« qu'une véritable infra puisse tourner et être émulée, que ce soit au
+niveau de l'équilibrage de charge, la redondance, la sécurité, les ports,
+les racks et tout ce que j'ai oublié ». L'inventaire, famille par famille,
+est dans [infra-complete.md](infra-complete.md). En plus de la liste
+ci-dessus :
+
+- une vue physique des baies, à côté du schéma : faces avant et ports,
+  câbles et longueurs, alimentations doublées, onduleur ;
+- l'équilibrage de charge, la redondance et la haute disponibilité, la
+  supervision, les journaux et la sauvegarde, en conteneurs ;
+- les images d'autres constructeurs que l'utilisateur fournit, quand leur
+  licence le permet ;
+- les interfaces web des outils du lab, ouvertes dans l'app.
+
 Le lab tourne sur le PC de l'utilisateur.
 
 ### Elle pilote le reste
@@ -219,7 +235,9 @@ extérieur sur l'app.
 L'ordre de construction, décidé le 16 novembre 2026 : les maquettes, puis
 l'app qui vérifie le PC, puis un petit lab Linux, puis l'IA, puis les autres
 familles de machines, puis macOS et la version publique, puis le pilotage
-(voir [questions-ouvertes.md](questions-ouvertes.md)).
+(voir [questions-ouvertes.md](questions-ouvertes.md)). Le 17 novembre 2026,
+le réseau prend les ports et la vue des baies, et les services avec la
+haute disponibilité deviennent une étape à part, juste après.
 
 ## 7. Les limites connues
 

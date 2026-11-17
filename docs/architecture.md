@@ -67,7 +67,9 @@ charger les modules du noyau dont le lab a besoin.
 
 - Des conteneurs pour ce qui est léger : services Linux, routeurs FRR,
   clients. Ils démarrent en quelques secondes.
-- Des VM QEMU pour le reste : Windows Server, OPNsense, Kali, ESXi.
+- Des VM QEMU pour le reste : Windows Server, OPNsense, Kali, ESXi, et les
+  images d'autres constructeurs que l'utilisateur fournit, quand la licence
+  le permet.
 - Windows Server s'installe sans intervention depuis l'ISO, avec un fichier
   de réponses et les pilotes virtio.
 - L'app commande une VM par QMP et par l'agent invité de QEMU. L'agent invité
@@ -87,6 +89,17 @@ vrai réseau.
 Les protocoles : le bonding de Linux ou Open vSwitch pour LACP, mstpd pour
 RSTP et MSTP, FRR pour VRRP, OSPF et BGP. Ce qu'on sait de chacun est dans
 [mesures.md](mesures.md), partie 10.
+
+Sur chaque câble, comme GNS3, EVE-NG et CML : la capture (tcpdump dans le
+réseau d'une des deux machines), la coupure (un bout éteint), la
+dégradation (tc et netem : délai, gigue, perte, débit). La vue des baies
+reprend les mêmes machines et les mêmes câbles
+([infra-complete.md](infra-complete.md)).
+
+Les interfaces web du lab s'ouvrent dans l'app. Sous Windows, le réseau du
+lab vit dans WSL2 et Windows ne le voit pas : l'app fait le pont. Piste à
+mesurer à l'étape 6 : un appareil `proxy` d'Incus, qui ouvre un port de
+Debian vers la machine, et le renvoi de WSL2 vers Windows.
 
 ### ESXi, le stockage, le WiFi
 

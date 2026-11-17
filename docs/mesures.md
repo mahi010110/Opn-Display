@@ -291,7 +291,7 @@ Ce qu'on en tire :
   Une machine Incus se comporte comme un vrai serveur, un conteneur Docker
   non.
 - Incus fait aussi les VM et les instantanés : un seul outil pourrait
-  servir des étapes 3 à 9.
+  servir des étapes 3 à 10.
 - Docker et nos bridges ne vont pas ensemble sans règles en plus.
 - À mesurer sur le PC du mainteneur : Incus dans WSL2, ses images, ses VM
   et un stockage plus rapide (btrfs).
