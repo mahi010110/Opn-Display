@@ -484,3 +484,17 @@ peut reprendre :
   minutes à répondre.
 - Une nouvelle panne repart d'une discussion vide avec l'IA, pour qu'elle
   ne mélange pas l'ancienne panne et la nouvelle.
+- La panne posée survit à la fermeture de l'app, comme le lab qui la
+  garde : la carte revient, avec les indices déjà donnés, et Mes labs
+  montre « Panne » à côté du lab. « Remettre à zéro » emporte la panne, et
+  sa question le dit.
+- Avant une pose ou une vérification, l'app démarre le lab s'il est arrêté
+  et attend que ses machines aient fini de démarrer.
+
+Claude a aussi trouvé que la fabrication de l'installeur Windows échouait
+depuis l'envoi qui a ajouté le test du terminal : l'installeur essayé par
+le mainteneur venait de l'envoi d'avant, et celui de l'IA n'avait jamais
+été fabriqué. La console de Windows demande au terminal où est son curseur
+et attend la réponse avant de lancer le programme. Dans l'app, xterm.js
+répond ; le test ne répondait pas. Il répond maintenant, et la fabrication
+passe.

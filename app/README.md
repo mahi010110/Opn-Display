@@ -80,6 +80,10 @@ si aucun n'échoue, la panne n'a rien cassé et le lab revient à l'instantané.
 Une panne inventée passe par l'outil `poser_une_panne`, que l'IA n'a que
 quand l'utilisateur en demande une. Elle prend le même chemin.
 
+La panne posée est gardée dans `panne.json`, dans le dossier de
+configuration de l'app, et reprise à l'ouverture. Le fichier part quand la
+panne est réparée, abandonnée, ou que le lab est remis à zéro.
+
 ## Le fabriquer
 
 Il faut Rust, Node 22, et sous Linux les bibliothèques de Tauri

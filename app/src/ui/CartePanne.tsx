@@ -31,7 +31,7 @@ export function CartePanne(props: {
     indicePanne()
       .then((texte) => {
         props.onDire(texte, 'ia')
-        props.onPanne({ ...panne, indicesDonnes: panne.indicesDonnes + 1 })
+        props.onPanne({ ...panne, indicesDonnes: panne.indicesDonnes + 1, indicesLus: [...panne.indicesLus, texte] })
       })
       .catch((e) => props.onDire(String(e), 'note'))
   }

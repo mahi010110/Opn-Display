@@ -11,9 +11,12 @@ export function MesLabs(props: {
   occupe: string | null
   erreur: string | null
   gestes: Gestes
+  /** Une panne posée attend dans le lab. */
+  enPanne: boolean
   onOuvrir: () => void
 }) {
   const { rapport, etat, occupe } = props
+  const badge = props.enPanne && <span className="oc-badge oc-badge--danger">Panne</span>
   const { totaleGo, libreGo } = rapport.memoire
   const enMarche = etat?.machines.filter((m) => m.marche === 'enMarche') ?? []
   const memoire = enMarche.reduce((total, m) => total + (m.memoire ?? 0), 0)
@@ -36,7 +39,9 @@ export function MesLabs(props: {
             <Fenetre titre="En marche" active>
               <div className="en-marche">
                 <div className="en-marche-texte">
-                  <p className="en-marche-nom">{etat.lab.nom}</p>
+                  <p className="en-marche-nom">
+                    {etat.lab.nom} {badge}
+                  </p>
                   <p className="mono">
                     {occupe ?? `${enMarche.length} ${enMarche.length > 1 ? 'machines' : 'machine'} en marche sur ${nombre}, ${texteMemoire(memoire)} de RAM`}
                   </p>
@@ -64,7 +69,9 @@ export function MesLabs(props: {
                 <tbody>
                   {etat && (
                     <tr>
-                      <td className="nom">{etat.lab.nom}</td>
+                      <td className="nom">
+                        {etat.lab.nom} {badge}
+                      </td>
                       <td className="chiffre">{nombre}</td>
                       <td className="fin">
                         <button className="oc-btn oc-btn--sm" disabled={occupe !== null} onClick={lancer}>

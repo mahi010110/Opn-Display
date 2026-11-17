@@ -147,9 +147,13 @@ async fn arreter_machine(nom: String) -> Result<EtatLab, String> {
 #[tauri::command]
 async fn remettre_a_zero(app: AppHandle) -> Result<EtatLab, String> {
     a_cote(move || {
-        lab::remettre_a_zero(&le_lab(), &mut |avance| {
+        let etat = lab::remettre_a_zero(&le_lab(), &mut |avance| {
             let _ = app.emit("lab-avance", avance);
-        })
+        });
+        // Les machines repartent de leur image : la panne et son instantané
+        // sont partis avec elles.
+        pannes::oublier_la_panne(&app);
+        etat
     })
     .await
 }
@@ -278,6 +282,10 @@ fn main() {
         .manage(Fermeture::default())
         .manage(ia::Ia::default())
         .manage(pannes::Pannes::default())
+        .setup(|app| {
+            pannes::reprendre(app.handle());
+            Ok(())
+        })
         .on_window_event(|fenetre, evenement| {
             if let WindowEvent::CloseRequested { api, .. } = evenement {
                 api.prevent_close();

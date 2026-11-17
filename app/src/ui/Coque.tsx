@@ -94,7 +94,13 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
     arreter: () => agir('Arrêt', arreterLab),
     demarrer: (machine) => agir(`Démarrage de ${machine}`, () => demarrerMachine(machine)),
     eteindre: (machine) => agir(`Arrêt de ${machine}`, () => arreterMachine(machine)),
-    remettreAZero: () => agir('Remise à zéro', remettreAZero),
+    // La remise à zéro emporte aussi la panne posée.
+    remettreAZero: () =>
+      agir('Remise à zéro', remettreAZero).then(() =>
+        panneEnCours()
+          .then(setPanne)
+          .catch(() => undefined),
+      ),
   }
 
   const aller = (vers: Ecran) => (evenement: MouseEvent) => {
@@ -161,7 +167,15 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
       </header>
 
       {ecran === 'labs' && (
-        <MesLabs rapport={props.rapport} etat={etat} occupe={occupe} erreur={erreur} gestes={gestes} onOuvrir={ouvrirLeLab} />
+        <MesLabs
+          rapport={props.rapport}
+          etat={etat}
+          occupe={occupe}
+          erreur={erreur}
+          gestes={gestes}
+          enPanne={panne !== null && !panne.verification?.reparee}
+          onOuvrir={ouvrirLeLab}
+        />
       )}
       {/* Le lab reste monté quand on le quitte : ses terminaux continuent. */}
       {labOuvert && (

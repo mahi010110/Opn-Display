@@ -341,7 +341,11 @@ La suite de l'étape 4, les pannes :
 - l'IA connaît la panne posée et sa cause. En Coach, elle ne la donne pas.
   En Silencieuse, elle n'en parle pas, et « Un indice » n'apparaît pas ;
 - « Arrêter » coupe l'IA tout de suite, même au milieu d'une réponse du
-  modèle.
+  modèle ;
+- la panne posée est gardée dans `panne.json`, à côté de `ia.json`, jusqu'à
+  sa fin : fermer l'app ne la perd pas. « Remettre à zéro » l'emporte ;
+- avant une pose ou une vérification, l'app démarre le lab s'il est arrêté,
+  et attend que ses machines aient fini de démarrer.
 
 Testé ici avec un vrai Incus : les cinq pannes posées, leurs tests en
 échec, puis le retour à l'instantané. Dans l'app lancée pour de vrai : une

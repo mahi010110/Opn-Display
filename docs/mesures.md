@@ -416,6 +416,10 @@ pour la suite de l'étape 4.
 - L'instantané des trois machines prend 4 s (11 s au premier essai), le
   retour 4 s, l'effacement 2,5 s. Le retour redémarre une machine qui
   tourne : ses terminaux se ferment, et l'app propose de les rouvrir.
+- Le lab démarré, ses machines ont fini de démarrer 0,8 s plus tard
+  (`systemctl is-system-running --wait`), et leur réseau répond aussitôt.
+  Juste après `incus start`, systemctl ne joint pas encore systemd : il
+  faut réessayer.
 - Dans l'app lancée pour de vrai, la passerelle de pc2 changée : « Pas
   encore », 0 test sur 3. La route corrigée à chaud : 2 sur 3, le test du
   fichier de systemd-networkd échoue toujours. Le fichier corrigé : 3 sur 3.

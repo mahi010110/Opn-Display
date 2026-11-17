@@ -381,6 +381,30 @@ pub(crate) fn commande_dans(
     )
 }
 
+/// Démarre le lab s'il ne tourne pas en entier, puis attend que chaque
+/// machine ait fini de démarrer : avant, son réseau n'est pas encore posé
+/// et un test ou une commande échouerait pour rien.
+pub fn lancer_et_attendre(lab: &Lab, avance: &mut dyn FnMut(&str)) -> Result<(), String> {
+    let en_marche = etat(lab)?
+        .machines
+        .iter()
+        .all(|m| m.marche == Marche::EnMarche);
+    if en_marche {
+        return Ok(());
+    }
+    lancer(lab, avance)?;
+    avance("Démarrage des machines");
+    // Juste après le démarrage, systemctl ne joint pas encore systemd :
+    // on réessaie. Une machine « degraded » a fini de démarrer aussi.
+    let attente = "until systemctl is-system-running --wait >/dev/null 2>&1 \
+                   || [ \"$(systemctl is-system-running 2>/dev/null)\" = degraded ]; \
+                   do sleep 0.3; done";
+    for machine in &lab.machines {
+        let _ = commande_dans(lab, &machine.nom, attente, 30);
+    }
+    Ok(())
+}
+
 /// Arrête tout de suite les machines en marche. Pour la fermeture de l'app.
 pub fn arreter_vite(lab: &Lab) {
     let projet = projet(lab);

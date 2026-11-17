@@ -169,5 +169,7 @@ export interface VuePanne {
   tests: number
   indices: number
   indicesDonnes: number
+  /** Les indices déjà donnés, pour les remontrer quand l'app rouvre. */
+  indicesLus: string[]
   verification: VerificationPanne | null
 }

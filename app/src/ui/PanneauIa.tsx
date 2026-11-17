@@ -35,7 +35,10 @@ export function PanneauIa(props: {
   onPanne: (panne: VuePanne | null) => void
   onAutrePanne: () => void
 }) {
-  const [entrees, setEntrees] = useState<Entree[]>([])
+  // Les indices déjà donnés avant que l'app ne se ferme reviennent dans le fil.
+  const [entrees, setEntrees] = useState<Entree[]>(() =>
+    (props.panne?.indicesLus ?? []).map((texte) => ({ sorte: 'ia', texte })),
+  )
   const [demandes, setDemandes] = useState<Demande[]>([])
   const [texte, setTexte] = useState('')
   const [occupee, setOccupee] = useState(false)

@@ -185,7 +185,10 @@ export function LabOuvert(props: {
             </button>
           }
         >
-          <p className="lu">Les machines repartent comme au premier lancement. Ce que tu y as changé est perdu.</p>
+          <p className="lu">
+            Les machines repartent comme au premier lancement. Ce que tu y as changé est perdu
+            {props.panne && !props.panne.verification?.reparee ? ', et la panne posée part aussi.' : '.'}
+          </p>
         </Dialogue>
       )}
     </>

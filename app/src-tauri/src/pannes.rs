@@ -1,18 +1,26 @@
 //! Les pannes côté app : celle qui est posée, ses indices, sa vérification.
 
+use std::fs;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use moteur::lab;
 use moteur::pannes::{self, Difficulte, Panne, ResultatTest};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::{a_cote, le_lab};
 
+/// La panne posée. Elle est gardée dans `panne.json` jusqu'à sa fin : le
+/// lab la garde aussi quand l'app est fermée.
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct EnCours {
     panne: Panne,
     posee: u64,
     indices_donnes: usize,
+    #[serde(skip)]
     verification: Option<Verification>,
 }
 
@@ -41,6 +49,8 @@ pub struct VuePanne {
     tests: usize,
     indices: usize,
     indices_donnes: usize,
+    /// Les indices déjà donnés, pour les remontrer quand l'app rouvre.
+    indices_lus: Vec<String>,
     verification: Option<Verification>,
 }
 
@@ -51,6 +61,54 @@ pub struct ResumePanne {
     titre: String,
     famille: String,
     niveau: Difficulte,
+}
+
+fn fichier(app: &AppHandle) -> Option<PathBuf> {
+    Some(app.path().app_config_dir().ok()?.join("panne.json"))
+}
+
+/// Écrit la panne en cours, ou efface le fichier quand elle est finie.
+fn garder(app: &AppHandle, en_cours: Option<&EnCours>) {
+    let Some(chemin) = fichier(app) else {
+        return;
+    };
+    let finie = en_cours.is_none_or(|e| e.verification.as_ref().is_some_and(|v| v.reparee));
+    if finie {
+        let _ = fs::remove_file(&chemin);
+        return;
+    }
+    if let (Some(dossier), Ok(texte)) = (chemin.parent(), serde_json::to_string_pretty(&en_cours)) {
+        let _ = fs::create_dir_all(dossier);
+        let _ = fs::write(&chemin, texte);
+    }
+}
+
+/// À l'ouverture de l'app : la panne laissée en cours la dernière fois.
+pub fn reprendre(app: &AppHandle) {
+    let Some(chemin) = fichier(app) else {
+        return;
+    };
+    let Ok(texte) = fs::read_to_string(&chemin) else {
+        return;
+    };
+    match serde_json::from_str::<EnCours>(&texte) {
+        Ok(en_cours) => {
+            if let Ok(mut place) = app.state::<Pannes>().en_cours.lock() {
+                *place = Some(en_cours);
+            }
+        }
+        Err(_) => {
+            let _ = fs::remove_file(&chemin);
+        }
+    }
+}
+
+/// Le lab est reparti de zéro : la panne n'y est plus.
+pub fn oublier_la_panne(app: &AppHandle) {
+    if let Ok(mut place) = app.state::<Pannes>().en_cours.lock() {
+        *place = None;
+    }
+    garder(app, None);
 }
 
 fn maintenant() -> u64 {
@@ -75,8 +133,20 @@ fn vue(en_cours: &EnCours) -> VuePanne {
         tests: en_cours.panne.tests.len(),
         indices: en_cours.panne.indices.len(),
         indices_donnes: en_cours.indices_donnes,
+        indices_lus: (0..en_cours.indices_donnes)
+            .filter_map(|n| texte_indice(&en_cours.panne, n))
+            .collect(),
         verification: en_cours.verification.clone(),
     }
+}
+
+fn texte_indice(panne: &Panne, n: usize) -> Option<String> {
+    let indice = panne.indices.get(n)?;
+    Some(format!(
+        "Indice {} sur {}. {indice}",
+        n + 1,
+        panne.indices.len()
+    ))
 }
 
 fn active(app: &AppHandle) -> bool {
@@ -99,6 +169,7 @@ pub fn poser_et_retenir(app: &AppHandle, panne: Panne) -> Result<VuePanne, Strin
         verification: None,
     };
     let vue = vue(&en_cours);
+    garder(app, Some(&en_cours));
     *app.state::<Pannes>()
         .en_cours
         .lock()
@@ -159,18 +230,14 @@ pub fn panne_en_cours(etat: State<'_, Pannes>) -> Option<VuePanne> {
 }
 
 #[tauri::command]
-pub fn indice_panne(etat: State<'_, Pannes>) -> Result<String, String> {
+pub fn indice_panne(app: AppHandle, etat: State<'_, Pannes>) -> Result<String, String> {
     let mut place = etat.en_cours.lock().map_err(|e| e.to_string())?;
     let en_cours = place.as_mut().ok_or("Aucune panne n'est posée.")?;
-    let total = en_cours.panne.indices.len();
-    let Some(indice) = en_cours.panne.indices.get(en_cours.indices_donnes) else {
-        return Err("Il n'y a plus d'indice. Demande à l'IA, ou regarde les tests.".into());
-    };
+    let texte = texte_indice(&en_cours.panne, en_cours.indices_donnes)
+        .ok_or("Il n'y a plus d'indice. Demande à l'IA, ou regarde les tests.")?;
     en_cours.indices_donnes += 1;
-    Ok(format!(
-        "Indice {} sur {total}. {indice}",
-        en_cours.indices_donnes
-    ))
+    garder(&app, Some(en_cours));
+    Ok(texte)
 }
 
 #[tauri::command]
@@ -185,6 +252,9 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
             .map(|e| e.panne.clone())
             .ok_or("Aucune panne n'est posée.")?;
         let lab = le_lab();
+        // Le bouton de la carte dit déjà « Vérification » : rien de plus à
+        // montrer pendant que le lab démarre.
+        lab::lancer_et_attendre(&lab, &mut |_| {})?;
         let tests = pannes::verifier(&lab, &panne);
         let reparee = tests.iter().all(|t| t.reussi);
         if reparee {
@@ -198,6 +268,7 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
             tests,
             explication: reparee.then(|| panne.explication.clone()),
         });
+        garder(&app, Some(en_cours));
         Ok(vue(en_cours))
     })
     .await
@@ -210,9 +281,7 @@ pub async fn abandonner_panne(app: AppHandle) -> Result<(), String> {
         if active(&app) {
             pannes::revenir(&le_lab())?;
         }
-        if let Ok(mut place) = app.state::<Pannes>().en_cours.lock() {
-            *place = None;
-        }
+        oublier_la_panne(&app);
         Ok(())
     })
     .await
@@ -220,13 +289,14 @@ pub async fn abandonner_panne(app: AppHandle) -> Result<(), String> {
 
 /// Une panne réparée quitte le panneau de l'IA.
 #[tauri::command]
-pub fn fermer_panne(etat: State<'_, Pannes>) {
+pub fn fermer_panne(app: AppHandle, etat: State<'_, Pannes>) {
     if let Ok(mut place) = etat.en_cours.lock()
         && place
             .as_ref()
             .is_some_and(|e| e.verification.as_ref().is_some_and(|v| v.reparee))
     {
         *place = None;
+        garder(&app, None);
     }
 }
 

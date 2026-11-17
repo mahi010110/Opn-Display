@@ -92,7 +92,7 @@ pub fn poser(lab: &Lab, panne: &Panne, avance: &mut dyn FnMut(&str)) -> Result<(
     if panne.tests.is_empty() {
         return Err("Une panne sans test ne peut pas se vérifier.".into());
     }
-    lab::lancer(lab, &mut |_| {})?;
+    lab::lancer_et_attendre(lab, avance)?;
     avance("Sauvegarde du lab");
     sauvegarder(lab)?;
     avance("Pose de la panne");
