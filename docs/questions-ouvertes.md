@@ -26,7 +26,10 @@ marche et peut se montrer.
    fonctionne bien ».
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
    réparation. Avec ses réglages et ses garde-fous. En cours depuis le
-   17 novembre 2026, avec les trois façons de la brancher ensemble.
+   17 novembre 2026, avec les trois façons de la brancher ensemble. Codé :
+   le branchement, ses outils dans le lab avec l'accord, les pannes du
+   catalogue et les pannes inventées, leur vérification. Reste : l'IA qui
+   construit le lab.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
    capture d'un câble, les câbles qu'on coupe et qu'on dégrade, et la vue
    des baies.
