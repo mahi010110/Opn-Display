@@ -1,7 +1,8 @@
 # Les mesures
 
 Les parties 1 à 9 ont été faites le 16 novembre 2026, avant de choisir la
-pile, l'ordre de construction et la licence. La partie 10 date du 17.
+pile, l'ordre de construction et la licence. Les parties 10 et 11 datent du
+17.
 
 Tout a été fait depuis l'environnement cloud : une machine Linux de 4
 processeurs et 15 Go, sans KVM. Rien n'a été mesuré sur le PC du mainteneur.
@@ -253,3 +254,44 @@ Ce qu'on en tire :
   l'équivalent Cisco : VRRP pour HSRP, MSTP pour PVST+, LACP pour PAgP.
 - Le vrai Cisco passe par Packet Tracer ou CML, pilotés. CML-Free suffit
   pour un petit lab Cisco de 5 machines.
+
+## 11. Les machines du lab : Docker ou Incus
+
+Mesuré le 17 novembre 2026 dans l'environnement cloud : Linux 6.18,
+4 processeurs, 15 Go, sans KVM. Pour choisir comment faire tourner les
+machines Linux du lab, à l'étape 3.
+
+| | Docker 29.9 | Incus 6.0 |
+|---|---|---|
+| Ce que c'est | des conteneurs d'application : un programme par conteneur | des conteneurs système : une machine Linux entière, avec systemd |
+| Le service au repos | 85 Mo (dockerd et containerd) | 75 Mo (incusd) |
+| 3 machines démarrées | 0,8 s | 2,8 s, systemd prêt dans les trois |
+| Mémoire par machine | environ 11 Mo | environ 12 Mo |
+| `systemctl` dans la machine | non, le premier processus est le programme lui-même | oui, systemd est le premier processus |
+| Instantané, puis retour | pas prévu pour | 1,1 s chacun, avec le stockage le plus simple (une copie) |
+| Les VM | non | oui, par QEMU et KVM (pas essayé ici, faute de KVM) |
+| Les images | Docker Hub, joignable d'ici | images.linuxcontainers.org, pas joignable d'ici. Image fabriquée ici : Ubuntu 24.04 avec systemd et nginx, 101 Mo |
+
+Ce qu'on a vu en plus :
+
+- Deux machines Incus reliées par un bridge à nous : le ping passe
+  (0,05 ms) et nginx répond (HTTP 200).
+- Docker met la chaîne FORWARD d'iptables à DROP, et fait passer les
+  bridges par iptables. Les câbles du lab, sur nos propres bridges, sont
+  alors coupés : le ping ne passe plus. Il repasse quand ce filtrage est
+  coupé (`net.bridge.bridge-nf-call-iptables=0`).
+- nginx ne démarrait pas dans la machine, parce qu'IPv6 manque dans cet
+  environnement cloud. Sans la ligne IPv6 de sa configuration, il démarre.
+- Debian 13 a Incus dans ses paquets, en version 6.0 LTS
+  ([wiki de Debian](https://wiki.debian.org/Incus)).
+
+Ce qu'on en tire :
+
+- Dans un lab d'administration, on répare des services avec `systemctl`.
+  Une machine Incus se comporte comme un vrai serveur, un conteneur Docker
+  non.
+- Incus fait aussi les VM et les instantanés : un seul outil pourrait
+  servir des étapes 3 à 9.
+- Docker et nos bridges ne vont pas ensemble sans règles en plus.
+- À mesurer sur le PC du mainteneur : Incus dans WSL2, ses images, ses VM
+  et un stockage plus rapide (btrfs).

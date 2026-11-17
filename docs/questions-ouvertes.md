@@ -35,6 +35,16 @@ marche et peut se montrer.
 Chaque famille de machines arrive avec ses pannes et ses cours. La version
 Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
 
+### Les machines du lab
+
+Mesuré le 17 novembre 2026 ([mesures.md](mesures.md), partie 11). Docker
+lance des conteneurs d'application, sans systemd. Incus lance des machines
+Linux entières, avec systemd, et sait aussi faire les VM et les instantanés.
+
+Recommandation : Incus, dans le Debian de l'app. Docker plus tard, seulement
+pour des images qui n'existent qu'en Docker, avec des règles pour ne pas
+couper les câbles du lab.
+
 ### La licence
 
 Le mainteneur a répondu « Je décide plus tard » (16 novembre 2026). La
