@@ -344,3 +344,6 @@ fabrique l'installeur Windows (« Oui, vas-y »).
 - Testé ici : sous Linux pour de vrai, et les écrans Windows avec des
   réponses simulées. La partie Windows ne tourne que sur un PC Windows.
 - Les mesures sur le PC du mainteneur arriveront quand il lancera l'app.
+- La première fabrication sur GitHub a réussi : les tests du moteur passent
+  sous Windows, et l'installeur pèse 2,5 Mo.
+- L'app ne sait pas encore retirer Debian de WSL2. C'est à ajouter.
