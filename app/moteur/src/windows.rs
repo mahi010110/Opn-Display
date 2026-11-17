@@ -558,6 +558,14 @@ fn installer_incus(
     }
 
     dire(EtatEtape::EnCours, "le démarrage d'Incus".into(), None);
+    // apt-get a installé Incus quand systemd ne tournait pas encore : son
+    // service n'a peut-être jamais été allumé. Et si systemctl échoue ici,
+    // c'est que systemd n'a pas démarré avec Debian.
+    systeme::lancer(
+        "systemctl",
+        &["enable", "--now", "incus.socket", "incus.service"],
+    )
+    .map_err(|e| format!("systemd ne démarre pas Incus dans Debian : {e}"))?;
     let version = incus::attendre(90)?;
     incus::preparer_pool()?;
     dire(EtatEtape::Fait, format!("Incus {version}"), None);
