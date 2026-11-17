@@ -8,9 +8,10 @@ Le code d'Opn-Display. La pile est dans
 - `moteur/` : le moteur, en Rust, sans rien de Tauri. Il vérifie le PC et
   installe le Linux de l'app. Ce qui touche à Windows est dans `windows.rs`,
   ce qui touche à Linux dans `linux.rs`. Le reste se teste partout.
-- `src-tauri/` : l'app de bureau. Elle expose le moteur aux écrans par trois
-  commandes : `verifier_pc`, `installer`, `installer_wsl`. L'installation
-  envoie son avancée par l'évènement `installation`.
+- `src-tauri/` : l'app de bureau. Elle expose le moteur aux écrans par ses
+  commandes : `verifier_pc`, `installer`, `arreter_installation`,
+  `retirer_linux`, `installer_wsl`. L'installation envoie son avancée par
+  l'évènement `installation`.
 - `src/` : les écrans, en React et TypeScript. Ils reprennent les maquettes
   validées (`../maquettes/`).
 - `src/kit/` : le matériel d'OpenContact, copié depuis son dépôt à la

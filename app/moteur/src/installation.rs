@@ -1,7 +1,8 @@
 //! L'installation du Linux de l'app. Sous Windows, c'est Debian importé dans
 //! WSL2. Sous Linux, il n'y a rien à installer.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::sync::atomic::AtomicBool;
 
 use serde::{Deserialize, Serialize};
 
@@ -36,14 +37,39 @@ pub struct Options {
     pub memoire_go: Option<u32>,
 }
 
-/// Installe le Linux de l'app, et dit où il en est à chaque étape.
-pub fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> Result<(), String> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Fin {
+    Installe,
+    /// L'utilisateur a arrêté l'installation : ce qu'elle avait mis dans
+    /// WSL2 est reparti.
+    Arretee,
+}
+
+/// Installe le Linux de l'app, et dit où il en est à chaque étape. `arret`
+/// passe à vrai quand l'utilisateur arrête l'installation.
+pub fn installer(
+    options: &Options,
+    signaler: &mut dyn FnMut(Etape),
+    arret: &AtomicBool,
+) -> Result<Fin, String> {
     #[cfg(windows)]
-    return crate::windows::installer(options, signaler);
+    return crate::windows::installer(options, signaler, arret);
     #[cfg(not(windows))]
     {
-        let _ = (options, signaler);
+        let _ = (options, signaler, arret);
         Err("Sur ce système, l'app n'a rien à installer.".into())
+    }
+}
+
+/// Retire Debian de WSL2, avec tout ce qu'il contient. Les autres Linux de
+/// WSL2 ne changent pas.
+pub fn retirer(dossier: &Path) -> Result<(), String> {
+    #[cfg(windows)]
+    return crate::windows::retirer(dossier);
+    #[cfg(not(windows))]
+    {
+        let _ = dossier;
+        Err("Sur ce système, l'app n'a rien installé.".into())
     }
 }
 

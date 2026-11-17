@@ -6,12 +6,13 @@ use std::io::{Read, Write};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use sha2::{Digest, Sha256};
 
 use crate::format::texte_go;
 use crate::installation::{
-    Etape, EtatEtape, Image, LISTE_DES_IMAGES, Options, extension, image_debian,
+    Etape, EtatEtape, Fin, Image, LISTE_DES_IMAGES, Options, extension, image_debian,
 };
 use crate::rapport::{
     Blocage, Fabricant, LinuxApp, Memoire, Plateforme, Rapport, Verification, machine,
@@ -316,7 +317,13 @@ fn processeur_capable(fabricant: Fabricant) -> bool {
     }
 }
 
-pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> Result<(), String> {
+pub(crate) fn installer(
+    options: &Options,
+    signaler: &mut dyn FnMut(Etape),
+    arret: &AtomicBool,
+) -> Result<Fin, String> {
+    let arrete = || arret.load(Ordering::Relaxed);
+    let mut importe_ici = false;
     let mut dire = |numero: usize, etat: EtatEtape, detail: String, avance: Option<f64>| {
         signaler(Etape {
             numero,
@@ -337,21 +344,28 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
             .and_then(|image| {
                 fs::create_dir_all(&options.dossier)
                     .map_err(|e| format!("Le dossier de l'app est inaccessible : {e}"))?;
-                telecharger(&agent, &image, &options.dossier, &mut |recus, total| {
-                    let detail = match total {
-                        Some(total) => format!("{} Mo sur {}", recus >> 20, total >> 20),
-                        None => format!("{} Mo", recus >> 20),
-                    };
-                    dire(
-                        0,
-                        EtatEtape::EnCours,
-                        detail,
-                        total.map(|t| recus as f64 / t as f64),
-                    );
-                })
+                telecharger(
+                    &agent,
+                    &image,
+                    &options.dossier,
+                    arret,
+                    &mut |recus, total| {
+                        let detail = match total {
+                            Some(total) => format!("{} Mo sur {}", recus >> 20, total >> 20),
+                            None => format!("{} Mo", recus >> 20),
+                        };
+                        dire(
+                            0,
+                            EtatEtape::EnCours,
+                            detail,
+                            total.map(|t| recus as f64 / t as f64),
+                        );
+                    },
+                )
             });
         let archive = match archive {
-            Ok(archive) => archive,
+            Ok(Some(archive)) => archive,
+            Ok(None) => return Ok(Fin::Arretee),
             Err(erreur) => {
                 dire(0, EtatEtape::Erreur, erreur.clone(), None);
                 return Err(erreur);
@@ -375,7 +389,10 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
             });
         let _ = fs::remove_file(&archive);
         match import {
-            Ok(sortie) if sortie.status.success() => dire(1, EtatEtape::Fait, String::new(), None),
+            Ok(sortie) if sortie.status.success() => {
+                importe_ici = true;
+                dire(1, EtatEtape::Fait, String::new(), None)
+            }
             Ok(sortie) => {
                 let erreur = format!("WSL a refusé l'import : {}", texte_erreur(&sortie));
                 dire(1, EtatEtape::Erreur, erreur.clone(), None);
@@ -387,6 +404,10 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
                 return Err(erreur);
             }
         }
+    }
+
+    if arrete() {
+        return defaire(importe_ici, &options.dossier);
     }
 
     match options.memoire_go {
@@ -404,6 +425,10 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
         None => dire(2, EtatEtape::Saute, String::new(), None),
     }
 
+    if arrete() {
+        return defaire(importe_ici, &options.dossier);
+    }
+
     dire(3, EtatEtape::EnCours, String::new(), None);
     match dans_debian(&["uname", "-r"]) {
         Some(sortie) if sortie.status.success() => {
@@ -413,7 +438,7 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
                 format!("noyau {}", texte_sortie(&sortie).trim()),
                 None,
             );
-            Ok(())
+            Ok(Fin::Installe)
         }
         Some(sortie) => {
             let erreur = format!("Debian ne démarre pas : {}", texte_erreur(&sortie));
@@ -426,6 +451,40 @@ pub(crate) fn installer(options: &Options, signaler: &mut dyn FnMut(Etape)) -> R
             Err(erreur)
         }
     }
+}
+
+/// Arrêté par l'utilisateur : ce que cette installation a mis dans WSL2
+/// repart. La mémoire de WSL2, s'il a dit oui, reste réglée.
+fn defaire(importe_ici: bool, dossier: &Path) -> Result<Fin, String> {
+    if importe_ici {
+        retirer(dossier)?;
+    }
+    Ok(Fin::Arretee)
+}
+
+pub(crate) fn retirer(dossier: &Path) -> Result<(), String> {
+    if debian_installe() {
+        let sortie = commande("wsl.exe")
+            .args(["--unregister", NOM_DISTRIBUTION])
+            .output()
+            .map_err(|e| format!("wsl.exe ne s'est pas lancé : {e}"))?;
+        if !sortie.status.success() {
+            return Err(format!(
+                "WSL n'a pas retiré Debian : {}",
+                texte_erreur(&sortie)
+            ));
+        }
+    }
+    let _ = fs::remove_dir_all(dossier.join("disque"));
+    for reste in [
+        "debian.telechargement",
+        "debian.tar.gz",
+        "debian.tar.xz",
+        "debian.tar",
+    ] {
+        let _ = fs::remove_file(dossier.join(reste));
+    }
+    Ok(())
 }
 
 pub(crate) fn installer_wsl() -> Result<(), String> {
@@ -471,8 +530,9 @@ fn telecharger(
     agent: &ureq::Agent,
     image: &Image,
     dossier: &Path,
+    arret: &AtomicBool,
     progres: &mut dyn FnMut(u64, Option<u64>),
-) -> Result<PathBuf, String> {
+) -> Result<Option<PathBuf>, String> {
     let reponse = agent
         .get(&image.url)
         .call()
@@ -497,6 +557,11 @@ fn telecharger(
             .map_err(|e| format!("Le téléchargement s'est coupé : {e}"))?;
         if lus == 0 {
             break;
+        }
+        if arret.load(Ordering::Relaxed) {
+            drop(fichier);
+            let _ = fs::remove_file(&provisoire);
+            return Ok(None);
         }
         let morceau = &tampon[..lus];
         if debut.len() < 8 {
@@ -527,7 +592,7 @@ fn telecharger(
     }
     let archive = dossier.join(format!("debian.{}", extension(&debut)));
     fs::rename(&provisoire, &archive).map_err(|e| format!("Écriture impossible : {e}"))?;
-    Ok(archive)
+    Ok(Some(archive))
 }
 
 fn regler_memoire(go: u32) -> Result<(), String> {

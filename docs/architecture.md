@@ -248,7 +248,9 @@ L'étape 2 de l'ordre de construction, commencée le 17 novembre 2026, dans
   garde une copie de `.wslconfig` avant d'y toucher ;
 - les écrans de la première ouverture reprennent les maquettes : la
   vérification, l'installation, le PC qui bloque, et le rapport final, que
-  l'utilisateur peut copier.
+  l'utilisateur peut copier ;
+- l'installation peut s'arrêter en cours de route, et Debian peut être
+  retiré de WSL2 depuis le rapport final, après une question.
 
 Testé dans l'environnement cloud : le moteur sous Linux (21 tests), l'app
 lancée pour de vrai sous Linux, et les écrans propres à Windows avec des

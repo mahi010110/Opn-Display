@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { installer, suivreInstallation } from '../pont'
+import { arreterInstallation, installer, suivreInstallation } from '../pont'
 import type { Etape, EtatEtape, Rapport } from '../types'
 import { Fenetre } from '../ui/Fenetre'
 import { Page } from '../ui/Page'
@@ -28,6 +28,7 @@ export function Installation(props: {
   ]
   const [etapes, setEtapes] = useState<(Etape | null)[]>(noms.map(() => null))
   const [erreur, setErreur] = useState<string | null>(null)
+  const [arret, setArret] = useState(false)
   const [essai, setEssai] = useState(0)
   const onFini = useRef(props.onFini)
   onFini.current = props.onFini
@@ -36,6 +37,7 @@ export function Installation(props: {
     let abandonne = false
     let arreterDEcouter: (() => void) | undefined
     setErreur(null)
+    setArret(false)
     suivreInstallation((etape) => {
       setEtapes((avant) => avant.map((e, i) => (i === etape.numero ? etape : e)))
     })
@@ -78,7 +80,21 @@ export function Installation(props: {
           })}
         </ul>
         {erreur === null ? (
-          <p className="note">Tu peux faire autre chose pendant ce temps.</p>
+          <>
+            <p className="note">Tu peux faire autre chose pendant ce temps.</p>
+            <div className="pied">
+              <button
+                className="oc-btn"
+                disabled={arret}
+                onClick={() => {
+                  setArret(true)
+                  arreterInstallation().catch(() => setArret(false))
+                }}
+              >
+                {arret ? 'Arrêt en cours' : "Arrêter l'installation"}
+              </button>
+            </div>
+          </>
         ) : (
           <div className="pied">
             <button className="oc-btn oc-btn--primary" onClick={() => setEssai((n) => n + 1)}>

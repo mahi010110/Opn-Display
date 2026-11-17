@@ -346,4 +346,7 @@ fabrique l'installeur Windows (« Oui, vas-y »).
 - Les mesures sur le PC du mainteneur arriveront quand il lancera l'app.
 - La première fabrication sur GitHub a réussi : les tests du moteur passent
   sous Windows, et l'installeur pèse 2,5 Mo.
-- L'app ne sait pas encore retirer Debian de WSL2. C'est à ajouter.
+- L'app ne savait pas encore retirer Debian de WSL2. C'est ajouté : un
+  bouton rouge à part sur l'écran « Ton PC », et une question avant d'agir.
+  L'installation peut aussi s'arrêter en cours de route, comme sur la
+  maquette : ce qu'elle avait mis dans WSL2 repart.

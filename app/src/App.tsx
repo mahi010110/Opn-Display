@@ -44,5 +44,5 @@ export function App() {
     return <Ouverture rapport={rapport} onInstaller={(memoireGo) => setInstallation({ memoireGo })} />
   }
 
-  return <Pret rapport={rapport} onVerifier={verifier} />
+  return <Pret rapport={rapport} onVerifier={verifier} onRetire={setRapport} />
 }

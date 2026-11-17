@@ -11,6 +11,14 @@ export function installer(memoireGo: number | null): Promise<Rapport> {
   return invoke<Rapport>('installer', { memoireGo })
 }
 
+export function arreterInstallation(): Promise<void> {
+  return invoke<void>('arreter_installation')
+}
+
+export function retirerLinux(): Promise<Rapport> {
+  return invoke<Rapport>('retirer_linux')
+}
+
 export function installerWsl(): Promise<void> {
   return invoke<void>('installer_wsl')
 }
