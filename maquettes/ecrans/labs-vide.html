@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mes labs, la première fois · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#" aria-current="page"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+    <a href="#"><i class="ic i-progression"></i>Progression</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Mes labs</h1>
+</div>
+
+<main class="page page--deux">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Ton premier lab</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <ol class="numeros">
+        <li><span>Branche l'IA : une clé API, un modèle local, ou ton abonnement ChatGPT.</span><button class="oc-btn oc-btn--primary">Brancher l'IA</button></li>
+        <li><span class="apres">Décris ton lab en une phrase. L'IA le propose, tu le lances.</span></li>
+      </ol>
+      <div class="a-part">
+        <span class="mono">Sans IA, tu peux monter un lab toi-même.</span>
+        <button class="oc-btn oc-btn--ghost oc-btn--sm">Construire à la main</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Ton PC</h2>
+    </header>
+    <div class="oc-window__body">
+      <dl class="fiche">
+        <dt>Mémoire</dt><dd>32 Go, 24,3 libres</dd>
+        <dt>Conteneurs</dt><dd>oui</dd>
+        <dt>Machines virtuelles</dt><dd>oui</dd>
+        <dt>WiFi simulé</dt><dd class="manque">non</dd>
+      </dl>
+      <p class="note">Le WiFi simulé demande une version plus récente de WSL.</p>
+      <p class="fiche-geste"><button class="oc-btn oc-btn--sm">Mettre WSL à jour</button></p>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : pas encore branchée</span>
+</footer>
+
+</body>
+</html>

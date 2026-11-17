@@ -1288,6 +1288,24 @@ a.oc-btn {
   grid-column: auto;
 }
 
+/* ---------- les derniers écrans : réglages, PC bloqué, lab trop gros ---------- */
+
+.a-part--dedans {
+  margin-top: 0;
+  padding: var(--space-4);
+}
+.rang .oc-select {
+  width: auto;
+}
+.oc-btn--primary:disabled {
+  background: var(--surface-chrome);
+  border-color: var(--border-soft);
+}
+.mono.trop,
+.table .manque {
+  color: var(--status-warn);
+}
+
 /* ---------- le grand écran ---------- */
 
 @media (min-width: 1600px) {

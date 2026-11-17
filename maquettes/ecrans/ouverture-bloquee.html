@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Première ouverture · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Avant ton premier lab</h1>
+</div>
+
+<main class="page page--paire">
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">Ton PC</h2>
+    </header>
+    <div class="oc-window__body">
+      <ul class="tests tests--large">
+        <li><i class="ic i-ok"></i>Windows 11<small>Famille</small></li>
+        <li><i class="ic i-ok"></i>Mémoire<small>16 Go</small></li>
+        <li><i class="ic i-alerte manque"></i>La virtualisation<small>coupée dans le BIOS de ton PC</small></li>
+        <li><i class="ic i-alerte manque"></i>WSL2<small>il ne démarre pas sans la virtualisation</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">À faire une fois</h2>
+    </header>
+    <div class="oc-window__body bloc">
+      <p class="lu">Les labs ont besoin de la virtualisation. Elle s'active dans le BIOS, l'écran qui s'ouvre à l'allumage du PC.</p>
+      <ol class="numeros">
+        <li><span>Redémarre le PC et ouvre le BIOS. La touche est souvent F2, F10 ou Suppr, juste à l'allumage.</span></li>
+        <li><span>Active « SVM Mode » ou « AMD-V ». Ton processeur est un AMD Ryzen 5.</span></li>
+        <li><span>Enregistre, redémarre, puis rouvre l'app.</span></li>
+      </ol>
+      <div class="pied">
+        <button class="oc-btn oc-btn--primary">Vérifier à nouveau</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>Rien n'est installé pour l'instant.</span>
+</footer>
+
+</body>
+</html>

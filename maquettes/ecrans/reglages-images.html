@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Images · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+    <a href="#"><i class="ic i-progression"></i>Progression</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#" aria-current="page"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <h1 class="lab-nom">Réglages</h1>
+</div>
+
+<main class="page reglages">
+  <nav class="oc-window" aria-label="Réglages">
+    <div class="oc-window__body oc-window__body--flush">
+      <ul class="liste-nav">
+        <li><a href="#"><i class="ic i-brancher"></i>Brancher l'IA</a></li>
+        <li><a href="#"><i class="ic i-reglages"></i>Régler l'IA</a></li>
+        <li><a href="#"><i class="ic i-memoire"></i>Sa mémoire</a></li>
+        <li><a href="#"><i class="ic i-journal"></i>Son journal</a></li>
+        <li><a href="#" aria-current="page"><i class="ic i-images"></i>Images</a></li>
+        <li><a href="#"><i class="ic i-poste"></i>Ton PC</a></li>
+        <li><a href="#"><i class="ic i-affichage"></i>Affichage</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Images</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <table class="table">
+        <thead>
+          <tr><th>Image</th><th>D'où elle vient</th><th>Taille</th><th>État</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="nom">Debian 12</td><td>téléchargée par l'app</td><td class="chiffre">0,4 Go</td><td class="chiffre">prête</td><td class="fin"><button class="oc-btn oc-btn--ghost oc-btn--sm">Supprimer</button></td></tr>
+          <tr><td class="nom">OPNsense</td><td>téléchargée par l'app</td><td class="chiffre">1,2 Go</td><td class="chiffre">prête</td><td class="fin"><button class="oc-btn oc-btn--ghost oc-btn--sm">Supprimer</button></td></tr>
+          <tr><td class="nom">Wazuh</td><td>téléchargée par l'app</td><td class="chiffre">4,1 Go</td><td class="chiffre">en cours, 62 %</td><td class="fin"></td></tr>
+          <tr><td class="nom">Kali Linux</td><td>libre, sur le site de Kali</td><td class="chiffre">4,0 Go</td><td class="chiffre">pas téléchargée</td><td class="fin"><button class="oc-btn oc-btn--sm">Télécharger</button></td></tr>
+          <tr><td class="nom">Windows Server 2022</td><td>fournie par toi</td><td class="chiffre">5,0 Go</td><td class="chiffre">prête</td><td class="fin"><button class="oc-btn oc-btn--ghost oc-btn--sm">Supprimer</button></td></tr>
+          <tr><td class="nom">ESXi 8.0U3e</td><td>à fournir, avec un compte Broadcom</td><td class="chiffre"></td><td class="chiffre manque">manque</td><td class="fin"><button class="oc-btn oc-btn--sm">Fournir</button></td></tr>
+        </tbody>
+      </table>
+      <div class="a-part a-part--dedans">
+        <span class="mono">10,7 Go sur le disque</span>
+        <button class="oc-btn oc-btn--sm"><i class="ic i-dossier"></i>Ouvrir le dossier</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du PC<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>24,3 Go libres sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+</footer>
+
+</body>
+</html>

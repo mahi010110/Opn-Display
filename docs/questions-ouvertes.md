@@ -35,19 +35,6 @@ marche et peut se montrer.
 Chaque famille de machines arrive avec ses pannes et ses cours. La version
 Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
 
-Les huit idées de la première fiche entrent dans la première version le
-17 novembre 2026. Claude propose de les placer ainsi, chacune avec ce dont
-elle dépend :
-
-- étape 3, le schéma en direct : il compare le lab prévu au lab réel, et
-  le premier lab a déjà les deux ;
-- étape 4, le compte rendu, le replay et le mode examen : ils s'appuient
-  sur le journal de l'IA et sur ses tests. Le tableau blanc aussi, avec les
-  premiers cours ;
-- étape 5, les paquets en animation, avec le réseau ;
-- à partir de l'étape 6, la progression et les parcours : ils demandent des
-  cours et des pannes dans plusieurs familles.
-
 ### La licence
 
 Le mainteneur a répondu « Je décide plus tard » (16 novembre 2026). La
@@ -79,8 +66,9 @@ proposer le menu (16 novembre 2026). Le brief est écrit :
 maquettes en captures, avant de coder un écran.
 
 Le menu et l'écran du lab sont validés (16 novembre 2026). Ils sont décrits
-dans [../maquettes/README.md](../maquettes/README.md). Les autres écrans se
-dessinent à partir d'eux, et se montrent en captures.
+dans [../maquettes/README.md](../maquettes/README.md), avec les 30 écrans
+dessinés jusqu'au 17 novembre. Restent les écrans du pilotage, qui se
+dessineront quand le pilotage viendra.
 
 Pour les maquettes, le matériel a été copié à la main dans `maquettes/kit/`,
 avec l'accord du mainteneur. Reste à dire comment il arrivera dans l'app, et

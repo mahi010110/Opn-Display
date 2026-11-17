@@ -24,6 +24,8 @@ Opn-Display est un nom de travail. Rien n'est codé.
   aucune ambiguïté.
 - Les questions portent sur le produit. Pas sur l'organisation du mainteneur
   (son temps, ses autres projets).
+- Pas de calendrier ni de planning : on avance étape par étape, sans placer
+  les choses dans le temps (17 novembre 2026).
 - Une décision prise est notée dans `docs/carnet.md` avec sa date, puis
   reportée dans `projet.md` ou `architecture.md`.
 - Pas de script, ni dans le dépôt ni à faire lancer au mainteneur. Ce qui
@@ -161,7 +163,7 @@ confiance », il peut revenir dessus.
 - La licence.
 - La question à Anthropic sur l'abonnement Claude, et la façon dont le
   matériel d'OpenContact arrive dans ce dépôt.
-- Les autres écrans, à dessiner avec le matériel d'OpenContact.
+- Les écrans du pilotage, quand il viendra.
 - Le lien avec OpenContact et Opn-Link, après la première version.
 - Rien n'est mesuré sur le PC du mainteneur.
 

@@ -67,6 +67,12 @@ idées.
 | `parcours` | choisir pourquoi on est là, et la suite proposée | retenu |
 | `examen` | le mode examen | validé |
 | `examen-resultat` | le résultat de l'examen | retenu |
+| `ouverture-bloquee` | la première ouverture, quand le PC ne peut pas encore lancer de lab | retenu |
+| `labs-vide` | Mes labs, la première fois, avant de brancher l'IA | retenu |
+| `nouveau-lab-trop` | un lab qui ne tient pas dans la mémoire libre | retenu |
+| `reglages-images` | les images : d'où elles viennent, leur place, celles qui manquent | retenu |
+| `reglages-pc` | ce que le PC sait faire, la mémoire de WSL2, la place sur le disque | retenu |
+| `reglages-affichage` | le thème et la taille du texte | retenu |
 
 ## L'écran du lab
 
@@ -111,7 +117,7 @@ en marche, une panne en cours, une panne réparée, un cours.
 ## Les réglages
 
 - Une liste à gauche : Brancher l'IA, Régler l'IA, Sa mémoire, Son journal,
-  Images, Ton PC, Thème.
+  Images, Ton PC, Affichage.
 - Brancher l'IA : une clé API, un modèle local, ou l'abonnement ChatGPT. Le
   choix retenu s'ouvre, les autres disent leur état en une ligne.
 - Régler l'IA, en deux cadres. « Sur ton PC » : avec accord, libre, ou
@@ -124,6 +130,26 @@ en marche, une panne en cours, une panne réparée, un cours.
   qu'on retire une à une, et « Effacer sa mémoire » à part, en rouge.
 - Son journal : l'heure, l'endroit, ce qu'elle a fait, et l'accord donné ou
   refusé.
+- Images : chaque image, d'où elle vient, sa taille et son état. Celles que
+  l'app ne peut pas contenir se fournissent depuis là, comme dans un lab.
+- Ton PC : ce qu'il sait faire, avec « Vérifier à nouveau », la mémoire de
+  WSL2 avec la ligne de `.wslconfig`, et la place prise sur le disque.
+- Affichage : le thème (automatique, clair, sombre) et la taille du texte,
+  pour montrer l'app sur un grand écran.
+
+## Quand ça bloque
+
+- Le PC ne peut pas encore lancer de lab : la première ouverture dit ce qui
+  manque et donne les pas pour le régler, ici la virtualisation à activer
+  dans le BIOS. L'app connaît le processeur et donne le bon nom du réglage.
+- Le lab ne tient pas dans la mémoire libre : « Lancer le lab » est grisé,
+  le manque est dit en Go, et l'app propose ce qui le comble, avec ce que
+  chaque geste libère.
+- Mes labs, la première fois : deux pas numérotés, brancher l'IA puis
+  décrire un lab. Sans IA, on peut construire un lab à la main.
+- Sur un Mac à puce Apple, « Ton PC » dit que Windows Server et ESXi ne
+  tournent pas, avec la raison. Un lab qui en a besoin le dit avant de se
+  lancer, comme pour la mémoire.
 
 ## Les cours, les pannes, une image
 

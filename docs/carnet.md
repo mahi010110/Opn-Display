@@ -260,9 +260,6 @@ Le mainteneur a choisi « Les huit ».
 - Les huit idées sont dans la version de juillet 2027 : le schéma en direct,
   les paquets en animation, le tableau blanc, le replay, le compte rendu, la
   progression, les parcours, le mode examen.
-- C'est plus de travail avant juillet. Claude propose une place pour chacune
-  dans l'ordre de construction, avec ce dont elle dépend
-  ([questions-ouvertes.md](questions-ouvertes.md)).
 
 Claude les a ensuite reliées aux écrans déjà retenus, comme le mainteneur
 lui a laissé la main sur les maquettes :
@@ -277,3 +274,27 @@ lui a laissé la main sur les maquettes :
 - la page Progression porte le parcours et la suite proposée. « Changer »
   ouvre le choix du parcours ;
 - un écran de plus : le résultat de l'examen.
+
+### Pas de calendrier
+
+Claude avait proposé une place pour chacune des huit idées dans les étapes
+de construction, en parlant du travail à faire avant juillet. Le mainteneur
+a répondu : « Cette histoire de calendrier, tu peux abandonner, on avancera
+sans ça. »
+
+- La proposition est retirée.
+- L'ordre de construction validé le 16 novembre reste.
+- Claude ne fait plus de calendrier ni de planning.
+
+### Les derniers écrans
+
+Claude a dessiné les six écrans qui manquaient, comme le mainteneur lui a
+laissé la main sur les maquettes :
+
+- trois réglages : les images, ton PC, l'affichage. L'entrée « Thème »
+  devient « Affichage », avec le thème et la taille du texte ;
+- la première ouverture quand le PC ne peut pas encore lancer de lab ;
+- Mes labs la première fois, avant de brancher l'IA ;
+- un lab qui ne tient pas dans la mémoire libre.
+
+Les maquettes comptent 30 écrans. Restent ceux du pilotage, plus tard.
