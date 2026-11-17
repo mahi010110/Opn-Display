@@ -228,13 +228,13 @@ Choisie le 17 novembre 2026 :
 | Matériel d'OpenContact | Copié dans le code, avec sa version notée | Comme pour les maquettes. Aucun script |
 | Machines du lab | Incus, dans le Debian de l'app. Docker plus tard, pour les images qui n'existent qu'en Docker | Une machine Incus est un vrai Linux avec systemd. Incus fait aussi les instantanés et les VM ([mesures.md](mesures.md), partie 11) |
 | Terminaux | xterm.js 6 dans l'écran, un pseudo-terminal côté Rust (portable-pty, ConPTY sous Windows) | Le plus répandu. Choisi à l'étape 3 ([mesures.md](mesures.md), partie 12) |
+| Agent de l'IA | Une boucle écrite à la main en Rust, avec ureq : le format d'OpenAI (que parlent aussi Ollama, Mistral et OpenRouter), celui d'Anthropic, et Codex pour l'abonnement ChatGPT | 44 paquets et 1,2 Mo, contre 186 et 8,2 Mo pour genai ([mesures.md](mesures.md), partie 13). Choisi par le mainteneur le 17 novembre 2026 |
 
 Encore à choisir, chacun à son étape, après mesure :
 
 | Partie | Piste | Pourquoi |
 |---|---|---|
 | VM | QEMU, commandé par QMP et l'agent invité | Ce que font GNS3 et EVE-NG |
-| Agent | Une boucle en Rust (rig-core ou genai) | Pas de Python à embarquer. Si le serveur MCP se fait un jour : rmcp |
 | Écran des VM | noVNC, branché sur QEMU | Marche pour Windows comme pour Linux |
 | Données locales | SQLite | Un seul fichier, sur le PC |
 | Distribution | GitHub Releases | Gratuit. La signature Windows peut l'être aussi, Apple coûte 99 $ par an |

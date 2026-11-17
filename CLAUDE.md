@@ -3,8 +3,8 @@
 Ce fichier est lu au début de chaque session. Il dit comment on travaille et
 ce qui est déjà décidé. Le détail est dans `docs/`.
 
-Opn-Display est un nom de travail. Le code est dans `app/`. L'étape 3 de
-l'ordre de construction est en cours.
+Opn-Display est un nom de travail. Le code est dans `app/`. L'étape 4 de
+l'ordre de construction (l'IA) est en cours.
 
 ## Comment on travaille
 
@@ -131,8 +131,9 @@ Le produit :
   TypeScript pour les écrans ; Debian pour le Linux de l'app ; le matériel
   d'OpenContact copié dans le code, avec sa version notée. Les machines du
   lab tournent avec Incus, Docker viendra plus tard pour les images qui
-  n'existent qu'en Docker. Le reste de la pile se choisit à chaque étape,
-  après mesure (`docs/architecture.md`, partie 5).
+  n'existent qu'en Docker. L'agent de l'IA est une boucle écrite à la main
+  en Rust. Le reste de la pile se choisit à chaque étape, après mesure
+  (`docs/architecture.md`, partie 5).
 - Le nom est un nom de travail. Le dépôt est privé, le mainteneur décidera
   plus tard quand l'ouvrir.
 
@@ -192,8 +193,7 @@ confiance », il peut revenir dessus.
 
 ## Ce qui n'est pas décidé
 
-- Le reste de la pile : les VM, la bibliothèque de l'IA. Chacun à son
-  étape, après mesure.
+- Le reste de la pile : les VM. À leur étape, après mesure.
 - La licence.
 - La question à Anthropic sur l'abonnement Claude.
 - Les écrans du pilotage, quand il viendra.

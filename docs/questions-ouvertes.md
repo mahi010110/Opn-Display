@@ -25,7 +25,8 @@ marche et peut se montrer.
    écrans sont validés, et le mainteneur l'a essayée sur son PC : « tout
    fonctionne bien ».
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
-   réparation. Avec ses réglages et ses garde-fous.
+   réparation. Avec ses réglages et ses garde-fous. En cours depuis le
+   17 novembre 2026, avec les trois façons de la brancher ensemble.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
    capture d'un câble, les câbles qu'on coupe et qu'on dégrade, et la vue
    des baies.

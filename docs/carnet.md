@@ -424,3 +424,16 @@ Claude a testé ce qu'il pouvait de son côté : l'installation sous Linux
 pour de vrai (l'échec du téléchargement, puis « Réessayer »), le
 pseudo-terminal et le rapport sur le Windows de GitHub, et le comportement
 de `wsl.exe --exec`, lu dans son code.
+
+### L'étape 4 commence : l'agent de l'IA
+
+Claude a mesuré trois façons d'écrire la boucle de l'agent
+([mesures.md](mesures.md), partie 13). Le mainteneur a choisi « Écrite à la
+main » (44 paquets et 1,2 Mo, contre 186 et 8,2 Mo pour genai). Pour
+brancher l'IA, il a choisi « Les trois ensemble » : la clé API, le modèle
+local (Ollama) et l'abonnement ChatGPT (Codex), dans la même passe.
+
+Pour Codex, Claude a lu son code public : son propre shell se coupe
+(`features.shell_tool=false`), il reçoit les outils de l'app par MCP, et
+il raconte ce qu'il fait en JSON (`--json`). L'IA branchée par ChatGPT
+n'agit donc que par les outils de l'app, avec les mêmes accords.

@@ -355,3 +355,30 @@ sans `--exec`, la commande passe par le shell de l'utilisateur
 arguments sont découpés comme sous Windows (`CommandLineToArgvW`) et passés
 tels quels. Microsoft lance lui-même `wsl.exe -u root --exec /usr/bin/id`.
 L'app passe toujours par `--exec`.
+
+## 13. L'agent de l'IA
+
+Mesuré le 17 novembre 2026 dans l'environnement cloud, pour l'étape 4.
+
+Le poids de la boucle d'agent, dans un petit programme qui fait un appel à
+un modèle, compilé en version finale :
+
+| | Écrite à la main (ureq et serde_json) | genai 0.7.5 | rig-core 0.46 |
+|---|---|---|---|
+| Paquets tirés | 44 | 186 | 130 |
+| Taille du programme | 1,2 Mo | 8,2 Mo | ne se compile pas ici : il demande Rust 1.97.1 |
+| Première compilation | 15 s | 78 s | |
+
+Un vrai modèle local, ici, pour essayer la boucle :
+
+- Ollama 0.40.16, pris sur Docker Hub, avec Qwen3 1.7B (Q4_K_M, 1,1 Go),
+  pris aussi sur Docker Hub. Ollama le reconnaît capable d'appeler des
+  outils.
+- Par l'API compatible OpenAI d'Ollama, avec un outil `lancer_commande` :
+  le modèle appelle l'outil (`pc1`, `ping 10.0.2.10`) en 31 s sur les
+  quatre processeurs d'ici, en réfléchissant d'abord. Sans réflexion, il
+  répond en 8 s, mais décrit ce qu'il ferait au lieu d'appeler l'outil.
+- Le ping demandé n'a pas de fin (`ping` sans `-c`). Une commande de l'IA
+  doit donc être coupée par l'app au bout d'un temps donné.
+- D'ici, seule l'API d'Anthropic répond. Celles d'OpenAI et de Mistral, et
+  le registre d'Ollama, sont bloqués.
