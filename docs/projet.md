@@ -85,6 +85,23 @@ l'émulation.
 - Elle agit sur le PC quand il le faut : installer un outil, récupérer une
   image, lancer un logiciel.
 
+### Autour du lab
+
+Choisi le 17 novembre 2026 :
+
+- le schéma en direct : ce qui diffère du lab prévu passe en rouge, sauf
+  pendant une panne ;
+- les paquets en animation, pas à pas, comme le mode simulation de Packet
+  Tracer ;
+- le tableau blanc, où l'IA dessine pour expliquer ;
+- le replay, pour revoir une session ;
+- le compte rendu à la fin d'une panne ;
+- la progression : ce que tu sais faire, et ce qu'il faut revoir ;
+- les parcours : débuter, préparer une certification, préparer un titre ou
+  un diplôme, comprendre un sujet ;
+- le mode examen : plusieurs pannes, un temps, pas d'indice, et le résultat
+  à la fin.
+
 ## 4. L'IA
 
 ### La brancher
@@ -175,6 +192,7 @@ En juillet 2027 :
 - sur Windows 11, Linux et macOS ;
 - avec tout ce qui peut s'émuler (partie 3) ;
 - avec les trois façons de brancher l'IA ;
+- avec les huit idées de la partie 3, « Autour du lab » ;
 - avec le matériel d'interface et d'UX d'OpenContact, « Utilitaire 98 » :
   ses jetons, ses polices, ses icônes, ses composants et les règles de son
   kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel,

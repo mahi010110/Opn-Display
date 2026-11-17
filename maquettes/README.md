@@ -28,13 +28,16 @@ Un écran s'ouvre dans un navigateur, depuis le disque. Il n'y a aucun script.
 
 ## Le menu
 
-Validé le 16 novembre 2026.
+Validé le 16 novembre 2026. La Progression s'y ajoute le 17, avec les huit
+idées.
 
-- Trois entrées en haut à gauche : Labs, Cours, Pannes. Réglages à droite.
+- Quatre entrées en haut à gauche : Labs, Cours, Pannes, Progression.
+  Réglages à droite.
 - Labs ouvre la liste des labs. Un lab ouvert prend tout l'écran, et « Mes
   labs » revient à la liste.
 - Un cours ou une panne se choisit dans sa liste, puis s'ouvre dans un lab.
-- La progression n'a pas d'entrée tant qu'elle n'est pas décidée.
+- Progression montre ce que tu sais faire, ton parcours et ce qu'il faut
+  revoir.
 
 ## Les écrans
 
@@ -55,14 +58,15 @@ Validé le 16 novembre 2026.
 | `cours-liste` | choisir un cours, en demander un autre à l'IA | retenu |
 | `pannes-liste` | choisir une panne du catalogue, ou en demander une inventée | retenu |
 | `image` | fournir l'image de Windows Server | retenu |
-| `idee-schema` | le schéma en direct : ce qui diffère du lab prévu passe en rouge | proposé |
-| `idee-paquets` | les paquets en animation, pas à pas | proposé |
-| `idee-tableau` | le tableau blanc où l'IA dessine | proposé |
-| `idee-replay` | revoir une session | proposé |
-| `idee-compte-rendu` | le compte rendu à la fin d'une panne | proposé |
-| `idee-progression` | ce qu'on sait faire, et ce qu'il faut revoir | proposé |
-| `idee-parcours` | choisir pourquoi on est là, et la suite proposée | proposé |
-| `idee-examen` | le mode examen | proposé |
+| `schema-direct` | le schéma en direct : ce qui diffère du lab prévu passe en rouge | validé |
+| `paquets` | les paquets en animation, pas à pas | validé |
+| `tableau` | le tableau blanc où l'IA dessine | validé |
+| `replay` | revoir une session | validé |
+| `compte-rendu` | le compte rendu à la fin d'une panne | validé |
+| `progression` | ce qu'on sait faire, son parcours, ce qu'il faut revoir | retenu |
+| `parcours` | choisir pourquoi on est là, et la suite proposée | retenu |
+| `examen` | le mode examen | validé |
+| `examen-resultat` | le résultat de l'examen | retenu |
 
 ## L'écran du lab
 
@@ -135,27 +139,32 @@ en marche, une panne en cours, une panne réparée, un cours.
 
 ## Les huit idées
 
-Elles viennent de la première fiche. Le mainteneur les voit avant de choisir.
-L'avis de Claude est dans
-[../docs/questions-ouvertes.md](../docs/questions-ouvertes.md).
+Elles viennent de la première fiche. Le mainteneur les a choisies le
+17 novembre 2026, après les avoir vues ici, une par écran. Claude les a
+ensuite reliées aux autres écrans.
 
-- Le schéma en direct : un interrupteur « Comparer au lab prévu » dans le
-  schéma. Ce qui diffère passe en rouge, avec le nombre d'écarts. Il n'est
-  pas proposé pendant une panne.
-- Les paquets : la fenêtre du bas passe des terminaux aux paquets. La liste
-  dit qui parle à qui et ce que le message veut dire. Un carré bleu marine
-  montre le paquet sur le schéma.
+- Le schéma en direct : en haut à droite du schéma, « Comparer au lab
+  prévu ». Ce qui diffère passe en rouge, avec le nombre d'écarts. Il n'est
+  pas proposé pendant une panne ni pendant un examen.
+- Les paquets : « Voir les paquets », à côté. La fenêtre du bas passe des
+  terminaux aux paquets. La liste dit qui parle à qui et ce que le message
+  veut dire. Un carré bleu marine montre le paquet sur le schéma.
 - Le tableau blanc : un onglet « Tableau » à côté de « Schéma », dans la
-  même fenêtre.
-- Le replay : le panneau de droite devient le déroulé de la session. Le
-  schéma et les terminaux montrent le moment choisi.
-- Le compte rendu : une fenêtre posée sur le lab, avec la durée, les indices,
-  les tests, la cause, ce qui a été fait et ce qu'il faut revoir.
-- La progression : une quatrième entrée dans le menu. Un niveau sur quatre
-  pavés par savoir-faire, et deux choses à revoir.
-- Les parcours : quatre raisons d'être là, et la suite proposée.
-- Le mode examen : plusieurs pannes, un temps, pas d'indice. L'IA se tait.
-  Les tests et le résultat arrivent à la fin.
+  même fenêtre. Il n'apparaît que quand l'IA a dessiné quelque chose.
+- Le replay : « Revoir la session », depuis le compte rendu ou le résultat
+  d'un examen. Le panneau de droite devient le déroulé, le schéma et les
+  terminaux montrent le moment choisi.
+- Le compte rendu : après la vérification, l'IA propose « Lire le compte
+  rendu ». Une fenêtre posée sur le lab, avec la durée, les indices, les
+  tests, la cause, ce qui a été fait et ce qu'il faut revoir.
+- La progression : une entrée du menu. Un niveau sur quatre pavés par
+  savoir-faire, le parcours avec ses trois prochaines étapes, et ce qu'il
+  faut revoir.
+- Les parcours : « Changer », dans la Progression. Quatre raisons d'être
+  là, et la suite proposée, qui change avec le choix.
+- Le mode examen : depuis Pannes, « Un examen », avec le nombre de pannes et
+  le temps. Pas d'indice, l'IA se tait. Le résultat arrive à la fin, panne
+  par panne, avec la cause de chacune.
 
 ## Les icônes des machines
 

@@ -35,6 +35,19 @@ marche et peut se montrer.
 Chaque famille de machines arrive avec ses pannes et ses cours. La version
 Linux de l'app suit dès l'étape 2 : le moteur y est le plus simple.
 
+Les huit idées de la première fiche entrent dans la première version le
+17 novembre 2026. Claude propose de les placer ainsi, chacune avec ce dont
+elle dépend :
+
+- étape 3, le schéma en direct : il compare le lab prévu au lab réel, et
+  le premier lab a déjà les deux ;
+- étape 4, le compte rendu, le replay et le mode examen : ils s'appuient
+  sur le journal de l'IA et sur ses tests. Le tableau blanc aussi, avec les
+  premiers cours ;
+- étape 5, les paquets en animation, avec le réseau ;
+- à partir de l'étape 6, la progression et les parcours : ils demandent des
+  cours et des pannes dans plusieurs familles.
+
 ### La licence
 
 Le mainteneur a répondu « Je décide plus tard » (16 novembre 2026). La
@@ -115,46 +128,23 @@ dit quels logiciels, ni si c'est avant ou après juillet 2027.
 
 Recommandation : décider quand l'émulation tourne.
 
-## Ce qui vient de la première fiche et n'a pas été rediscuté
+## Ce qui vient de la première fiche
 
-Le mainteneur a précisé que la fiche du 15 novembre ne vaut pas décision. Ces
-points y figurent. Ils n'ont été ni confirmés ni refusés :
+Le mainteneur a précisé que la fiche du 15 novembre ne vaut pas décision.
+Voici ce que sont devenues ses idées d'écran.
 
-- quatre espaces dans l'app : Apprendre, Lab, Pannes et défis, Ma
-  progression ;
-- quatre modes pour un lab : Cours, Construire, Panne, Examen ;
-- le schéma du lab en direct, qui montre en rouge ce qui diffère du lab
-  prévu ;
-- les paquets du lab rejoués en animation ;
-- le tableau blanc où l'IA dessine ;
-- le replay d'une session et le compte rendu à la fin ;
-- la progression : compétences validées et révisions espacées ;
-- les parcours : débutant, certification, titre ou diplôme, curieux ;
-- le lien futur avec OpenContact et Opn-Link.
+- Les huit idées sont dans la première version, choisies le 17 novembre
+  2026 : le schéma en direct, les paquets en animation, le tableau blanc,
+  le replay, le compte rendu, la progression, les parcours, le mode examen.
+  Claude en recommandait trois.
+- Les quatre espaces (Apprendre, Lab, Pannes et défis, Ma progression) sont
+  remplacés par le menu : Labs, Cours, Pannes, Progression.
+- Les quatre modes d'un lab (Cours, Construire, Panne, Examen) : Cours,
+  Panne et Examen ont leurs écrans. On construit dans l'écran du lab, avec
+  le schéma en direct.
+- Reste le lien avec OpenContact et Opn-Link.
 
-Le 16 novembre, le mainteneur a coché huit de ces idées (le schéma en
-direct, les paquets en animation, le tableau blanc, le replay, le compte
-rendu, la progression, les parcours, le mode examen) en disant qu'il ne
-savait pas encore. Pour le menu, il a demandé une proposition à la place des
-quatre espaces.
-
-Les huit idées sont dessinées (16 novembre 2026), dans `maquettes/ecrans/`,
-sous les noms `idee-…`. Le mainteneur tranche en voyant les captures.
-
-Recommandation de Claude :
-
-| Idée | Avis | Pourquoi |
-|---|---|---|
-| Le schéma en direct | garder | L'app connaît déjà le lab prévu et le lab réel. Il se coupe pendant une panne |
-| Le compte rendu | garder | L'IA l'écrit à partir du journal et des tests. Il sert aussi au dossier d'examen |
-| Le mode examen | garder | Ce sont des pannes sans indice, avec un temps. Peu de travail une fois les pannes faites |
-| Les paquets en animation | plus tard | Le plus long à construire : capturer, lire et placer chaque paquet sur le schéma |
-| Le tableau blanc | plus tard | Un dessin faux se remarque moins qu'un texte faux. À faire quand les cours sont rodés |
-| Le replay | plus tard | Le journal et le compte rendu couvrent déjà le besoin |
-| La progression | plus tard | Elle ne dit rien tant qu'il y a peu de cours et de pannes. Les listes marquent déjà ce qui est fait |
-| Les parcours | plus tard | Il faut relier chaque cours à un référentiel. Les familles suffisent au début |
-
-Le lien avec OpenContact et Opn-Link se rediscute après la première version.
+Recommandation : en reparler après la première version.
 
 ## À vérifier
 

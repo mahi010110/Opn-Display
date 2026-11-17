@@ -67,7 +67,7 @@ Dans le code, quand il y en aura :
 
 ## Ce qui est décidé
 
-Tout date du 16 novembre 2026. Le détail est dans `docs/projet.md`,
+Tout date du 16 et du 17 novembre 2026. Le détail est dans `docs/projet.md`,
 l'historique dans `docs/carnet.md`.
 
 Le produit :
@@ -92,7 +92,7 @@ Le produit :
   kit `design/`. Les écrans d'Opn-Display se dessinent avec ce matériel.
 - Un dessin simple et classique, proche de GNS3 et de Packet Tracer, avec le
   panneau de l'IA sur le côté.
-- Le menu : Labs, Cours, Pannes, et Réglages à droite. L'écran du lab : le
+- Le menu : Labs, Cours, Pannes, Progression, et Réglages à droite. L'écran du lab : le
   schéma, les terminaux, l'IA sur le côté. Le panneau de droite est toujours
   l'IA : elle y montre une discussion, une panne, une vérification ou un
   cours.
@@ -108,6 +108,9 @@ Juillet 2027 :
 - Tout ce qui peut s'émuler : Linux et ses services, le réseau, Windows
   Server et Active Directory, les pare-feu et la sécurité, ESXi, un SAN et
   un NAS, le WiFi simulé.
+- Les huit idées de la première fiche : le schéma en direct, les paquets en
+  animation, le tableau blanc, le replay, le compte rendu, la progression,
+  les parcours, le mode examen.
 - Le lab tourne sur le PC de l'utilisateur.
 - Après l'examen : le multijoueur, la voix, le lab dans le navigateur, le lab
   sur un serveur distant.
@@ -159,10 +162,7 @@ confiance », il peut revenir dessus.
 - La question à Anthropic sur l'abonnement Claude, et la façon dont le
   matériel d'OpenContact arrive dans ce dépôt.
 - Les autres écrans, à dessiner avec le matériel d'OpenContact.
-- Huit idées de la première fiche : le schéma en direct, les paquets en
-  animation, le tableau blanc, le replay, le compte rendu, la progression,
-  les parcours, le mode examen. Le mainteneur ne sait pas encore. Elles se
-  dessinent en maquettes, et il tranche sur les captures.
+- Le lien avec OpenContact et Opn-Link, après la première version.
 - Rien n'est mesuré sur le PC du mainteneur.
 
 La liste complète est dans `docs/questions-ouvertes.md`.

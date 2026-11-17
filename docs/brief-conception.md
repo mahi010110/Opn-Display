@@ -148,11 +148,11 @@ vérifier les écrans.
   doivent rester lisibles quand on agrandit.
 - Les commandes et les terminaux sont en IBM Plex Mono.
 
-## 7. Les idées à dessiner pour décider
+## 7. Les huit idées de la première fiche
 
-Elles viennent de la première fiche. Le mainteneur les a toutes cochées en
-ajoutant « honnêtement je sais pas ». Elles sont donc à dessiner, et il
-tranchera en voyant les captures.
+Le mainteneur les a d'abord cochées en ajoutant « honnêtement je sais pas ».
+Après les avoir vues en maquettes, il les a toutes choisies pour la première
+version (17 novembre 2026).
 
 Dans le lab :
 
@@ -171,8 +171,8 @@ Autour du lab :
 - le mode examen : l'IA se tait, l'utilisateur répare seul, il a le résultat
   à la fin.
 
-Chacune se dessine au plus simple, sur un écran. Si une idée alourdit l'écran
-du lab, le dire, et proposer où la mettre ailleurs.
+Chacune se rattache aux écrans du lab sans les alourdir. Leur place est dans
+[../maquettes/README.md](../maquettes/README.md).
 
 ## 8. Les points difficiles
 
@@ -193,11 +193,11 @@ du lab, le dire, et proposer où la mettre ailleurs.
 
 ## 9. Ce qui reste ouvert
 
-- Le menu. C'est la première chose à proposer.
 - Les mots de l'écran. Une proposition à faire valider : lab, machine,
   câble, panne, test, indice, cours, image.
 - Les icônes des machines. Le jeu copié dans OpenContact n'a ni routeur, ni
-  switch, ni serveur, ni pare-feu. À chercher dans le reste de pixelarticons.
+  switch, ni serveur, ni pare-feu. Claude en a pris dans le reste de
+  pixelarticons ([../maquettes/README.md](../maquettes/README.md)).
 - Le logo. Opn-Display est un nom de travail.
 - La façon dont le matériel d'OpenContact arrive dans ce dépôt
   ([questions-ouvertes.md](questions-ouvertes.md)).

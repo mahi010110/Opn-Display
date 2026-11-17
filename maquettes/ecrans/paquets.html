@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les paquets en animation · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#" aria-current="page"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+    <a href="#"><i class="ic i-progression"></i>Progression</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <a class="oc-btn oc-btn--ghost oc-btn--sm" href="#"><i class="ic i-retour"></i>Mes labs</a>
+  <h1 class="lab-nom">Agence Exemple</h1>
+  <span class="oc-chip oc-chip--dot" style="--chip-dot:var(--accent)">Cours : le DHCP</span>
+  <div class="lab-gestes">
+    <button class="oc-btn"><i class="ic i-zero"></i>Remettre à zéro</button>
+    <button class="oc-btn"><i class="ic i-arreter"></i>Arrêter le lab</button>
+  </div>
+</div>
+
+<main class="lab">
+  <div class="lab-gauche">
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--inactive">
+        <h2 class="oc-window__title">Schéma</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="palette">
+          <p class="palette-titre">Ajouter</p>
+          <button><i class="ic ic-24 i-serveur"></i>Serveur</button>
+          <button><i class="ic ic-24 i-poste"></i>Poste</button>
+          <button><i class="ic ic-24 i-routeur"></i>Routeur</button>
+          <button><i class="ic ic-24 i-switch"></i>Switch</button>
+          <button><i class="ic ic-24 i-parefeu"></i>Pare-feu</button>
+          <button><i class="ic ic-24 i-stockage"></i>Stockage</button>
+        </div>
+        <div class="plan">
+          <div class="plan-outils"><label class="oc-switch"><input type="checkbox">Comparer au lab prévu</label><button class="oc-btn oc-btn--sm" aria-pressed="true">Voir les paquets</button></div>
+          <svg class="cables" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="12,24 36,24 60,24"/>
+            <polyline points="60,24 60,50"/>
+            <polyline points="30,73 30,50 87,50 87,73"/>
+            <polyline points="49,50 49,73"/>
+            <polyline points="68,50 68,73"/>
+            <polyline class="trajet" points="36,24 60,24 60,50 68,50 68,73"/>
+          </svg>
+          <span class="reseau" style="left:24%;top:24%">WAN</span>
+          <span class="paquet" style="left:48%;top:24%"></span>
+          <span class="reseau" style="left:77.5%;top:50%">LAN 192.168.10.0/24</span>
+
+          <div class="machine machine--dehors" style="left:12%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-internet"></i></span>
+            <span class="machine-nom">Internet</span>
+          </div>
+          <div class="machine" style="left:36%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-parefeu"></i></span>
+            <span class="machine-nom">fw1</span>
+            <span class="machine-ip">192.168.10.1</span>
+          </div>
+          <div class="machine" style="left:60%;top:24%">
+            <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
+            <span class="machine-nom">sw1</span>
+          </div>
+          <div class="machine" style="left:30%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-ad</span>
+            <span class="machine-ip">192.168.10.10</span>
+          </div>
+          <div class="machine" style="left:49%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv-web</span>
+            <span class="machine-ip">192.168.10.20</span>
+          </div>
+          <div class="machine machine--choisie" style="left:68%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc1</span>
+            <span class="machine-ip">192.168.10.101</span>
+          </div>
+          <div class="machine machine--eteinte" style="left:87%;top:73%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc2</span>
+            <span class="machine-ip">éteint</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--accent">
+        <h2 class="oc-window__title">Paquets</h2>
+        <button class="oc-window__btn" aria-label="Revenir aux terminaux"><i class="ic i-fermer"></i></button>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="volet">
+          <table class="table table--serree">
+            <thead>
+              <tr><th>N°</th><th>De</th><th>Vers</th><th>Message</th><th>Ce qu'il dit</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="chiffre">1</td><td class="chiffre">pc1</td><td class="chiffre">tout le réseau</td><td class="chiffre">DHCP Discover</td><td>Qui peut me donner une adresse ?</td></tr>
+              <tr class="courant"><td class="chiffre">2</td><td class="chiffre">fw1</td><td class="chiffre">pc1</td><td class="chiffre">DHCP Offer</td><td>Prends 192.168.10.101.</td></tr>
+              <tr><td class="chiffre">3</td><td class="chiffre">pc1</td><td class="chiffre">tout le réseau</td><td class="chiffre">DHCP Request</td><td>D'accord, je la prends.</td></tr>
+              <tr><td class="chiffre">4</td><td class="chiffre">fw1</td><td class="chiffre">pc1</td><td class="chiffre">DHCP Ack</td><td>C'est noté, pour une heure.</td></tr>
+            </tbody>
+          </table>
+          <div class="lecteur">
+            <button class="oc-iconbtn oc-iconbtn--sm" aria-label="Revenir au début"><i class="ic i-debut"></i></button>
+            <button class="oc-iconbtn oc-iconbtn--sm" aria-label="Paquet précédent"><i class="ic i-retour"></i></button>
+            <button class="oc-iconbtn oc-iconbtn--sm" aria-label="Paquet suivant"><i class="ic i-suite"></i></button>
+            <button class="oc-iconbtn oc-iconbtn--sm" aria-label="Tout jouer"><i class="ic i-lecture"></i></button>
+            paquet 2 sur 4
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">IA</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="ia">
+        <div class="ia-niveau">
+          <div class="segments" role="group" aria-label="Niveau de l'IA">
+            <button aria-pressed="true">Prof</button>
+            <button aria-pressed="false">Coach</button>
+            <button aria-pressed="false">Silencieuse</button>
+          </div>
+        </div>
+        <div class="cours">
+          <div class="cours-tete">
+            <span class="pas" aria-hidden="true"><i class="fait"></i><i class="fait"></i><i class="fait"></i><i></i><i></i></span>
+            Le DHCP, étape 3 sur 5
+          </div>
+          <h3>Regarder l'échange</h3>
+          <p>pc1 n'a pas encore d'adresse, alors il parle à tout le réseau. fw1 lui répond avec une adresse libre.</p>
+          <p>Quatre messages suffisent. Le carré bleu sur le schéma montre où est le paquet.</p>
+          <div class="cours-gestes">
+            <button class="oc-btn"><i class="ic i-retour"></i>Précédent</button>
+            <button class="oc-btn oc-btn--primary">Suivant<i class="ic i-suite"></i></button>
+          </div>
+        </div>
+        <div class="ia-saisie">
+          <input class="oc-input" type="text" placeholder="Pose une question sur cette étape" aria-label="Écrire à l'IA">
+          <button class="oc-iconbtn" aria-label="Envoyer"><i class="ic i-envoyer"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>6,2 Go sur 32</span>
+  <span class="etat-fin">IA : avec accord sur le PC</span>
+  <span>Enregistré à 14:32</span>
+</footer>
+
+</body>
+</html>

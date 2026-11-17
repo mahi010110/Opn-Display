@@ -164,6 +164,18 @@ Le mainteneur l'a lu et validé : « le reste me va ». Sont donc retenus :
   avec Codex. Pour l'abonnement Claude, la question sera posée à Anthropic.
   Sans accord, il attend le serveur MCP.
 
+### Le matériel d'OpenContact
+
+Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,
+on utilisera le même matériel UI/UX qu'OpenContact. »
+
+- Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
+  ses jetons, ses polices, ses icônes, ses composants et les règles de son
+  kit `design/`.
+- Claude comprend que les écrans et la navigation restent à dessiner pour
+  Opn-Display, avec ce matériel : OpenContact n'a ni lab, ni terminal, ni
+  schéma. Le mainteneur peut corriger.
+
 ### L'ordre de construction, et la licence
 
 Claude a proposé l'ordre et la licence. Le mainteneur a dit qu'il n'avait pas
@@ -237,14 +249,31 @@ commencer (« Go »).
   direct, le compte rendu et le mode examen. Les cinq autres viendraient
   plus tard. Le mainteneur n'a pas encore tranché.
 
-### Le matériel d'OpenContact
+## 17 novembre 2026
 
-Le mainteneur avait répondu « un design à lui ». Il corrige : « J'ai oublié,
-on utilisera le même matériel UI/UX qu'OpenContact. »
+### Les huit idées, dans la première version
 
-- Le matériel d'interface et d'UX est celui d'OpenContact, « Utilitaire 98 » :
-  ses jetons, ses polices, ses icônes, ses composants et les règles de son
-  kit `design/`.
-- Claude comprend que les écrans et la navigation restent à dessiner pour
-  Opn-Display, avec ce matériel : OpenContact n'a ni lab, ni terminal, ni
-  schéma. Le mainteneur peut corriger.
+Claude a montré les huit idées en maquettes, une par écran, et recommandait
+d'en garder trois : le schéma en direct, le compte rendu et le mode examen.
+Le mainteneur a choisi « Les huit ».
+
+- Les huit idées sont dans la version de juillet 2027 : le schéma en direct,
+  les paquets en animation, le tableau blanc, le replay, le compte rendu, la
+  progression, les parcours, le mode examen.
+- C'est plus de travail avant juillet. Claude propose une place pour chacune
+  dans l'ordre de construction, avec ce dont elle dépend
+  ([questions-ouvertes.md](questions-ouvertes.md)).
+
+Claude les a ensuite reliées aux écrans déjà retenus, comme le mainteneur
+lui a laissé la main sur les maquettes :
+
+- la Progression devient une entrée du menu : Labs, Cours, Pannes,
+  Progression, et Réglages à droite ;
+- le schéma a deux outils en haut à droite : « Comparer au lab prévu » et
+  « Voir les paquets ». Pendant une panne ou un examen, seul « Voir les
+  paquets » reste, pour ne pas donner la réponse ;
+- après la vérification, l'IA propose « Lire le compte rendu » ;
+- la page Pannes propose un examen, à côté de la panne inventée ;
+- la page Progression porte le parcours et la suite proposée. « Changer »
+  ouvre le choix du parcours ;
+- un écran de plus : le résultat de l'examen.

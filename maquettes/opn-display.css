@@ -1047,9 +1047,26 @@ a.oc-btn {
   top: var(--space-3);
   right: 10px;
   z-index: 1;
-  padding: 4px var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 4px 4px 4px var(--space-3);
   background: var(--surface-window);
   border: 1px solid var(--border-soft);
+}
+.oc-btn[aria-pressed="true"] {
+  background: var(--gray-3);
+  box-shadow: var(--bevel-down);
+}
+.ia-fil > .oc-btn {
+  align-self: flex-start;
+}
+.parcours-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 .cables .manque {
   stroke: var(--status-danger);
