@@ -2,7 +2,7 @@
 
 Pour celui qui dessine les écrans d'Opn-Display. Écrit le 16 novembre 2026.
 Il rassemble ce qui est décidé, ce qui est à proposer, et ce que le
-mainteneur veut voir avant de choisir. Rien n'est codé.
+mainteneur veut voir avant de choisir.
 
 ## 1. Ce qu'on attend
 

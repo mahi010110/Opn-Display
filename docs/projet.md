@@ -1,6 +1,6 @@
 # Opn-Display
 
-Opn-Display est un nom de travail. Rien n'est codé.
+Opn-Display est un nom de travail. Le code est dans `app/`.
 
 Ce fichier dit ce que le mainteneur a décidé le 16 novembre 2026. Ce qui
 reste à discuter est dans [questions-ouvertes.md](questions-ouvertes.md),

@@ -1,7 +1,7 @@
 # Architecture
 
-Une proposition, sauf la pile de la partie 5, choisie le 17 novembre 2026.
-Rien n'est codé. Les premières mesures sont dans
+Une proposition, sauf la pile de la partie 5, choisie le 17 novembre 2026,
+et ce qui est codé (partie 7). Les premières mesures sont dans
 [mesures.md](mesures.md). Rien n'est encore mesuré sur le PC du mainteneur.
 
 Les pistes viennent des recherches du 13 novembre 2026 et des trois outils
@@ -231,3 +231,26 @@ Encore à choisir, chacun à son étape, après mesure :
 Le reste de la pile se choisit à chaque étape, après mesure. Ce qui est
 mesuré est dans [mesures.md](mesures.md). Ce qui reste se mesure sur le PC
 du mainteneur, par l'app elle-même.
+
+## 7. Ce qui est codé
+
+L'étape 2 de l'ordre de construction, commencée le 17 novembre 2026, dans
+`app/` :
+
+- le moteur (`app/moteur/`) regarde le PC : Windows et son édition, la
+  mémoire, la virtualisation, WSL2 et son noyau. Une fois Debian installé,
+  il regarde dedans : KVM, le WiFi simulé, la mémoire de WSL2. Sous Linux,
+  il regarde le système lui-même ;
+- sous Windows, il installe Debian dans WSL2. L'image vient de la liste des
+  distributions de WSL tenue par Microsoft, elle est fabriquée par le projet
+  Debian, et son empreinte SHA-256 est vérifiée avant l'import ;
+- la mémoire de WSL2 ne change que si l'utilisateur coche la case. L'app
+  garde une copie de `.wslconfig` avant d'y toucher ;
+- les écrans de la première ouverture reprennent les maquettes : la
+  vérification, l'installation, le PC qui bloque, et le rapport final, que
+  l'utilisateur peut copier.
+
+Testé dans l'environnement cloud : le moteur sous Linux (21 tests), l'app
+lancée pour de vrai sous Linux, et les écrans propres à Windows avec des
+réponses simulées. La partie Windows se compile ici, mais ne tourne que sur
+un PC Windows.

@@ -1,0 +1,83 @@
+/* ============================================================
+   OpenContact — Effets
+   Le relief 98, réinterprété : biseaux 1px discrets,
+   ombres dures décalées SANS flou, trames dither en accent.
+   Jamais de flou, jamais de dégradé doux, jamais de glow.
+   ============================================================ */
+
+:root{
+  /* Biseau moderne : 1px de lumière en haut/gauche, 1px d'ombre en bas/droite */
+  --bevel-up:inset 1px 1px 0 rgba(255,255,255,.7), inset -1px -1px 0 rgba(29,36,44,.14);
+  --bevel-down:inset 1px 1px 0 rgba(29,36,44,.18), inset -1px -1px 0 rgba(255,255,255,.5);
+  --bevel-field:inset 1px 1px 0 rgba(29,36,44,.08);
+
+  /* Ombres dures — décalage net, zéro flou */
+  --shadow-raised:2px 2px 0 0 color-mix(in srgb, var(--ink) 18%, transparent);
+  --shadow-window:4px 4px 0 0 color-mix(in srgb, var(--ink) 16%, transparent);
+  --shadow-modal:6px 6px 0 0 color-mix(in srgb, var(--ink) 22%, transparent);
+
+  /* Trame dither (damier 2px) — texture d'accent, à utiliser avec parcimonie :
+     fonds de barre inactive, zones « en creux », fins séparateurs décoratifs.
+
+     DEUX FORMES, et ce n'est pas un doublon. `--dither` porte la position
+     et la taille (`0 0 / 4px 4px`) : il n'est valable que derrière la
+     propriété raccourcie `background`. Posé sur `background-image`, il est
+     REJETÉ en silence et la trame ne s'affiche pas — c'est ce qui arrivait
+     à quatre endroits de l'app. Quand un fond de couleur doit rester sous
+     la trame, prendre `--dither-img` + `--dither-size`. */
+  --dither-img:repeating-conic-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 0% 25%, transparent 0% 50%);
+  --dither-strong-img:repeating-conic-gradient(color-mix(in srgb, var(--ink) 28%, transparent) 0% 25%, transparent 0% 50%);
+  --dither-size:4px 4px;
+  --dither:var(--dither-img) 0 0 / var(--dither-size);
+  --dither-strong:var(--dither-strong-img) 0 0 / var(--dither-size);
+  --scanlines:repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 6%, transparent) 0 1px, transparent 1px 3px);
+
+  /* Focus clavier : pointillé 98. « Lisible partout » était une
+     INTENTION, jamais une mesure — relevé sur les 150 contrôles de
+     l'app, le trait de 1 px rendait 65 % de l'aire exigée par WCAG 2.2
+     SC 2.4.11 sur un bouton de 32 px, 78 % sur la marque. Le critère
+     demande, au plus facile des deux, l'aire d'un périmètre de 2 px ou
+     celle d'un trait de 4 px le long du plus petit côté ; un pointillé
+     n'encre que la moitié de sa bande, donc 1 px en rend le quart.
+     2 px n'est pas moins « 98 » : la case de focus de l'époque faisait
+     un pixel d'un écran à 96 ppp, soit deux à trois sur un téléphone
+     d'aujourd'hui. C'est le trait qui rattrape la densité, pas le
+     dessin qui change. */
+  --focus-outline:2px dotted var(--focus-ring);
+  --focus-offset:2px;
+
+  /* Mouvement (#23) : les OBJETS restent « 98 » — nets, instantanés,
+     steps() pour le feedback (secousse, bascule). Seul le DÉPLACEMENT
+     entre états est doux : court, ease-out, senti sans être vu.
+     transform/opacity uniquement (GPU) ; reduced-motion coupe tout. */
+  --dur-1:0ms;      /* changements d'état : immédiats, comme à l'époque */
+  --dur-2:120ms;    /* apparitions discrètes (toast, page, lignes) */
+  --dur-3:200ms;    /* déplacements (feuille, panneau, liste, barre) */
+  /* On n'ENTRE pas comme on SORT. À l'entrée, il y a quelque chose à
+     lire : on décélère, on prend le temps. À la sortie, la décision est
+     déjà prise : attendre pour partir traîne. Material, Carbon et IBM
+     disent la même chose — sortie plus courte, et qui ACCÉLÈRE. */
+  --dur-out:140ms;  /* sorties : 70 % de l'entrée */
+  /* « regarde, ça a changé » : assez long pour être vu par quelqu'un qui
+     revient à l'écran, assez court pour ne pas devenir un décor */
+  --dur-vu:900ms;
+  --ease-steps:steps(2, end);           /* les objets qui claquent */
+  --ease-out:cubic-bezier(.2,.9,.3,1);  /* on arrive en décélérant */
+  --ease-in:cubic-bezier(.5,0,.9,.4);   /* on part en accélérant */
+}
+
+html[data-theme="dark"]{
+  --bevel-up:inset 1px 1px 0 rgba(255,255,255,.10), inset -1px -1px 0 rgba(0,0,0,.45);
+  --bevel-down:inset 1px 1px 0 rgba(0,0,0,.5), inset -1px -1px 0 rgba(255,255,255,.08);
+  --bevel-field:inset 1px 1px 0 rgba(0,0,0,.4);
+
+  --shadow-raised:2px 2px 0 0 rgba(0,0,0,.5);
+  --shadow-window:4px 4px 0 0 rgba(0,0,0,.55);
+  --shadow-modal:6px 6px 0 0 rgba(0,0,0,.65);
+
+  --dither-img:repeating-conic-gradient(rgba(233,236,239,.10) 0% 25%, transparent 0% 50%);
+  --dither-strong-img:repeating-conic-gradient(rgba(233,236,239,.20) 0% 25%, transparent 0% 50%);
+  --dither:var(--dither-img) 0 0 / var(--dither-size);
+  --dither-strong:var(--dither-strong-img) 0 0 / var(--dither-size);
+  --scanlines:repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px);
+}

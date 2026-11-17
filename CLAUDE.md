@@ -3,7 +3,8 @@
 Ce fichier est lu au début de chaque session. Il dit comment on travaille et
 ce qui est déjà décidé. Le détail est dans `docs/`.
 
-Opn-Display est un nom de travail. Rien n'est codé.
+Opn-Display est un nom de travail. Le code est dans `app/`. L'étape 2 de
+l'ordre de construction est en cours.
 
 ## Comment on travaille
 
@@ -41,6 +42,19 @@ Opn-Display est un nom de travail. Rien n'est codé.
   note ce qu'il a retenu. Le mainteneur peut revenir dessus. Ça ne vaut pas
   pour le code, la licence ni ce qui se publie.
 - Ni image propriétaire (Windows, ESXi, Cisco) ni clé API dans le dépôt.
+
+## Le code
+
+- Il est dans `app/` : le moteur en Rust (`moteur/`), l'app Tauri
+  (`src-tauri/`), les écrans en React et TypeScript (`src/`).
+  `app/README.md` dit comment il est rangé.
+- Avant d'enregistrer : `cargo test -p moteur`, `cargo clippy` pour Linux
+  et pour Windows (`--target x86_64-pc-windows-gnu`), `npm run build`.
+- Ce qui est propre à Windows ne tourne pas dans l'environnement cloud. Il
+  se compile ici, et GitHub fabrique l'installeur Windows à chaque envoi
+  (`.github/workflows/app-windows.yml`). Le mainteneur l'essaie sur son PC.
+- Un écran se vérifie en captures : sous Linux pour de vrai, et les écrans
+  propres à Windows avec des réponses simulées du moteur.
 
 ## Comment on écrit
 

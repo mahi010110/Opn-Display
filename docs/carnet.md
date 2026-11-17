@@ -328,3 +328,19 @@ répondu :
 
 Le reste de la pile (conteneurs, VM, bibliothèque de l'IA) se choisit à
 chaque étape, après mesure.
+
+### L'étape 2 commence
+
+Le mainteneur a donné son feu vert pour l'étape 2, et pour que GitHub
+fabrique l'installeur Windows (« Oui, vas-y »).
+
+- Le code est dans `app/` : le moteur en Rust, l'app Tauri, les écrans en
+  React et TypeScript.
+- L'app vérifie le PC, installe Debian dans WSL2, et affiche ce que le PC
+  sait faire : le noyau de WSL2, KVM, le WiFi simulé, la mémoire.
+- Le code React du kit d'OpenContact n'est pas repris : il injecte ses
+  styles après ceux de l'app, et OpenContact ne s'en sert pas non plus dans
+  son app. Le matériel l'est : jetons, polices, style des composants.
+- Testé ici : sous Linux pour de vrai, et les écrans Windows avec des
+  réponses simulées. La partie Windows ne tourne que sur un PC Windows.
+- Les mesures sur le PC du mainteneur arriveront quand il lancera l'app.

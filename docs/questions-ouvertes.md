@@ -18,7 +18,7 @@ marche et peut se montrer.
    le matériel d'OpenContact.
 2. L'app s'ouvre et vérifie le PC : WSL2, le noyau, KVM, le WiFi simulé, la
    RAM. Elle installe son environnement Linux. Cette étape donne les mesures
-   qui manquent.
+   qui manquent. En cours depuis le 17 novembre 2026, dans `app/`.
 3. Un premier lab : deux ou trois machines Linux en conteneurs, reliées, avec
    leurs terminaux dans l'app.
 4. L'IA : elle se branche, construit ce lab, pose une panne et vérifie la
