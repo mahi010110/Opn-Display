@@ -8,8 +8,13 @@ use std::sync::mpsc::{self, RecvTimeoutError, Sender};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use moteur::ia::{self, Branchement, Conversation, Demande, Execution, Inventer, Liberte, Niveau};
+use moteur::ia::{
+    self, Branchement, Conversation, Demande, Evenement, Execution, Inventer, Liberte, Niveau,
+    Proposer,
+};
+use moteur::lab::Lab;
 use moteur::pannes::{Difficulte, Panne};
+use moteur::proposition::{self, MACHINES_MAX, Proposition};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -26,6 +31,23 @@ const ESSAIS_D_INVENTION: usize = 3;
 struct Invention {
     niveau: Difficulte,
     ratees: Arc<AtomicUsize>,
+}
+
+/// Un lab à proposer : ce que l'IA a proposé, les propositions refusées, et
+/// ce qu'elle a écrit hors de l'outil, souvent une question.
+#[derive(Default)]
+struct Plan {
+    recu: Arc<Mutex<Option<(Lab, String)>>>,
+    ratees: Arc<AtomicUsize>,
+    ecrit: Arc<Mutex<String>>,
+}
+
+/// Ce qu'on demande à l'IA.
+enum Travail {
+    /// Parler avec l'utilisateur, dans le panneau du lab ouvert.
+    Discussion,
+    Invention(Invention),
+    Proposition(Plan),
 }
 
 #[derive(Serialize, Deserialize, Clone, Default)]
@@ -55,6 +77,9 @@ pub struct EtatIa {
 #[derive(Default)]
 pub struct Ia {
     conversation: Mutex<Option<Conversation>>,
+    /// La conversation de l'écran Nouveau lab : on y redemande un
+    /// changement, et l'IA se souvient du lab qu'elle a proposé.
+    proposition: Mutex<Option<Conversation>>,
     accords: Arc<Mutex<HashMap<String, Sender<bool>>>>,
     arret: Arc<AtomicBool>,
     occupee: AtomicBool,
@@ -202,7 +227,7 @@ pub async fn regler_ia(
 /// ses demandes d'accord par `ia-accord`.
 #[tauri::command]
 pub async fn parler_ia(app: AppHandle, texte: String) -> Result<(), String> {
-    tour(app, texte, None).await
+    tour(app, texte, Travail::Discussion).await
 }
 
 /// L'IA invente une panne et la pose, sans rien montrer de ce qu'elle fait.
@@ -223,10 +248,11 @@ pub async fn inventer_panne(
     tour(
         app.clone(),
         "Invente la panne et pose-la.".into(),
-        Some(invention),
+        Travail::Invention(invention),
     )
     .await?;
-    if let Some(vue) = pannes::panne_en_cours(app.state()).filter(|vue| vue.inventee()) {
+    if let Some(vue) = pannes::panne_en_cours(app.clone(), app.state()).filter(|vue| vue.inventee())
+    {
         return Ok(Some(vue));
     }
     if ratees.load(Ordering::SeqCst) >= ESSAIS_D_INVENTION {
@@ -240,6 +266,90 @@ pub async fn inventer_panne(
     Err(
         "L'IA n'a pas réussi à poser une panne. Essaie encore, ou prends une panne du catalogue."
             .into(),
+    )
+}
+
+/// Le lab que propose l'IA, et ce qu'elle en dit. Sans lab, elle a posé
+/// une question.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PropositionLab {
+    lab: Option<Lab>,
+    commentaire: String,
+}
+
+/// L'IA propose un lab d'après la description de l'utilisateur. Rien quand
+/// l'utilisateur l'a arrêtée.
+#[tauri::command]
+pub async fn proposer_lab(
+    app: AppHandle,
+    description: String,
+) -> Result<Option<PropositionLab>, String> {
+    let texte = description.trim().to_string();
+    if texte.is_empty() {
+        return Err("Décris le lab que tu veux.".into());
+    }
+    let plan = Plan::default();
+    let (recu, ratees, ecrit) = (plan.recu.clone(), plan.ratees.clone(), plan.ecrit.clone());
+    tour(app.clone(), texte, Travail::Proposition(plan)).await?;
+    let ecrit = ecrit
+        .lock()
+        .map(|e| e.trim().to_string())
+        .unwrap_or_default();
+    if let Some((lab, commentaire)) = recu.lock().map_err(|e| e.to_string())?.take() {
+        return Ok(Some(PropositionLab {
+            lab: Some(lab),
+            commentaire,
+        }));
+    }
+    if ratees.load(Ordering::SeqCst) >= ESSAIS_D_INVENTION {
+        return Err(format!(
+            "L'IA n'a pas réussi à proposer un lab qui tourne, en {ESSAIS_D_INVENTION} essais. \
+             Reformule ta demande, ou demande plus simple."
+        ));
+    }
+    if app.state::<Ia>().arret.load(Ordering::SeqCst) {
+        return Ok(None);
+    }
+    if !ecrit.is_empty() {
+        return Ok(Some(PropositionLab {
+            lab: None,
+            commentaire: ecrit,
+        }));
+    }
+    Err("L'IA n'a pas proposé de lab. Reformule ta demande.".into())
+}
+
+/// L'écran Nouveau lab repart de zéro.
+#[tauri::command]
+pub fn oublier_proposition(ia_etat: State<'_, Ia>) {
+    if let Ok(mut conversation) = ia_etat.proposition.lock() {
+        *conversation = None;
+    }
+}
+
+/// Le lab ouvert change : la discussion du panneau repart de zéro.
+pub(crate) fn oublier(app: &AppHandle) {
+    if let Ok(mut conversation) = app.state::<Ia>().conversation.lock() {
+        *conversation = None;
+    }
+}
+
+fn consigne_de_proposition() -> String {
+    format!(
+        "Tu es l'IA d'Opn-Display, une app pour apprendre l'administration d'infrastructures. Tu \
+         parles français, tu tutoies, sans emoji. L'utilisateur décrit un lab à construire : \
+         propose-le avec l'outil proposer_un_lab. Il le verra en schéma avant de le lancer.\n\
+         Pour l'instant, l'app fait tourner des postes, des serveurs et des routeurs Debian, et \
+         des switchs simples, sans VLAN. Pas encore de pare-feu, de Windows, d'accès à Internet \
+         ni de logiciel à installer : si la demande en a besoin, propose ce qui s'en approche et \
+         dis-le dans le commentaire.\n\
+         Donne une adresse à chaque bout de câble, sauf côté switch, une passerelle aux postes et \
+         aux serveurs, et des routes aux routeurs, pour que toutes les machines se joignent, sauf \
+         si l'utilisateur demande autre chose. Des noms courts : pc1, srv1, r1, sw1. \
+         {MACHINES_MAX} machines au plus.\n\
+         Si l'utilisateur demande un changement, propose le lab entier à nouveau. Une fois le lab \
+         proposé, réponds seulement : proposé."
     )
 }
 
@@ -258,7 +368,7 @@ fn consigne_d_invention(niveau: Difficulte) -> String {
     )
 }
 
-async fn tour(app: AppHandle, texte: String, invention: Option<Invention>) -> Result<(), String> {
+async fn tour(app: AppHandle, texte: String, travail: Travail) -> Result<(), String> {
     let ia_etat = app.state::<Ia>();
     if ia_etat.occupee.swap(true, Ordering::SeqCst) {
         return Err("L'IA répond déjà.".into());
@@ -276,25 +386,60 @@ async fn tour(app: AppHandle, texte: String, invention: Option<Invention>) -> Re
         if branchement.cle().is_some() && cle.is_none() {
             return Err("La clé de l'IA manque. Range-la dans Réglages.".into());
         }
-        let lab = le_lab();
-        let mut consigne = ia::consigne(reglages.niveau, &ia::description_du_lab(&lab));
-        if let Some(contexte) = pannes::contexte(&app_tour) {
-            consigne.push_str("\n\n");
-            consigne.push_str(&contexte);
-        }
-        let discret = invention.is_some();
-        if let Some(invention) = &invention {
-            consigne.push_str("\n\n");
-            consigne.push_str(&consigne_d_invention(invention.niveau));
-        }
+        let lab = le_lab(&app_tour);
+        let consigne = match &travail {
+            Travail::Proposition(_) => consigne_de_proposition(),
+            Travail::Discussion | Travail::Invention(_) => {
+                let mut consigne = ia::consigne(reglages.niveau, &ia::description_du_lab(&lab));
+                if let Some(contexte) = pannes::contexte(&app_tour) {
+                    consigne.push_str("\n\n");
+                    consigne.push_str(&contexte);
+                }
+                if let Travail::Invention(invention) = &travail {
+                    consigne.push_str("\n\n");
+                    consigne.push_str(&consigne_d_invention(invention.niveau));
+                }
+                consigne
+            }
+        };
+        let (invention, plan) = match travail {
+            Travail::Discussion => (None, None),
+            Travail::Invention(invention) => (Some(invention), None),
+            Travail::Proposition(plan) => (None, Some(plan)),
+        };
+        let discussion = invention.is_none() && plan.is_none();
+        let ecrit = plan.as_ref().map(|p| p.ecrit.clone());
         let app_accord = app_tour.clone();
         let arret_accord = arret.clone();
         let app_panne = app_tour.clone();
+        let arret_plan = arret.clone();
         let execution = Execution {
             lab,
             liberte: reglages.dans_le_lab,
             accorder: Arc::new(move |demande: &Demande| {
                 demander_accord(&app_accord, &accords, &arret_accord, demande)
+            }),
+            proposer: plan.map(|Plan { recu, ratees, .. }| {
+                Arc::new(move |proposee: Proposition, commentaire: String| {
+                    match proposition::construire(&proposee) {
+                        Ok(lab) => {
+                            if let Ok(mut place) = recu.lock() {
+                                *place = Some((lab, commentaire));
+                            }
+                            Ok(
+                                "Le lab est proposé à l'utilisateur, qui le voit en schéma. \
+                                Réponds seulement : proposé."
+                                    .to_string(),
+                            )
+                        }
+                        Err(erreur) => {
+                            if ratees.fetch_add(1, Ordering::SeqCst) + 1 >= ESSAIS_D_INVENTION {
+                                arret_plan.store(true, Ordering::SeqCst);
+                            }
+                            Err(erreur)
+                        }
+                    }
+                }) as Proposer
             }),
             inventer: invention.map(|Invention { niveau, ratees }| {
                 let arret = arret.clone();
@@ -318,17 +463,23 @@ async fn tour(app: AppHandle, texte: String, invention: Option<Invention>) -> Re
             }),
         };
         let ia_etat = app_tour.state::<Ia>();
-        // L'invention a sa propre conversation : rien ne reste dans celle
-        // de l'utilisateur, et rien ne s'affiche.
-        let mut conversation = if discret {
-            Conversation::default()
+        // L'invention a sa propre conversation, qui ne reste pas : rien ne
+        // passe dans celle de l'utilisateur, et rien ne s'affiche. La
+        // proposition garde la sienne, pour qu'on y demande un changement.
+        let gardee = if discussion {
+            Some(&ia_etat.conversation)
+        } else if ecrit.is_some() {
+            Some(&ia_etat.proposition)
         } else {
-            ia_etat
-                .conversation
+            None
+        };
+        let mut conversation = match gardee {
+            Some(place) => place
                 .lock()
                 .map_err(|e| e.to_string())?
                 .take()
-                .unwrap_or_default()
+                .unwrap_or_default(),
+            None => Conversation::default(),
         };
         let resultat = ia::parler(
             &branchement,
@@ -338,13 +489,19 @@ async fn tour(app: AppHandle, texte: String, invention: Option<Invention>) -> Re
             &texte,
             &execution,
             &mut |evenement| {
-                if !discret {
+                if discussion {
                     let _ = app_tour.emit("ia", evenement);
+                } else if let (Some(ecrit), Evenement::Texte { texte }) = (&ecrit, &evenement)
+                    && let Ok(mut place) = ecrit.lock()
+                {
+                    *place = texte.clone();
                 }
             },
             &arret,
         );
-        if !discret && let Ok(mut place) = ia_etat.conversation.lock() {
+        if let Some(place) = gardee
+            && let Ok(mut place) = place.lock()
+        {
             *place = Some(conversation);
         }
         resultat

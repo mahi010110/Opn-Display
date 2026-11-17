@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 
 import { LabOuvert } from '../ecrans/LabOuvert'
 import { MesLabs } from '../ecrans/MesLabs'
+import { NouveauLab } from '../ecrans/NouveauLab'
 import { Pannes } from '../ecrans/Pannes'
 import { Reglages, type Section } from '../ecrans/Reglages'
 import {
@@ -13,19 +14,24 @@ import {
   reglerIa,
   arreterLab,
   arreterMachine,
+  creerLab,
   demarrerMachine,
-  etatLab,
+  etatLabs,
   lancerLab,
+  ouvrirLab,
   remettreAZero,
   suivreLab,
   suivreMachines,
+  supprimerLab,
   veiller,
 } from '../pont'
-import type { Difficulte, EtatIa, EtatLab, Niveau, Rapport, VuePanne } from '../types'
+import type { Difficulte, EtatIa, EtatLab, Lab, Niveau, Rapport, VuePanne } from '../types'
 
-type Ecran = 'labs' | 'lab' | 'pannes' | 'reglages'
+type Ecran = 'labs' | 'lab' | 'nouveau' | 'pannes' | 'reglages'
 
-/** Ce que les écrans peuvent demander au lab. */
+const PREMIER_LAB = 'premier-lab'
+
+/** Ce que les écrans peuvent demander au lab ouvert. */
 export interface Gestes {
   lancer: () => Promise<void>
   arreter: () => Promise<void>
@@ -37,8 +43,9 @@ export interface Gestes {
 /** L'app installée : le menu, et l'écran choisi dessous. */
 export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) => void }) {
   const [ecran, setEcran] = useState<Ecran>('labs')
-  const [labOuvert, setLabOuvert] = useState(false)
-  const [etat, setEtat] = useState<EtatLab | null>(null)
+  const [labMonte, setLabMonte] = useState(false)
+  const [ouvert, setOuvert] = useState(PREMIER_LAB)
+  const [labs, setLabs] = useState<EtatLab[]>([])
   const [occupe, setOccupe] = useState<string | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
   const [etatIa, setEtatIa] = useState<EtatIa | null>(null)
@@ -46,10 +53,20 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
   const [panne, setPanne] = useState<VuePanne | null>(null)
   const [invention, setInvention] = useState(false)
 
+  const etat = labs.find((l) => l.lab.id === ouvert) ?? null
+
   const rafraichir = useCallback(() => {
-    etatLab()
-      .then(setEtat)
+    etatLabs()
+      .then(setLabs)
       .catch((e) => setErreur(String(e)))
+  }, [])
+
+  const retenir = useCallback((nouvel: EtatLab) => {
+    setLabs((avant) =>
+      avant.some((l) => l.lab.id === nouvel.lab.id)
+        ? avant.map((l) => (l.lab.id === nouvel.lab.id ? nouvel : l))
+        : [...avant, nouvel],
+    )
   }, [])
 
   useEffect(() => {
@@ -78,7 +95,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
       setErreur(null)
       setOccupe(debut)
       try {
-        setEtat(await action())
+        retenir(await action())
       } catch (e) {
         setErreur(String(e))
         rafraichir()
@@ -86,17 +103,17 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
         setOccupe(null)
       }
     },
-    [rafraichir],
+    [rafraichir, retenir],
   )
 
   const gestes: Gestes = {
-    lancer: () => agir('Démarrage', lancerLab),
-    arreter: () => agir('Arrêt', arreterLab),
-    demarrer: (machine) => agir(`Démarrage de ${machine}`, () => demarrerMachine(machine)),
-    eteindre: (machine) => agir(`Arrêt de ${machine}`, () => arreterMachine(machine)),
+    lancer: () => agir('Démarrage', () => lancerLab(ouvert)),
+    arreter: () => agir('Arrêt', () => arreterLab(ouvert)),
+    demarrer: (machine) => agir(`Démarrage de ${machine}`, () => demarrerMachine(ouvert, machine)),
+    eteindre: (machine) => agir(`Arrêt de ${machine}`, () => arreterMachine(ouvert, machine)),
     // La remise à zéro emporte aussi la panne posée.
     remettreAZero: () =>
-      agir('Remise à zéro', remettreAZero).then(() =>
+      agir('Remise à zéro', () => remettreAZero(ouvert)).then(() =>
         panneEnCours()
           .then(setPanne)
           .catch(() => undefined),
@@ -106,6 +123,61 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
   const aller = (vers: Ecran) => (evenement: MouseEvent) => {
     evenement.preventDefault()
     setEcran(vers)
+  }
+
+  /** Ouvre un lab à l'écran. L'IA et les pannes travaillent dans celui-là. */
+  const ouvrir = useCallback(
+    async (id: string) => {
+      setErreur(null)
+      try {
+        retenir(await ouvrirLab(id))
+        setOuvert(id)
+        setLabMonte(true)
+        setEcran('lab')
+        return true
+      } catch (e) {
+        setErreur(String(e))
+        return false
+      }
+    },
+    [retenir],
+  )
+
+  const lancerLe = async (id: string) => {
+    if (await ouvrir(id)) await agir('Démarrage', () => lancerLab(id))
+  }
+
+  const arreterLe = (id: string) => agir('Arrêt', () => arreterLab(id))
+
+  const supprimer = async (id: string) => {
+    setErreur(null)
+    setOccupe('Suppression du lab')
+    try {
+      await supprimerLab(id)
+      if (ouvert === id) {
+        setOuvert(PREMIER_LAB)
+        setLabMonte(false)
+      }
+      setLabs((avant) => avant.filter((l) => l.lab.id !== id))
+      setPanne(await panneEnCours())
+    } catch (e) {
+      setErreur(String(e))
+    } finally {
+      setOccupe(null)
+      rafraichir()
+    }
+  }
+
+  /** Range le lab proposé, l'ouvre et le lance. */
+  const creer = async (lab: Lab) => {
+    setErreur(null)
+    try {
+      const nouveau = await creerLab(lab)
+      retenir(nouveau)
+      await lancerLe(nouveau.lab.id)
+    } catch (e) {
+      setErreur(String(e))
+    }
   }
 
   const changerNiveau = (niveau: Niveau) => {
@@ -127,7 +199,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
         if (vue === null) return
         setPanne(vue)
         rafraichir()
-        setLabOuvert(true)
+        setLabMonte(true)
         setEcran('lab')
       })
       .catch((e) => setErreur(String(e)))
@@ -142,17 +214,19 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
     poser(() => inventerPanne(niveau), "L'IA invente une panne")
   }
 
-  const ouvrirLeLab = () => {
-    setLabOuvert(true)
-    setEcran('lab')
-  }
+  const enPanne = panne !== null && !panne.verification?.reparee ? panne.lab : null
+  const panneIci = panne !== null && panne.lab === ouvert ? panne : null
 
   return (
     <div className="app">
       <header className="barre">
         <span className="marque">Opn-Display</span>
         <nav className="menu" aria-label="Menu">
-          <a href="#" aria-current={ecran === 'labs' || ecran === 'lab' ? 'page' : undefined} onClick={aller('labs')}>
+          <a
+            href="#"
+            aria-current={ecran === 'labs' || ecran === 'lab' || ecran === 'nouveau' ? 'page' : undefined}
+            onClick={aller('labs')}
+          >
             <i className="ic i-labs" aria-hidden="true"></i>Labs
           </a>
           <a href="#" aria-current={ecran === 'pannes' ? 'page' : undefined} onClick={aller('pannes')}>
@@ -169,18 +243,32 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
       {ecran === 'labs' && (
         <MesLabs
           rapport={props.rapport}
-          etat={etat}
+          labs={labs}
           occupe={occupe}
           erreur={erreur}
-          gestes={gestes}
-          enPanne={panne !== null && !panne.verification?.reparee}
-          onOuvrir={ouvrirLeLab}
+          enPanne={enPanne}
+          onOuvrir={(id) => void ouvrir(id)}
+          onLancer={(id) => void lancerLe(id)}
+          onArreter={(id) => void arreterLe(id)}
+          onSupprimer={(id) => void supprimer(id)}
+          onNouveau={() => setEcran('nouveau')}
+        />
+      )}
+      {ecran === 'nouveau' && (
+        <NouveauLab
+          rapport={props.rapport}
+          etatIa={etatIa}
+          erreur={erreur}
+          onRetour={() => setEcran('labs')}
+          onBrancher={brancherLIa}
+          onCreer={(lab) => void creer(lab)}
         />
       )}
       {/* Le lab reste monté quand on le quitte : ses terminaux continuent. */}
-      {labOuvert && (
+      {labMonte && (
         <div className="ecran-garde" hidden={ecran !== 'lab'}>
           <LabOuvert
+            key={ouvert}
             rapport={props.rapport}
             etat={etat}
             occupe={occupe}
@@ -191,7 +279,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
             etatIa={etatIa}
             onNiveau={changerNiveau}
             onBrancher={brancherLIa}
-            panne={panne}
+            panne={panneIci}
             onPanne={setPanne}
             onAutrePanne={() => setEcran('pannes')}
           />
@@ -199,6 +287,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
       )}
       {ecran === 'pannes' && (
         <Pannes
+          key={ouvert}
           etatIa={etatIa}
           panne={panne}
           nomDuLab={etat?.lab.nom ?? ''}
@@ -209,7 +298,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
           onInventer={inventer}
           onArreter={() => void arreterIa()}
           onBrancher={brancherLIa}
-          onOuvrirLab={ouvrirLeLab}
+          onOuvrirLab={() => void ouvrir(panne?.lab ?? ouvert)}
         />
       )}
       {ecran === 'reglages' && (

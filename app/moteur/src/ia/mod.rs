@@ -21,7 +21,7 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub use outils::{Demande, Execution, Inventer, Liberte, description_du_lab};
+pub use outils::{Demande, Execution, Inventer, Liberte, Mode, Proposer, description_du_lab};
 
 /// D'où vient le modèle.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -183,7 +183,7 @@ pub fn parler(
     conversation
         .messages
         .push(Message::Utilisateur(texte.to_string()));
-    let definitions = outils::definitions(execution.inventer.is_some());
+    let definitions = outils::definitions(execution.mode());
     for _ in 0..TOURS_MAX {
         if arret.load(Ordering::Relaxed) {
             return Ok(());

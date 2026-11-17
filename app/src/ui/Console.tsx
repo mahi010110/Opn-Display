@@ -32,6 +32,7 @@ type Etat = 'attente' | 'ouverte' | 'finie'
  * qu'il a affiché quand le shell s'arrête.
  */
 export function Console(props: {
+  lab: string
   machine: string
   marche: Marche
   visible: boolean
@@ -128,6 +129,7 @@ export function Console(props: {
     const ici = ++generation.current
     setEtat('ouverte')
     ouvrirTerminal(
+      props.lab,
       props.machine,
       term.cols,
       term.rows,
@@ -160,7 +162,7 @@ export function Console(props: {
         setVoulue(false)
       })
     // L'état n'entre pas ici : une session ouverte ne se rouvre pas.
-  }, [pret, enMarche, voulue, props.machine])
+  }, [pret, enMarche, voulue, props.lab, props.machine])
 
   useEffect(() => {
     if (!props.visible || !pret) return

@@ -498,3 +498,51 @@ le mainteneur venait de l'envoi d'avant, et celui de l'IA n'avait jamais
 et attend la réponse avant de lancer le programme. Dans l'app, xterm.js
 répond ; le test ne répondait pas. Il répond maintenant, et la fabrication
 passe.
+
+### L'étape 4 : l'IA construit le lab
+
+Le 17 novembre 2026, le mainteneur a validé les écrans des pannes (« Oui,
+ils me vont »), puis choisi la suite de l'étape 4 : l'IA qui construit le
+lab. Ses deux réponses :
+
+- « Avec un switch simple » : à cette étape, un lab contient des postes,
+  des serveurs et des routeurs Debian, des câbles, et un switch sans VLAN
+  pour mettre plusieurs machines dans un même réseau. Les VLAN viennent à
+  l'étape 5, Windows et les pare-feu plus tard. L'IA le dit quand une
+  demande en a besoin.
+- « Nouveau lab, comme la maquette » : l'écran validé `nouveau-lab`. On
+  décrit le lab, l'IA propose le schéma, les machines et la RAM, on retire
+  une machine ou on redemande, puis « Lancer le lab ». Le lab rejoint Mes
+  labs, à côté du Premier lab.
+
+Avant la question, Claude a mesuré le switch simple : un pont Linux dans un
+conteneur Debian ([mesures.md](mesures.md), partie 15).
+
+Codé le 17 novembre 2026 : l'écran Nouveau lab, Mes labs avec plusieurs
+labs, et le switch simple. Ce que Claude a retenu en codant, que le
+mainteneur peut reprendre :
+
+- L'IA ne nomme pas les interfaces : l'app les nomme dans l'ordre des
+  câbles, eth0, eth1… Elle ne peut donc pas s'y tromper.
+- L'app vérifie le lab proposé avant de le montrer : une adresse donnée
+  deux fois, deux réseaux séparés sur la même plage, une passerelle qui
+  n'est pas un routeur de son réseau sont refusés. Le refus dit quoi
+  corriger, et repart vers l'IA. Elle s'arrête après trois refus, comme
+  pour une panne.
+- 12 machines au plus par lab : le schéma reste lisible.
+- La RAM montrée avant le lancement compte 16 Mo par machine, les 13 Mo
+  mesurés arrondis au-dessus.
+- L'app place les machines sur le schéma, pas l'IA : les routeurs et les
+  switchs sur une rangée, les autres dessous.
+- Un lab construit se supprime depuis Mes labs, arrêté, après une
+  question. Le Premier lab ne se supprime pas : il porte le catalogue de
+  pannes.
+- Deux choses de la maquette ne sont pas encore là : « Ajouter une
+  machine » dans le lab proposé, qui demande de construire à la main, et
+  la colonne « Ouvert » de Mes labs.
+- Changer de lab ouvert repart d'une discussion vide avec l'IA. Une panne
+  posée reste attachée à son lab.
+
+Claude a aussi rendu le schéma lisible pour un lab qui n'est pas le
+Premier lab : un nom de réseau ou d'interface ne passe plus sur une case
+ni sur la jonction d'un câble.

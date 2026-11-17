@@ -127,6 +127,7 @@ export function LabOuvert(props: {
                     {onglets.map((nom) => (
                       <Console
                         key={nom}
+                        lab={lab?.id ?? ''}
                         machine={nom}
                         marche={marche(nom)}
                         visible={props.visible && nom === actif}

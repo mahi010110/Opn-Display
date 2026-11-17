@@ -62,12 +62,21 @@ export interface Interface {
   passerelle: string | null
 }
 
+export interface Route {
+  destination: string
+  passerelle: string
+}
+
 export interface MachineLab {
   nom: string
   sorte: Sorte
   x: number
   y: number
   interfaces: Interface[]
+  routes: Route[]
+  transfere: boolean
+  /** La mémoire qu'elle prendra, en octets, montrée avant le lancement. */
+  memoirePrevue: number
 }
 
 export interface Bout {
@@ -86,6 +95,13 @@ export interface Lab {
   nom: string
   machines: MachineLab[]
   cables: Cable[]
+  numero: number
+}
+
+/** Le lab que propose l'IA. Sans lab, elle a posé une question. */
+export interface PropositionLab {
+  lab: Lab | null
+  commentaire: string
 }
 
 export type Marche = 'absente' | 'arretee' | 'enMarche'
@@ -162,6 +178,9 @@ export interface VerificationPanne {
 }
 
 export interface VuePanne {
+  /** Le lab où elle est posée, et son nom. */
+  lab: string
+  nomDuLab: string
   titre: string
   niveau: Difficulte
   inventee: boolean

@@ -9,8 +9,10 @@ import type {
   EtatIa,
   EtatLab,
   EvenementIa,
+  Lab,
   Liberte,
   Niveau,
+  PropositionLab,
   Rapport,
   ResumePanne,
   VuePanne,
@@ -40,28 +42,61 @@ export function suivreInstallation(quandEtape: (etape: Etape) => void): Promise<
   return listen<Etape>('installation', (evenement) => quandEtape(evenement.payload))
 }
 
-export function etatLab(): Promise<EtatLab> {
-  return invoke<EtatLab>('etat_lab')
+/** Tous les labs et leurs machines, pour Mes labs. */
+export function etatLabs(): Promise<EtatLab[]> {
+  return invoke<EtatLab[]>('etat_labs')
 }
 
-export function lancerLab(): Promise<EtatLab> {
-  return invoke<EtatLab>('lancer_lab')
+/** Ouvre un lab à l'écran : l'IA et les pannes travaillent dans celui-là. */
+export function ouvrirLab(id: string): Promise<EtatLab> {
+  return invoke<EtatLab>('ouvrir_lab', { id })
 }
 
-export function arreterLab(): Promise<EtatLab> {
-  return invoke<EtatLab>('arreter_lab')
+export function etatLab(id: string): Promise<EtatLab> {
+  return invoke<EtatLab>('etat_lab', { id })
 }
 
-export function demarrerMachine(nom: string): Promise<EtatLab> {
-  return invoke<EtatLab>('demarrer_machine', { nom })
+export function lancerLab(id: string): Promise<EtatLab> {
+  return invoke<EtatLab>('lancer_lab', { id })
 }
 
-export function arreterMachine(nom: string): Promise<EtatLab> {
-  return invoke<EtatLab>('arreter_machine', { nom })
+export function arreterLab(id: string): Promise<EtatLab> {
+  return invoke<EtatLab>('arreter_lab', { id })
 }
 
-export function remettreAZero(): Promise<EtatLab> {
-  return invoke<EtatLab>('remettre_a_zero')
+export function demarrerMachine(id: string, nom: string): Promise<EtatLab> {
+  return invoke<EtatLab>('demarrer_machine', { id, nom })
+}
+
+export function arreterMachine(id: string, nom: string): Promise<EtatLab> {
+  return invoke<EtatLab>('arreter_machine', { id, nom })
+}
+
+export function remettreAZero(id: string): Promise<EtatLab> {
+  return invoke<EtatLab>('remettre_a_zero', { id })
+}
+
+/** Le lab proposé, sans une machine. Rien n'est créé. */
+export function retirerDuLab(lab: Lab, machine: string): Promise<Lab> {
+  return invoke<Lab>('retirer_du_lab', { lab, machine })
+}
+
+/** Range le lab proposé parmi les labs. Ses machines se créent à son lancement. */
+export function creerLab(lab: Lab): Promise<EtatLab> {
+  return invoke<EtatLab>('creer_lab', { lab })
+}
+
+export function supprimerLab(id: string): Promise<void> {
+  return invoke<void>('supprimer_lab', { id })
+}
+
+/** Le lab que propose l'IA, ou rien si l'utilisateur l'a arrêtée. */
+export function proposerLab(description: string): Promise<PropositionLab | null> {
+  return invoke<PropositionLab | null>('proposer_lab', { description })
+}
+
+export function oublierProposition(): Promise<void> {
+  return invoke<void>('oublier_proposition')
 }
 
 /** Ce que le moteur raconte pendant qu'il crée ou démarre des machines. */
@@ -90,6 +125,7 @@ export interface Session {
  * l'ordre ; `fin` est appelée quand le shell s'est arrêté.
  */
 export async function ouvrirTerminal(
+  lab: string,
   machine: string,
   colonnes: number,
   lignes: number,
@@ -102,7 +138,7 @@ export async function ouvrirTerminal(
     else if (message instanceof ArrayBuffer) recevoir(new Uint8Array(message))
     else if (Array.isArray(message)) recevoir(Uint8Array.from(message))
   }
-  const id = await invoke<number>('ouvrir_terminal', { machine, colonnes, lignes, flux })
+  const id = await invoke<number>('ouvrir_terminal', { lab, machine, colonnes, lignes, flux })
   return {
     id,
     ecrire: (donnees) => void invoke('ecrire_terminal', { id, donnees }).catch(() => undefined),

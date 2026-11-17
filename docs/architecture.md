@@ -352,3 +352,36 @@ Testé ici avec un vrai Incus : les cinq pannes posées, leurs tests en
 panne posée, un indice, la vérification avant et après la réparation,
 « Abandonner », et une panne inventée avec un faux modèle
 ([mesures.md](mesures.md), partie 14).
+
+La fin de l'étape 4, l'IA construit le lab :
+
+- « Nouveau lab » reprend la maquette validée : on décrit le lab, l'IA le
+  propose avec l'outil `proposer_un_lab`, on voit son schéma, ses machines
+  et sa RAM, on retire une machine ou on redemande, puis « Lancer le lab ».
+  L'IA n'y a que cet outil, dans une conversation à part qui se souvient du
+  lab proposé ;
+- l'IA décrit les machines (poste, serveur, routeur, switch), les câbles
+  avec l'adresse de chaque bout, les passerelles et les routes. L'app nomme
+  les interfaces dans l'ordre des câbles, et vérifie tout : des noms
+  valables, une adresse par machine, une plage par réseau, une passerelle
+  qui est un routeur de son réseau. Un refus repart vers l'IA, qui
+  corrige. Elle s'arrête après trois refus ;
+- l'app place les machines sur le schéma : les routeurs et les switchs sur
+  une rangée, les autres dessous. Les machines d'un switch descendent d'une
+  même ligne, qui porte leur réseau une seule fois ;
+- un switch est un conteneur Debian dont les ports entrent dans un pont
+  Linux, `br0`. Pas de VLAN à cette étape ;
+- chaque lab construit a son fichier dans le dossier des données de l'app
+  (`labs/lab-2.json`…), son numéro, qui entre dans le nom de ses câbles, et
+  son projet Incus. Mes labs le montre à côté du Premier lab ;
+- le lab ouvert est celui où travaillent l'IA du panneau et les pannes.
+  Changer de lab repart d'une discussion vide. Une panne garde son lab ;
+- un lab construit se supprime depuis Mes labs, quand il est arrêté, après
+  une question. Le Premier lab ne se supprime pas.
+
+Testé ici avec un vrai Incus et un faux modèle qui répond toujours pareil.
+Sa première proposition avait une mauvaise passerelle : l'app l'a refusée,
+et il a corrigé. Le lab proposé (un routeur, deux switchs, quatre
+machines), lancé : pc1 joint pc2 par le switch, et srv1 par le routeur.
+Une panne inventée s'y pose et s'y abandonne. Supprimé, son projet Incus,
+ses dix bouts de câble et son fichier partent.

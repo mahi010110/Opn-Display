@@ -12,12 +12,24 @@ use serde_json::{Value, json};
 use super::{Appel, Evenement};
 use crate::lab::{self, Lab, Marche, Sorte};
 use crate::pannes::Panne;
+use crate::proposition::{MACHINES_MAX, Proposition};
 
 #[derive(Clone)]
 pub struct Outil {
     pub nom: String,
     pub description: String,
     pub parametres: Value,
+}
+
+/// Ce que fait l'IA, qui décide de ses outils.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Mode {
+    /// Elle parle avec l'utilisateur, dans le lab ouvert.
+    Lab,
+    /// Elle invente une panne et la pose.
+    Invention,
+    /// Elle propose un lab à construire, sur l'écran Nouveau lab.
+    Proposition,
 }
 
 /// Ce que l'IA a le droit de faire dans le lab sans demander.
@@ -46,7 +58,10 @@ const SORTIE_MAX: usize = 6000;
 /// Ce que l'écran montre d'un résultat.
 const APERCU_MAX: usize = 1500;
 
-pub fn definitions(invention: bool) -> Vec<Outil> {
+pub fn definitions(mode: Mode) -> Vec<Outil> {
+    if mode == Mode::Proposition {
+        return vec![proposer_un_lab()];
+    }
     let machine = json!({"type": "string", "description": "Le nom de la machine, par exemple pc1"});
     let mut outils = vec![
         Outil {
@@ -80,7 +95,7 @@ pub fn definitions(invention: bool) -> Vec<Outil> {
             parametres: json!({"type": "object", "properties": {"machine": machine}, "required": ["machine"]}),
         },
     ];
-    if invention {
+    if mode == Mode::Invention {
         let commande = json!({
             "type": "object",
             "properties": {"machine": {"type": "string"}, "commande": {"type": "string"}},
@@ -110,6 +125,56 @@ pub fn definitions(invention: bool) -> Vec<Outil> {
         });
     }
     outils
+}
+
+fn proposer_un_lab() -> Outil {
+    let bout = json!({
+        "type": "object",
+        "properties": {
+            "machine": {"type": "string"},
+            "adresse": {"type": "string", "description": "L'adresse de ce bout du câble avec son masque, par exemple 10.0.1.10/24. Rien pour un switch."},
+        },
+        "required": ["machine"],
+    });
+    Outil {
+        nom: "proposer_un_lab".into(),
+        description: format!(
+            "Propose un lab à l'utilisateur, qui le verra en schéma avant de le lancer. L'app le \
+             vérifie : un refus dit quoi corriger, et tu proposes à nouveau. Les interfaces se \
+             nomment toutes seules, eth0, eth1…, dans l'ordre des câbles. {MACHINES_MAX} machines \
+             au plus."
+        ),
+        parametres: json!({
+            "type": "object",
+            "properties": {
+                "nom": {"type": "string", "description": "Un nom court pour le lab, par exemple Deux réseaux et un routeur"},
+                "commentaire": {"type": "string", "description": "Une ou deux phrases pour l'utilisateur : ce que tu as choisi, et ce qu'il peut te demander de changer."},
+                "machines": {"type": "array", "items": {
+                    "type": "object",
+                    "properties": {
+                        "nom": {"type": "string", "description": "Des minuscules, des chiffres et des tirets, 15 au plus : pc1, srv-web, r1, sw1"},
+                        "sorte": {"type": "string", "enum": ["poste", "serveur", "routeur", "switch"]},
+                        "passerelle": {"type": "string", "description": "La passerelle par défaut : l'adresse d'un routeur branché dans son réseau, par exemple 10.0.1.1"},
+                        "routes": {"type": "array", "items": {
+                            "type": "object",
+                            "properties": {
+                                "destination": {"type": "string", "description": "Un réseau, par exemple 10.0.3.0/24"},
+                                "passerelle": {"type": "string", "description": "L'adresse d'un routeur branché dans un réseau de cette machine"},
+                            },
+                            "required": ["destination", "passerelle"],
+                        }},
+                    },
+                    "required": ["nom", "sorte"],
+                }},
+                "cables": {"type": "array", "items": {
+                    "type": "object",
+                    "properties": {"de": bout, "vers": bout},
+                    "required": ["de", "vers"],
+                }},
+            },
+            "required": ["nom", "commentaire", "machines", "cables"],
+        }),
+    }
 }
 
 fn nom_de_sorte(sorte: Sorte) -> &'static str {
@@ -174,6 +239,9 @@ pub fn description_du_lab(le_lab: &Lab) -> String {
 /// Pose une panne inventée par l'IA, et rend ce qu'elle lira.
 pub type Inventer = Arc<dyn Fn(Panne) -> Result<String, String> + Send + Sync>;
 
+/// Reçoit le lab proposé et ce que l'IA en dit à l'utilisateur.
+pub type Proposer = Arc<dyn Fn(Proposition, String) -> Result<String, String> + Send + Sync>;
+
 /// Ce qu'il faut pour exécuter les outils : le lab, le réglage, et de quoi
 /// demander l'accord de l'utilisateur.
 #[derive(Clone)]
@@ -187,15 +255,34 @@ pub struct Execution {
     /// réponse. L'utilisateur a demandé la panne : il n'y a pas d'accord à
     /// demander.
     pub inventer: Option<Inventer>,
+    /// Sur l'écran Nouveau lab : elle n'a que l'outil pour proposer un lab,
+    /// et rien ne s'affiche dans le panneau.
+    pub proposer: Option<Proposer>,
 }
 
 impl Execution {
+    pub fn mode(&self) -> Mode {
+        if self.proposer.is_some() {
+            Mode::Proposition
+        } else if self.inventer.is_some() {
+            Mode::Invention
+        } else {
+            Mode::Lab
+        }
+    }
+
     /// Exécute un appel d'outil, après l'accord s'il le faut, et rend ce que
     /// l'IA lira.
     pub fn executer(&self, appel: &Appel, signaler: &mut dyn FnMut(Evenement)) -> String {
-        let discret = self.inventer.is_some();
+        let discret = self.mode() != Mode::Lab;
         if appel.nom == "poser_une_panne" {
             return self.poser_une_panne(&appel.arguments);
+        }
+        if appel.nom == "proposer_un_lab" {
+            return self.proposer_un_lab(&appel.arguments);
+        }
+        if self.mode() == Mode::Proposition {
+            return format!("L'outil {} n'existe pas ici.", appel.nom);
         }
         let mut rien = |_: Evenement| {};
         let signaler: &mut dyn FnMut(Evenement) = if discret { &mut rien } else { signaler };
@@ -282,6 +369,25 @@ impl Execution {
         }
     }
 
+    fn proposer_un_lab(&self, arguments: &Value) -> String {
+        let Some(proposer) = &self.proposer else {
+            return "Tu ne peux proposer un lab que sur l'écran Nouveau lab.".into();
+        };
+        let proposition: Proposition = match serde_json::from_value(arguments.clone()) {
+            Ok(proposition) => proposition,
+            Err(e) => return format!("Le lab est mal décrit : {e}. Recommence."),
+        };
+        let commentaire = arguments["commentaire"]
+            .as_str()
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        match proposer(proposition, commentaire) {
+            Ok(message) => message,
+            Err(erreur) => format!("{erreur} Corrige, puis propose à nouveau."),
+        }
+    }
+
     fn commande(&self, machine: &str, commande: &str) -> Result<String, String> {
         if commande.trim().is_empty() {
             return Err("La commande est vide.".into());
@@ -321,6 +427,7 @@ mod tests {
             liberte,
             accorder: Arc::new(move |_| oui),
             inventer: None,
+            proposer: None,
         }
     }
 
@@ -373,8 +480,47 @@ mod tests {
 
     #[test]
     fn les_outils_ont_un_schema() {
-        for outil in definitions(true) {
-            assert_eq!(outil.parametres["type"], "object", "{}", outil.nom);
+        for mode in [Mode::Lab, Mode::Invention, Mode::Proposition] {
+            for outil in definitions(mode) {
+                assert_eq!(outil.parametres["type"], "object", "{}", outil.nom);
+            }
         }
+    }
+
+    #[test]
+    fn la_proposition_passe_au_lab_construit() {
+        let recu: Arc<std::sync::Mutex<Option<(Proposition, String)>>> = Arc::default();
+        let garde = recu.clone();
+        let mut execution = execution(Liberte::AvecAccord, false);
+        execution.proposer = Some(Arc::new(move |proposition, commentaire| {
+            *garde.lock().unwrap() = Some((proposition, commentaire));
+            Ok("proposé".into())
+        }));
+        assert_eq!(execution.mode(), Mode::Proposition);
+        let appel = Appel {
+            id: "p".into(),
+            nom: "proposer_un_lab".into(),
+            arguments: json!({
+                "nom": "Un poste",
+                "commentaire": "Un seul poste, sans réseau.",
+                "machines": [{"nom": "pc1", "sorte": "poste"}],
+                "cables": [],
+            }),
+        };
+        let mut rien = |_: Evenement| {};
+        assert_eq!(execution.executer(&appel, &mut rien), "proposé");
+        let (proposition, commentaire) = recu.lock().unwrap().take().unwrap();
+        assert_eq!(proposition.machines[0].nom, "pc1");
+        assert_eq!(commentaire, "Un seul poste, sans réseau.");
+        let lancer = Appel {
+            id: "q".into(),
+            nom: "lancer_commande".into(),
+            arguments: json!({"machine": "pc1", "commande": "ls"}),
+        };
+        assert!(
+            execution
+                .executer(&lancer, &mut rien)
+                .contains("n'existe pas ici")
+        );
     }
 }

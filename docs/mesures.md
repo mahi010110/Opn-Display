@@ -433,3 +433,16 @@ pour la suite de l'étape 4.
   Avec trois poses qui ne cassent rien, l'app arrête l'IA au bout de 43 s.
   « Arrêter » pendant qu'un modèle met deux minutes à répondre : l'app rend
   la main en une demi-seconde.
+
+## 15. Le switch simple
+
+Mesuré le 17 novembre 2026 dans l'environnement cloud, avec un vrai Incus,
+avant de choisir ce que l'IA peut mettre dans un lab.
+
+- Le switch est un conteneur Debian dont les ports (eth1, eth2, eth3)
+  entrent dans un pont Linux, `br0`, réglé par systemd-networkd.
+- Trois postes y sont branchés par des paires veth, dans 10.0.5.0/24 : ils
+  se joignent tous.
+- Docker tourne sur la même machine. Sa règle `FORWARD DROP` vit dans le
+  réseau de l'hôte, pas dans celui du switch : elle ne le gêne pas.
+- Le switch prend 13 Mo de RAM, comme un poste.

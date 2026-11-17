@@ -10,7 +10,7 @@ use moteur::pannes::{self, Difficulte, Panne, ResultatTest};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State};
 
-use crate::{a_cote, le_lab};
+use crate::{a_cote, le_lab, un_lab};
 
 /// La panne posée. Elle est gardée dans `panne.json` jusqu'à sa fin : le
 /// lab la garde aussi quand l'app est fermée.
@@ -18,10 +18,18 @@ use crate::{a_cote, le_lab};
 #[serde(rename_all = "camelCase")]
 struct EnCours {
     panne: Panne,
+    /// Le lab où elle est posée. Une panne gardée avant les labs construits
+    /// était dans le Premier lab.
+    #[serde(default = "premier_lab")]
+    lab: String,
     posee: u64,
     indices_donnes: usize,
     #[serde(skip)]
     verification: Option<Verification>,
+}
+
+fn premier_lab() -> String {
+    lab::premier_lab().id
 }
 
 #[derive(Default)]
@@ -42,6 +50,9 @@ pub struct Verification {
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct VuePanne {
+    /// Le lab où elle est posée, et son nom.
+    lab: String,
+    nom_du_lab: String,
     titre: String,
     niveau: Difficulte,
     inventee: bool,
@@ -103,12 +114,25 @@ pub fn reprendre(app: &AppHandle) {
     }
 }
 
-/// Le lab est reparti de zéro : la panne n'y est plus.
-pub fn oublier_la_panne(app: &AppHandle) {
+fn oublier_la_panne(app: &AppHandle) {
     if let Ok(mut place) = app.state::<Pannes>().en_cours.lock() {
         *place = None;
     }
     garder(app, None);
+}
+
+/// Le lab est reparti de zéro, ou il est supprimé : la panne qu'il portait
+/// n'existe plus.
+pub fn oublier_la_panne_du_lab(app: &AppHandle, id: &str) {
+    let dans_ce_lab = app
+        .state::<Pannes>()
+        .en_cours
+        .lock()
+        .ok()
+        .is_some_and(|e| e.as_ref().is_some_and(|e| e.lab == id));
+    if dans_ce_lab {
+        oublier_la_panne(app);
+    }
 }
 
 fn maintenant() -> u64 {
@@ -124,8 +148,12 @@ impl VuePanne {
     }
 }
 
-fn vue(en_cours: &EnCours) -> VuePanne {
+fn vue(app: &AppHandle, en_cours: &EnCours) -> VuePanne {
     VuePanne {
+        lab: en_cours.lab.clone(),
+        nom_du_lab: un_lab(app, &en_cours.lab)
+            .map(|l| l.nom)
+            .unwrap_or_default(),
         titre: en_cours.panne.titre.clone(),
         niveau: en_cours.panne.niveau,
         inventee: en_cours.panne.inventee,
@@ -158,17 +186,18 @@ fn active(app: &AppHandle) -> bool {
 
 /// Pose la panne, la retient, et le dit aux écrans.
 pub fn poser_et_retenir(app: &AppHandle, panne: Panne) -> Result<VuePanne, String> {
-    let lab = le_lab();
+    let lab = le_lab(app);
     pannes::poser(&lab, &panne, &mut |avance| {
         let _ = app.emit("lab-avance", avance);
     })?;
     let en_cours = EnCours {
         panne,
+        lab: lab.id,
         posee: maintenant(),
         indices_donnes: 0,
         verification: None,
     };
-    let vue = vue(&en_cours);
+    let vue = vue(app, &en_cours);
     garder(app, Some(&en_cours));
     *app.state::<Pannes>()
         .en_cours
@@ -184,7 +213,7 @@ pub fn contexte(app: &AppHandle) -> Option<String> {
     let etat = app.state::<Pannes>();
     let place = etat.en_cours.lock().ok()?;
     let en_cours = place.as_ref()?;
-    if en_cours.verification.as_ref().is_some_and(|v| v.reparee) {
+    if en_cours.verification.as_ref().is_some_and(|v| v.reparee) || en_cours.lab != le_lab(app).id {
         return None;
     }
     Some(format!(
@@ -196,9 +225,10 @@ pub fn contexte(app: &AppHandle) -> Option<String> {
     ))
 }
 
+/// Les pannes prêtes pour le lab ouvert.
 #[tauri::command]
-pub fn catalogue_pannes() -> Vec<ResumePanne> {
-    pannes::catalogue(&le_lab())
+pub fn catalogue_pannes(app: AppHandle) -> Vec<ResumePanne> {
+    pannes::catalogue(&le_lab(&app))
         .into_iter()
         .map(|p| ResumePanne {
             id: p.id,
@@ -215,7 +245,7 @@ pub async fn poser_panne(app: AppHandle, id: String) -> Result<VuePanne, String>
         if active(&app) {
             return Err("Une panne est déjà posée. Répare-la ou abandonne-la d'abord.".into());
         }
-        let panne = pannes::catalogue(&le_lab())
+        let panne = pannes::catalogue(&le_lab(&app))
             .into_iter()
             .find(|p| p.id == id)
             .ok_or("Cette panne n'est pas dans le catalogue.")?;
@@ -225,8 +255,8 @@ pub async fn poser_panne(app: AppHandle, id: String) -> Result<VuePanne, String>
 }
 
 #[tauri::command]
-pub fn panne_en_cours(etat: State<'_, Pannes>) -> Option<VuePanne> {
-    etat.en_cours.lock().ok()?.as_ref().map(vue)
+pub fn panne_en_cours(app: AppHandle, etat: State<'_, Pannes>) -> Option<VuePanne> {
+    etat.en_cours.lock().ok()?.as_ref().map(|e| vue(&app, e))
 }
 
 #[tauri::command]
@@ -243,15 +273,15 @@ pub fn indice_panne(app: AppHandle, etat: State<'_, Pannes>) -> Result<String, S
 #[tauri::command]
 pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
     a_cote(move || {
-        let panne = app
+        let (panne, son_lab) = app
             .state::<Pannes>()
             .en_cours
             .lock()
             .map_err(|e| e.to_string())?
             .as_ref()
-            .map(|e| e.panne.clone())
+            .map(|e| (e.panne.clone(), e.lab.clone()))
             .ok_or("Aucune panne n'est posée.")?;
-        let lab = le_lab();
+        let lab = un_lab(&app, &son_lab)?;
         // Le bouton de la carte dit déjà « Vérification » : rien de plus à
         // montrer pendant que le lab démarre.
         lab::lancer_et_attendre(&lab, &mut |_| {})?;
@@ -269,7 +299,7 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
             explication: reparee.then(|| panne.explication.clone()),
         });
         garder(&app, Some(en_cours));
-        Ok(vue(en_cours))
+        Ok(vue(&app, en_cours))
     })
     .await
 }
@@ -278,8 +308,16 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
 #[tauri::command]
 pub async fn abandonner_panne(app: AppHandle) -> Result<(), String> {
     a_cote(move || {
-        if active(&app) {
-            pannes::revenir(&le_lab())?;
+        let son_lab = app
+            .state::<Pannes>()
+            .en_cours
+            .lock()
+            .ok()
+            .and_then(|e| e.as_ref().map(|e| e.lab.clone()));
+        if let Some(id) = son_lab
+            && active(&app)
+        {
+            pannes::revenir(&un_lab(&app, &id)?)?;
         }
         oublier_la_panne(&app);
         Ok(())

@@ -49,37 +49,43 @@ export function Pannes(props: {
           {posee && props.panne && (
             <div className="en-cours-panne">
               <span>
-                Une panne est posée : <strong>{props.panne.titre}</strong>
+                Une panne est posée dans {props.panne.nomDuLab} : <strong>{props.panne.titre}</strong>
               </span>
               <button className="oc-btn oc-btn--sm" onClick={props.onOuvrirLab}>
                 Ouvrir le lab
               </button>
             </div>
           )}
-          <Fenetre titre="Le catalogue" flush>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Ce qui ne marche plus</th>
-                  <th>Niveau</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {catalogue.map((p) => (
-                  <tr key={p.id}>
-                    <td className="nom">{p.titre}</td>
-                    <td className="chiffre">{MOT_NIVEAU[p.niveau]}</td>
-                    <td className="fin">
-                      <button className="oc-btn oc-btn--sm" disabled={bloque} onClick={() => props.onPoser(p.id)}>
-                        Poser
-                      </button>
-                    </td>
+          {catalogue.length === 0 ? (
+            <Fenetre titre="Le catalogue">
+              <p className="lu">{props.nomDuLab} n'a pas de panne prête. Demande une panne inventée à l'IA.</p>
+            </Fenetre>
+          ) : (
+            <Fenetre titre="Le catalogue" flush>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Ce qui ne marche plus</th>
+                    <th>Niveau</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </Fenetre>
+                </thead>
+                <tbody>
+                  {catalogue.map((p) => (
+                    <tr key={p.id}>
+                      <td className="nom">{p.titre}</td>
+                      <td className="chiffre">{MOT_NIVEAU[p.niveau]}</td>
+                      <td className="fin">
+                        <button className="oc-btn oc-btn--sm" disabled={bloque} onClick={() => props.onPoser(p.id)}>
+                          Poser
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Fenetre>
+          )}
           {props.erreur && <p className="note erreur">{props.erreur}</p>}
         </div>
 
@@ -129,7 +135,12 @@ export function Pannes(props: {
       </main>
 
       <footer className="etat">
-        <span>{props.occupe ?? `${catalogue.length} pannes dans le catalogue`}</span>
+        <span>
+          {props.occupe ??
+            (catalogue.length > 0
+              ? `${catalogue.length} ${catalogue.length > 1 ? 'pannes' : 'panne'} dans le catalogue`
+              : '')}
+        </span>
       </footer>
     </>
   )

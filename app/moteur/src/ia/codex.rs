@@ -194,7 +194,7 @@ pub(crate) fn parler(
     let (envoi, reception) = mpsc::channel::<Signal>();
     let envoi_outils = envoi.clone();
     let execution = execution.clone();
-    let relais = mcp::ecouter(execution.inventer.is_some(), move |appel| {
+    let relais = mcp::ecouter(execution.mode(), move |appel| {
         let envoi = envoi_outils.clone();
         execution.executer(&appel, &mut |e| {
             let _ = envoi.send(Signal::Ia(e));

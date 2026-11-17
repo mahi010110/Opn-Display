@@ -6,12 +6,15 @@
 //! machine comme une carte réseau. Elle passe tout ce qu'un vrai câble
 //! passe, et aucun pont ni pare-feu ne se met entre les deux.
 
+use std::fs;
+use std::path::Path;
+
 use serde::{Deserialize, Serialize};
 
 use crate::incus::{self, IMAGE, Instance, incus, incus_avec};
 use crate::systeme;
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum Sorte {
     Poste,
@@ -22,7 +25,7 @@ pub enum Sorte {
     Stockage,
 }
 
-#[derive(Serialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Interface {
     pub nom: String,
@@ -31,7 +34,15 @@ pub struct Interface {
     pub passerelle: Option<String>,
 }
 
-#[derive(Serialize, Clone, Debug, PartialEq)]
+/// Une route posée au départ : vers `destination`, passer par `passerelle`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Route {
+    pub destination: String,
+    pub passerelle: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Machine {
     pub nom: String,
@@ -40,19 +51,29 @@ pub struct Machine {
     pub x: f64,
     pub y: f64,
     pub interfaces: Vec<Interface>,
+    #[serde(default)]
+    pub routes: Vec<Route>,
     /// Elle fait passer les paquets d'un réseau à l'autre.
-    #[serde(skip)]
+    #[serde(default)]
     pub transfere: bool,
+    /// La mémoire qu'elle prendra, en octets, pour la montrer avant le
+    /// lancement.
+    #[serde(default)]
+    pub memoire_prevue: u64,
 }
 
-#[derive(Serialize, Clone, Debug, PartialEq)]
+/// Ce que prend un conteneur Debian du lab à vide : 13 Mo mesurés
+/// (`docs/mesures.md`, partie 15), arrondis au-dessus.
+pub const MEMOIRE_CONTENEUR: u64 = 16 * 1024 * 1024;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Bout {
     pub machine: String,
     pub interface: String,
 }
 
-#[derive(Serialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Cable {
     pub de: Bout,
@@ -61,7 +82,7 @@ pub struct Cable {
     pub reseau: Option<String>,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Lab {
     pub id: String,
@@ -69,7 +90,6 @@ pub struct Lab {
     pub machines: Vec<Machine>,
     pub cables: Vec<Cable>,
     /// Il entre dans le nom des câbles, qui doit tenir en 15 caractères.
-    #[serde(skip)]
     pub numero: u8,
 }
 
@@ -102,7 +122,9 @@ pub fn premier_lab() -> Lab {
                 x: 16.0,
                 y: 46.0,
                 interfaces: vec![interface("eth0", "10.0.1.10/24", Some("10.0.1.1"))],
+                routes: Vec::new(),
                 transfere: false,
+                memoire_prevue: MEMOIRE_CONTENEUR,
             },
             Machine {
                 nom: "routeur".into(),
@@ -113,7 +135,9 @@ pub fn premier_lab() -> Lab {
                     interface("eth0", "10.0.1.1/24", None),
                     interface("eth1", "10.0.2.1/24", None),
                 ],
+                routes: Vec::new(),
                 transfere: true,
+                memoire_prevue: MEMOIRE_CONTENEUR,
             },
             Machine {
                 nom: "pc2".into(),
@@ -121,7 +145,9 @@ pub fn premier_lab() -> Lab {
                 x: 84.0,
                 y: 46.0,
                 interfaces: vec![interface("eth0", "10.0.2.10/24", Some("10.0.2.1"))],
+                routes: Vec::new(),
                 transfere: false,
+                memoire_prevue: MEMOIRE_CONTENEUR,
             },
         ],
         cables: vec![
@@ -141,7 +167,86 @@ pub fn premier_lab() -> Lab {
 
 /// Le projet Incus du lab.
 pub fn projet(lab: &Lab) -> String {
-    format!("opn-display-{}", lab.id)
+    format!("{PREFIXE}{}", lab.id)
+}
+
+/// Le début du nom de tous les projets Incus de l'app.
+pub const PREFIXE: &str = "opn-display-";
+
+/// Les labs construits, un fichier JSON chacun dans `dossier`, du plus
+/// ancien au plus récent. Un fichier illisible est laissé de côté.
+pub fn labs_ranges(dossier: &Path) -> Vec<Lab> {
+    let Ok(entrees) = fs::read_dir(dossier) else {
+        return Vec::new();
+    };
+    let mut labs: Vec<Lab> = entrees
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+        .filter_map(|e| fs::read_to_string(e.path()).ok())
+        .filter_map(|texte| serde_json::from_str(&texte).ok())
+        .collect();
+    labs.sort_by_key(|l| l.numero);
+    labs
+}
+
+/// Range un lab construit dans `dossier`.
+pub fn ranger(dossier: &Path, lab: &Lab) -> Result<(), String> {
+    fs::create_dir_all(dossier).map_err(|e| format!("Le lab ne se range pas : {e}"))?;
+    let texte = serde_json::to_string_pretty(lab).map_err(|e| e.to_string())?;
+    fs::write(dossier.join(format!("{}.json", lab.id)), texte)
+        .map_err(|e| format!("Le lab ne se range pas : {e}"))
+}
+
+/// Retire le fichier d'un lab construit.
+pub fn oublier(dossier: &Path, lab: &Lab) {
+    let _ = fs::remove_file(dossier.join(format!("{}.json", lab.id)));
+}
+
+/// Le plus petit numéro libre : le Premier lab a le 1, et le numéro entre
+/// dans le nom des câbles.
+pub fn numero_libre(labs: &[Lab]) -> Option<u8> {
+    (2..=u8::MAX).find(|n| labs.iter().all(|l| l.numero != *n))
+}
+
+/// Donne au lab proposé son numéro et son identifiant.
+pub fn baptiser(mut lab: Lab, numero: u8) -> Lab {
+    lab.numero = numero;
+    lab.id = format!("lab-{numero}");
+    lab
+}
+
+/// Retire le lab de la machine : ses machines, son projet Incus et ses
+/// câbles. Rien ne revient.
+pub fn supprimer(lab: &Lab) -> Result<(), String> {
+    let projet = projet(lab);
+    if incus::projet_existe(&projet) {
+        for instance in incus::instances(&projet)? {
+            incus(&["delete", &instance.nom, "--force", "--project", &projet])
+                .map_err(|e| format!("{} ne se retire pas : {e}", instance.nom))?;
+        }
+        let _ = incus(&[
+            "profile",
+            "device",
+            "remove",
+            "default",
+            "root",
+            "--project",
+            &projet,
+        ]);
+        incus(&["project", "delete", &projet])
+            .map_err(|e| format!("Le lab ne se retire pas : {e}"))?;
+    }
+    // Retirer un bout d'une paire veth retire aussi l'autre.
+    let ici = interfaces_ici().unwrap_or_default();
+    for rang in 0..lab.cables.len() {
+        let paire = paire(lab, rang);
+        if ici.contains(&paire.de) {
+            let _ = systeme::lancer("ip", &["link", "del", &paire.de]);
+        } else if ici.contains(&paire.vers) {
+            let _ = systeme::lancer("ip", &["link", "del", &paire.vers]);
+        }
+    }
+    Ok(())
 }
 
 /// Les deux bouts d'un câble, tels qu'ils s'appellent hors des machines.
@@ -179,13 +284,21 @@ pub(crate) fn bout_branche(lab: &Lab, machine: &str, interface: &str) -> Option<
     })
 }
 
+const ENTETE: &str = "# Posé par Opn-Display au départ du lab. Tu peux le changer.\n";
+
 /// Le réglage réseau d'une interface, pour systemd-networkd, qui règle le
-/// réseau dans l'image Debian d'Incus.
-pub(crate) fn reglage_reseau(interface: &Interface) -> Option<String> {
+/// réseau dans l'image Debian d'Incus. Les routes de la machine vont dans
+/// l'interface du réseau où se trouve leur passerelle.
+pub(crate) fn reglage_reseau(machine: &Machine, interface: &Interface) -> Option<String> {
+    if machine.sorte == Sorte::Switch {
+        return Some(format!(
+            "{ENTETE}[Match]\nName={}\n\n[Link]\nRequiredForOnline=no\n\n[Network]\nBridge={PONT}\n",
+            interface.nom
+        ));
+    }
     let adresse = interface.adresse.as_ref()?;
     let mut texte = format!(
-        "# Posé par Opn-Display au départ du lab. Tu peux le changer.\n\
-         [Match]\nName={}\n\n\
+        "{ENTETE}[Match]\nName={}\n\n\
          [Link]\nRequiredForOnline=no\n\n\
          [Network]\nConfigureWithoutCarrier=yes\nAddress={adresse}\n",
         interface.nom
@@ -193,7 +306,34 @@ pub(crate) fn reglage_reseau(interface: &Interface) -> Option<String> {
     if let Some(passerelle) = &interface.passerelle {
         texte.push_str(&format!("Gateway={passerelle}\n"));
     }
+    for route in &machine.routes {
+        if crate::reseau::dans_le_reseau(&route.passerelle, adresse) {
+            texte.push_str(&format!(
+                "\n[Route]\nDestination={}\nGateway={}\n",
+                route.destination, route.passerelle
+            ));
+        }
+    }
     Some(texte)
+}
+
+/// Le pont d'un switch : tous ses ports y entrent.
+const PONT: &str = "br0";
+
+fn reglages_du_pont() -> [(&'static str, String); 2] {
+    [
+        (
+            "br0.netdev",
+            format!("{ENTETE}[NetDev]\nName={PONT}\nKind=bridge\n"),
+        ),
+        (
+            "br0.network",
+            format!(
+                "{ENTETE}[Match]\nName={PONT}\n\n[Link]\nRequiredForOnline=no\n\n\
+                 [Network]\nConfigureWithoutCarrier=yes\nLinkLocalAddressing=no\n"
+            ),
+        ),
+    ]
 }
 
 const TRANSFERT: &str = "# Posé par Opn-Display : cette machine fait passer les paquets \
@@ -474,13 +614,22 @@ fn creer_machine(lab: &Lab, machine: &Machine) -> Result<(), String> {
             .map_err(|e| format!("Le câble de {nom} ne se branche pas : {e}"))?;
         }
         let fichier = format!("{nom}/etc/systemd/network/{}.network", interface.nom);
-        match reglage_reseau(interface) {
+        match reglage_reseau(machine, interface) {
             Some(reglage) => ecrire(&projet, &fichier, &reglage)?,
             // L'image fait du DHCP sur eth0 : sur un câble du lab, ce serait
             // du bruit que personne n'a demandé.
             None => {
                 let _ = incus(&["file", "delete", &fichier, "--project", &projet]);
             }
+        }
+    }
+    if machine.sorte == Sorte::Switch {
+        for (fichier, contenu) in reglages_du_pont() {
+            ecrire(
+                &projet,
+                &format!("{nom}/etc/systemd/network/{fichier}"),
+                &contenu,
+            )?;
         }
     }
     if machine.transfere {
@@ -628,19 +777,81 @@ mod tests {
 
     #[test]
     fn ecrit_le_reglage_reseau() {
-        let reglage = reglage_reseau(&interface("eth0", "10.0.1.10/24", Some("10.0.1.1"))).unwrap();
+        let lab = premier_lab();
+        let (pc1, routeur) = (&lab.machines[0], &lab.machines[1]);
+        let reglage = reglage_reseau(pc1, &pc1.interfaces[0]).unwrap();
         assert!(reglage.contains("Name=eth0\n"));
         assert!(reglage.contains("Address=10.0.1.10/24\n"));
         assert!(reglage.contains("Gateway=10.0.1.1\n"));
         assert!(reglage.contains("RequiredForOnline=no\n"));
-        let routeur = reglage_reseau(&interface("eth1", "10.0.2.1/24", None)).unwrap();
-        assert!(!routeur.contains("Gateway"));
+        let reglage = reglage_reseau(routeur, &routeur.interfaces[1]).unwrap();
+        assert!(!reglage.contains("Gateway"));
         let vide = Interface {
             nom: "eth2".into(),
             adresse: None,
             passerelle: None,
         };
-        assert_eq!(reglage_reseau(&vide), None);
+        assert_eq!(reglage_reseau(pc1, &vide), None);
+    }
+
+    #[test]
+    fn range_et_relit_les_labs() {
+        let dossier = std::env::temp_dir().join(format!("opn-display-labs-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dossier);
+        assert!(labs_ranges(&dossier).is_empty());
+        let deux = baptiser(premier_lab(), 3);
+        let trois = baptiser(premier_lab(), 2);
+        ranger(&dossier, &deux).unwrap();
+        ranger(&dossier, &trois).unwrap();
+        fs::write(dossier.join("abime.json"), "{").unwrap();
+        let lus = labs_ranges(&dossier);
+        assert_eq!(
+            lus.iter().map(|l| l.id.as_str()).collect::<Vec<_>>(),
+            ["lab-2", "lab-3"]
+        );
+        assert_eq!(lus[1], deux);
+        oublier(&dossier, &deux);
+        assert_eq!(labs_ranges(&dossier).len(), 1);
+        let _ = fs::remove_dir_all(&dossier);
+    }
+
+    #[test]
+    fn donne_le_plus_petit_numero_libre() {
+        assert_eq!(numero_libre(&[]), Some(2));
+        let labs = [baptiser(premier_lab(), 2), baptiser(premier_lab(), 4)];
+        assert_eq!(numero_libre(&labs), Some(3));
+        assert_eq!(paire(&labs[1], 9).de, "od4-c10a");
+    }
+
+    #[test]
+    fn une_route_va_dans_le_reseau_de_sa_passerelle() {
+        let mut routeur = premier_lab().machines[1].clone();
+        routeur.routes = vec![Route {
+            destination: "10.0.3.0/24".into(),
+            passerelle: "10.0.2.2".into(),
+        }];
+        let eth0 = reglage_reseau(&routeur, &routeur.interfaces[0]).unwrap();
+        let eth1 = reglage_reseau(&routeur, &routeur.interfaces[1]).unwrap();
+        assert!(!eth0.contains("[Route]"));
+        assert!(eth1.contains("[Route]\nDestination=10.0.3.0/24\nGateway=10.0.2.2\n"));
+    }
+
+    #[test]
+    fn les_ports_d_un_switch_entrent_dans_son_pont() {
+        let mut switch = premier_lab().machines[1].clone();
+        switch.sorte = Sorte::Switch;
+        let port = Interface {
+            nom: "eth3".into(),
+            adresse: None,
+            passerelle: None,
+        };
+        let reglage = reglage_reseau(&switch, &port).unwrap();
+        assert!(reglage.contains("Name=eth3\n"));
+        assert!(reglage.contains("Bridge=br0\n"));
+        assert!(!reglage.contains("Address"));
+        let [netdev, reseau] = reglages_du_pont();
+        assert!(netdev.1.contains("Kind=bridge"));
+        assert!(reseau.1.contains("Name=br0"));
     }
 
     #[test]

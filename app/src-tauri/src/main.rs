@@ -53,9 +53,47 @@ pub(crate) async fn a_cote<T: Send + 'static>(
         .map_err(|e| e.to_string())?
 }
 
-/// Le seul lab de l'étape 3.
-pub(crate) fn le_lab() -> Lab {
-    lab::premier_lab()
+/// Le lab ouvert à l'écran : celui où l'IA travaille et où se posent les
+/// pannes. Rien veut dire le Premier lab.
+#[derive(Default)]
+pub(crate) struct Labs {
+    ouvert: Mutex<Option<String>>,
+}
+
+fn dossier_labs(app: &AppHandle) -> Result<PathBuf, String> {
+    Ok(app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?
+        .join("labs"))
+}
+
+/// Le Premier lab, puis ceux que l'IA a construits.
+pub(crate) fn tous_les_labs(app: &AppHandle) -> Vec<Lab> {
+    let mut labs = vec![lab::premier_lab()];
+    if let Ok(dossier) = dossier_labs(app) {
+        labs.extend(lab::labs_ranges(&dossier));
+    }
+    labs
+}
+
+pub(crate) fn un_lab(app: &AppHandle, id: &str) -> Result<Lab, String> {
+    tous_les_labs(app)
+        .into_iter()
+        .find(|l| l.id == id)
+        .ok_or_else(|| "Ce lab n'existe plus.".to_string())
+}
+
+pub(crate) fn le_lab(app: &AppHandle) -> Lab {
+    let ouvert = app
+        .state::<Labs>()
+        .ouvert
+        .lock()
+        .ok()
+        .and_then(|o| o.clone());
+    ouvert
+        .and_then(|id| un_lab(app, &id).ok())
+        .unwrap_or_else(lab::premier_lab)
 }
 
 #[tauri::command]
@@ -109,15 +147,42 @@ async fn installer_wsl() -> Result<(), String> {
     a_cote(installation::installer_wsl).await
 }
 
+/// Tous les labs et leurs machines, pour Mes labs.
 #[tauri::command]
-async fn etat_lab() -> Result<EtatLab, String> {
-    a_cote(|| lab::etat(&le_lab())).await
+async fn etat_labs(app: AppHandle) -> Result<Vec<EtatLab>, String> {
+    a_cote(move || tous_les_labs(&app).iter().map(lab::etat).collect()).await
+}
+
+/// Ouvre un lab à l'écran. L'IA du panneau change de lab : sa discussion
+/// repart de zéro.
+#[tauri::command]
+async fn ouvrir_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
+    a_cote(move || {
+        let le_lab = un_lab(&app, &id)?;
+        let labs = app.state::<Labs>();
+        let change = {
+            let mut ouvert = labs.ouvert.lock().map_err(|e| e.to_string())?;
+            let avant = ouvert.clone().unwrap_or_else(|| lab::premier_lab().id);
+            *ouvert = Some(id.clone());
+            avant != id
+        };
+        if change {
+            ia::oublier(&app);
+        }
+        lab::etat(&le_lab)
+    })
+    .await
 }
 
 #[tauri::command]
-async fn lancer_lab(app: AppHandle) -> Result<EtatLab, String> {
+async fn etat_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
+    a_cote(move || lab::etat(&un_lab(&app, &id)?)).await
+}
+
+#[tauri::command]
+async fn lancer_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
     a_cote(move || {
-        lab::lancer(&le_lab(), &mut |avance| {
+        lab::lancer(&un_lab(&app, &id)?, &mut |avance| {
             let _ = app.emit("lab-avance", avance);
         })
     })
@@ -125,14 +190,14 @@ async fn lancer_lab(app: AppHandle) -> Result<EtatLab, String> {
 }
 
 #[tauri::command]
-async fn arreter_lab() -> Result<EtatLab, String> {
-    a_cote(|| lab::arreter(&le_lab())).await
+async fn arreter_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
+    a_cote(move || lab::arreter(&un_lab(&app, &id)?)).await
 }
 
 #[tauri::command]
-async fn demarrer_machine(app: AppHandle, nom: String) -> Result<EtatLab, String> {
+async fn demarrer_machine(app: AppHandle, id: String, nom: String) -> Result<EtatLab, String> {
     a_cote(move || {
-        lab::demarrer_machine(&le_lab(), &nom, &mut |avance| {
+        lab::demarrer_machine(&un_lab(&app, &id)?, &nom, &mut |avance| {
             let _ = app.emit("lab-avance", avance);
         })
     })
@@ -140,19 +205,65 @@ async fn demarrer_machine(app: AppHandle, nom: String) -> Result<EtatLab, String
 }
 
 #[tauri::command]
-async fn arreter_machine(nom: String) -> Result<EtatLab, String> {
-    a_cote(move || lab::arreter_machine(&le_lab(), &nom)).await
+async fn arreter_machine(app: AppHandle, id: String, nom: String) -> Result<EtatLab, String> {
+    a_cote(move || lab::arreter_machine(&un_lab(&app, &id)?, &nom)).await
+}
+
+/// Le lab proposé, sans une machine. Rien n'est créé.
+#[tauri::command]
+fn retirer_du_lab(lab: Lab, machine: String) -> Lab {
+    moteur::proposition::retirer(&lab, &machine)
+}
+
+/// Range le lab proposé parmi les labs, avec son numéro. Ses machines se
+/// créent à son lancement.
+#[tauri::command]
+async fn creer_lab(app: AppHandle, lab: Lab) -> Result<EtatLab, String> {
+    a_cote(move || {
+        if lab.machines.is_empty() {
+            return Err("Le lab n'a aucune machine.".into());
+        }
+        let dossier = dossier_labs(&app)?;
+        let numero = lab::numero_libre(&lab::labs_ranges(&dossier))
+            .ok_or("Il y a trop de labs : supprimes-en un.")?;
+        let nouveau = lab::baptiser(lab, numero);
+        lab::ranger(&dossier, &nouveau)?;
+        lab::etat(&nouveau)
+    })
+    .await
+}
+
+/// Retire un lab construit : ses machines, ses câbles et son fichier. Le
+/// Premier lab reste toujours.
+#[tauri::command]
+async fn supprimer_lab(app: AppHandle, id: String) -> Result<(), String> {
+    a_cote(move || {
+        if id == lab::premier_lab().id {
+            return Err("Le Premier lab ne se supprime pas. Il peut se remettre à zéro.".into());
+        }
+        let le_lab = un_lab(&app, &id)?;
+        lab::supprimer(&le_lab)?;
+        lab::oublier(&dossier_labs(&app)?, &le_lab);
+        pannes::oublier_la_panne_du_lab(&app, &id);
+        if let Ok(mut ouvert) = app.state::<Labs>().ouvert.lock()
+            && ouvert.as_deref() == Some(id.as_str())
+        {
+            *ouvert = None;
+        }
+        Ok(())
+    })
+    .await
 }
 
 #[tauri::command]
-async fn remettre_a_zero(app: AppHandle) -> Result<EtatLab, String> {
+async fn remettre_a_zero(app: AppHandle, id: String) -> Result<EtatLab, String> {
     a_cote(move || {
-        let etat = lab::remettre_a_zero(&le_lab(), &mut |avance| {
+        let etat = lab::remettre_a_zero(&un_lab(&app, &id)?, &mut |avance| {
             let _ = app.emit("lab-avance", avance);
         });
         // Les machines repartent de leur image : la panne et son instantané
         // sont partis avec elles.
-        pannes::oublier_la_panne(&app);
+        pannes::oublier_la_panne_du_lab(&app, &id);
         etat
     })
     .await
@@ -164,16 +275,18 @@ async fn remettre_a_zero(app: AppHandle) -> Result<EtatLab, String> {
 fn ouvrir_terminal(
     app: AppHandle,
     terminaux: State<'_, Terminaux>,
+    lab: String,
     machine: String,
     colonnes: u16,
     lignes: u16,
     flux: Channel<InvokeResponseBody>,
 ) -> Result<u32, String> {
+    let le_lab = un_lab(&app, &lab)?;
     let id = terminaux.suivant.fetch_add(1, Ordering::Relaxed);
     let fini = Arc::new(AtomicBool::new(false));
     let (fini_ici, flux_fin) = (fini.clone(), flux.clone());
     let terminal = moteur::terminal::ouvrir(
-        &le_lab(),
+        &le_lab,
         &machine,
         colonnes,
         lignes,
@@ -238,9 +351,8 @@ fn fermer_terminal(terminaux: State<'_, Terminaux>, id: u32) {
 fn veiller(app: AppHandle, veilleur: State<'_, Veilleur>) -> Result<(), String> {
     let mut place = veilleur.0.lock().map_err(|e| e.to_string())?;
     if place.is_none() {
-        let projet = lab::projet(&le_lab());
         *place = Some(veille::veiller(move |changement| {
-            if changement.projet == projet {
+            if changement.projet.starts_with(lab::PREFIXE) {
                 let _ = app.emit("lab", changement);
             }
         }));
@@ -252,8 +364,11 @@ fn veiller(app: AppHandle, veilleur: State<'_, Veilleur>) -> Result<(), String> 
 /// plus de dix secondes un Incus qui ne répondrait plus.
 fn fermer(app: &AppHandle) {
     let (fait, attente) = mpsc::channel();
+    let labs = tous_les_labs(app);
     std::thread::spawn(move || {
-        lab::arreter_vite(&le_lab());
+        for le_lab in &labs {
+            lab::arreter_vite(le_lab);
+        }
         let _ = fait.send(());
     });
     let _ = attente.recv_timeout(Duration::from_secs(10));
@@ -282,6 +397,7 @@ fn main() {
         .manage(Fermeture::default())
         .manage(ia::Ia::default())
         .manage(pannes::Pannes::default())
+        .manage(Labs::default())
         .setup(|app| {
             pannes::reprendre(app.handle());
             Ok(())
@@ -301,12 +417,17 @@ fn main() {
             arreter_installation,
             retirer_linux,
             installer_wsl,
+            etat_labs,
+            ouvrir_lab,
             etat_lab,
             lancer_lab,
             arreter_lab,
             demarrer_machine,
             arreter_machine,
             remettre_a_zero,
+            retirer_du_lab,
+            creer_lab,
+            supprimer_lab,
             ouvrir_terminal,
             ecrire_terminal,
             redimensionner_terminal,
@@ -322,6 +443,8 @@ fn main() {
             ia::arreter_ia,
             ia::oublier_conversation,
             ia::inventer_panne,
+            ia::proposer_lab,
+            ia::oublier_proposition,
             pannes::catalogue_pannes,
             pannes::poser_panne,
             pannes::panne_en_cours,
