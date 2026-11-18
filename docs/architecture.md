@@ -385,3 +385,31 @@ et il a corrigé. Le lab proposé (un routeur, deux switchs, quatre
 machines), lancé : pc1 joint pc2 par le switch, et srv1 par le routeur.
 Une panne inventée s'y pose et s'y abandonne. Supprimé, son projet Incus,
 ses dix bouts de câble et son fichier partent.
+
+Le 18 novembre 2026, « Ajouter une machine » et les réglages de l'IA :
+
+- « Ajouter une machine » demande un poste, un serveur, un routeur ou un
+  switch à l'IA, dans la conversation du lab proposé. L'app lui envoie le
+  lab tel qu'il est à l'écran, écrit comme elle l'écrit
+  (`proposition::en_proposition`) : une machine retirée ne revient pas ;
+- Mes labs dit quand chaque lab a été ouvert. L'app le note dans
+  `ouverts.json`, à chaque ouverture ;
+- Régler l'IA a ses trois façons : par niveau, un par un, ou une IA qui
+  s'adapte (`moteur/src/ia/reglage.rs`). Toutes portent sur trois
+  comportements : sa liberté dans le lab, ce qu'elle fait quand on demande
+  la solution, et quand elle parle d'elle-même. C'est la solution qui écrit
+  sa façon d'aider dans sa consigne, et ce qu'elle sait de la panne posée ;
+- l'IA qui s'adapte change de niveau à la fin d'une panne, réparée ou
+  abandonnée. L'app garde son niveau et la raison dans `ia.json` ;
+- quand l'utilisateur bloque, c'est le panneau qui compte les 10 minutes.
+  Il demande alors un tour à l'IA (`aider_ia`) ; pendant ce tour, l'app
+  refuse chacun de ses outils. Ils restent décrits au modèle : Anthropic
+  refuse une conversation qui a appelé des outils sans qu'ils le soient ;
+- sa mémoire est dans `memoire.json` (`moteur/src/ia/memoire.rs`) : deux
+  listes, 30 lignes en tout. Elle y écrit avec l'outil `retenir`, et la
+  relit au début de chaque conversation ;
+- son journal est dans `journal.json` (`moteur/src/ia/journal.rs`). Les
+  outils l'écrivent à chaque action dans le lab, avec la réponse à
+  l'accord ; l'app y ajoute les labs proposés et les pannes inventées.
+  Pour Codex, le relais MCP passe ces nouveaux modes par la variable
+  `OPN_OUTILS`, comme les autres.

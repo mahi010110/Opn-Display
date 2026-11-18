@@ -172,6 +172,15 @@ de l'IA sur le PC et sa mémoire se règlent à part : Prof, Coach ou
 Silencieuse ne change jamais ce qu'elle a le droit de faire sur le PC
 (retenu par Claude le 16 novembre 2026, le mainteneur lui a laissé le choix).
 
+L'IA qui s'adapte : c'est l'app qui change son niveau, d'après les pannes.
+Réparées sans indice, elle passe de Prof à Coach puis à Silencieuse ; des
+indices ou un abandon, elle redescend. Régler l'IA dit son niveau du moment
+et pourquoi. Dans le lab, elle reste « avec accord » (18 novembre 2026).
+
+Elle parle d'elle-même quand l'utilisateur bloque : pendant une panne,
+après 10 minutes sans réparation ni question, elle propose de l'aide en une
+phrase. Ailleurs, elle se tait (18 novembre 2026).
+
 ### Les pannes
 
 Elles viennent d'un catalogue écrit à l'avance, et l'IA peut aussi en

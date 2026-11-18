@@ -723,6 +723,15 @@ a.oc-btn {
   min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 440px;
+  /* La liste des machines défile : « Lancer le lab » reste en bas. */
+  grid-template-rows: minmax(0, 1fr);
+}
+.propose-defile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  overflow-y: auto;
 }
 .propose-liste {
   display: flex;
@@ -767,6 +776,17 @@ a.oc-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+.ajout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pointille:disabled {
+  border-color: var(--border-soft);
+  color: var(--text-muted);
+  cursor: default;
 }
 
 .fiche-geste {
@@ -893,6 +913,11 @@ a.oc-btn {
 .choix {
   border: 1px solid var(--border-frame);
 }
+.reglage-nom {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-13);
+  color: var(--text-muted);
+}
 .choix-ligne {
   display: flex;
   align-items: center;
@@ -954,6 +979,23 @@ a.oc-btn {
 }
 .a-part .mono {
   flex: 1;
+}
+.ligne-edition {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 0;
+}
+.ligne-edition .oc-input {
+  flex: 1;
+}
+.journal {
+  overflow: auto;
+}
+.journal code {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
 }
 .puces {
   display: flex;

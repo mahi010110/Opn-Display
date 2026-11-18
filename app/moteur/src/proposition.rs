@@ -216,6 +216,43 @@ pub fn retirer(lab: &Lab, nom: &str) -> Lab {
     lab
 }
 
+/// Le lab proposé, écrit comme l'IA l'écrit, pour qu'elle reparte de ce que
+/// voit l'utilisateur : il a pu retirer des machines depuis.
+pub fn en_proposition(lab: &Lab) -> Proposition {
+    let adresse = |bout: &Bout| {
+        lab.machines
+            .iter()
+            .find(|m| m.nom == bout.machine)
+            .and_then(|m| m.interfaces.iter().find(|i| i.nom == bout.interface))
+            .and_then(|i| i.adresse.clone())
+    };
+    let propose = |bout: &Bout| BoutPropose {
+        machine: bout.machine.clone(),
+        adresse: adresse(bout),
+    };
+    Proposition {
+        nom: lab.nom.clone(),
+        machines: lab
+            .machines
+            .iter()
+            .map(|m| MachineProposee {
+                nom: m.nom.clone(),
+                sorte: m.sorte.mot().into(),
+                passerelle: m.interfaces.iter().find_map(|i| i.passerelle.clone()),
+                routes: m.routes.clone(),
+            })
+            .collect(),
+        cables: lab
+            .cables
+            .iter()
+            .map(|c| CablePropose {
+                de: propose(&c.de),
+                vers: propose(&c.vers),
+            })
+            .collect(),
+    }
+}
+
 fn valider_nom(nom: &str) -> Result<(), String> {
     let bon = !nom.is_empty()
         && nom.len() <= NOM_MAX
@@ -646,6 +683,32 @@ mod tests {
                 cable("srv1", Some("10.0.2.10/24"), "sw2", None),
             ],
         }
+    }
+
+    #[test]
+    fn un_lab_propose_se_relit_comme_l_ia_l_ecrit() {
+        let lab = construire(&deux_reseaux()).unwrap();
+        let relu = en_proposition(&lab);
+        assert_eq!(construire(&relu).unwrap(), lab);
+        let pc1 = relu.machines.iter().find(|m| m.nom == "pc1").unwrap();
+        assert_eq!(pc1.sorte, "poste");
+        assert_eq!(pc1.passerelle.as_deref(), Some("10.0.1.1"));
+        assert_eq!(relu.cables[0].de.adresse.as_deref(), Some("10.0.1.1/24"));
+        assert_eq!(relu.cables[0].vers.adresse, None);
+    }
+
+    #[test]
+    fn une_machine_retiree_ne_revient_pas_dans_ce_que_lit_l_ia() {
+        let lab = retirer(&construire(&deux_reseaux()).unwrap(), "pc2");
+        let relu = en_proposition(&lab);
+        assert!(relu.machines.iter().all(|m| m.nom != "pc2"));
+        assert!(
+            relu.cables
+                .iter()
+                .all(|c| c.de.machine != "pc2" && c.vers.machine != "pc2")
+        );
+        let refait = construire(&relu).unwrap();
+        assert_eq!(refait.machines.len(), 5);
     }
 
     #[test]

@@ -9,8 +9,9 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
+use super::memoire::Liste;
 use super::{Appel, Evenement};
-use crate::lab::{self, Lab, Marche, Sorte};
+use crate::lab::{self, Lab, Marche};
 use crate::pannes::Panne;
 use crate::proposition::{MACHINES_MAX, Proposition};
 
@@ -26,10 +27,16 @@ pub struct Outil {
 pub enum Mode {
     /// Elle parle avec l'utilisateur, dans le lab ouvert.
     Lab,
+    /// La même chose, et elle peut écrire dans sa mémoire.
+    LabEtMemoire,
     /// Elle invente une panne et la pose.
     Invention,
     /// Elle propose un lab à construire, sur l'écran Nouveau lab.
     Proposition,
+    /// Elle parle d'elle-même, en une phrase. Ses outils restent décrits :
+    /// Anthropic refuse une conversation qui a appelé des outils sans qu'ils
+    /// soient décrits. Mais l'app refuse chaque appel.
+    Parole,
 }
 
 /// Ce que l'IA a le droit de faire dans le lab sans demander.
@@ -39,6 +46,29 @@ pub enum Liberte {
     Libre,
     #[default]
     AvecAccord,
+}
+
+/// Ce qu'a répondu l'utilisateur, pour le journal.
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum Accord {
+    Donne,
+    Refuse,
+    /// Elle est libre dans le lab : elle n'a pas demandé.
+    SansDemander,
+}
+
+/// Ce que l'IA a fait, pour son journal.
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Action {
+    /// Une machine, un lab, ou sa mémoire.
+    pub lieu: String,
+    pub quoi: String,
+    #[serde(default)]
+    pub commande: Option<String>,
+    #[serde(default)]
+    pub accord: Option<Accord>,
 }
 
 /// Une action que l'IA veut faire, montrée à l'utilisateur avant.
@@ -95,6 +125,9 @@ pub fn definitions(mode: Mode) -> Vec<Outil> {
             parametres: json!({"type": "object", "properties": {"machine": machine}, "required": ["machine"]}),
         },
     ];
+    if matches!(mode, Mode::LabEtMemoire | Mode::Parole) {
+        outils.push(retenir());
+    }
     if mode == Mode::Invention {
         let commande = json!({
             "type": "object",
@@ -125,6 +158,24 @@ pub fn definitions(mode: Mode) -> Vec<Outil> {
         });
     }
     outils
+}
+
+fn retenir() -> Outil {
+    Outil {
+        nom: "retenir".into(),
+        description: "Garde une ligne dans ta mémoire, pour les prochaines sessions. \
+                      L'utilisateur la voit et peut la corriger."
+            .into(),
+        parametres: json!({
+            "type": "object",
+            "properties": {
+                "liste": {"type": "string", "enum": ["toi", "notes"], "description": "toi : ce que tu sais de l'utilisateur. notes : le reste, son PC, ses labs, ce qui s'est passé."},
+                "texte": {"type": "string", "description": "Une phrase courte, qui servira la prochaine fois. Par exemple : Tu prépares le titre AIS."},
+                "remplace": {"type": "string", "description": "Une ligne de ta mémoire qui ne sert plus, recopiée exactement : elle est remplacée par texte."},
+            },
+            "required": ["liste", "texte"],
+        }),
+    }
 }
 
 fn proposer_un_lab() -> Outil {
@@ -177,17 +228,6 @@ fn proposer_un_lab() -> Outil {
     }
 }
 
-fn nom_de_sorte(sorte: Sorte) -> &'static str {
-    match sorte {
-        Sorte::Poste => "poste",
-        Sorte::Serveur => "serveur",
-        Sorte::Routeur => "routeur",
-        Sorte::Switch => "switch",
-        Sorte::ParFeu => "pare-feu",
-        Sorte::Stockage => "stockage",
-    }
-}
-
 /// Le lab tel que l'IA le lit : ses machines, leur état et leurs câbles.
 pub fn description_du_lab(le_lab: &Lab) -> String {
     let etat = lab::etat(le_lab).ok();
@@ -205,7 +245,7 @@ pub fn description_du_lab(le_lab: &Lab) -> String {
         texte.push_str(&format!(
             "- {} ({}), {dit}",
             machine.nom,
-            nom_de_sorte(machine.sorte)
+            machine.sorte.mot()
         ));
         for interface in &machine.interfaces {
             texte.push_str(&format!(
@@ -242,6 +282,13 @@ pub type Inventer = Arc<dyn Fn(Panne) -> Result<String, String> + Send + Sync>;
 /// Reçoit le lab proposé et ce que l'IA en dit à l'utilisateur.
 pub type Proposer = Arc<dyn Fn(Proposition, String) -> Result<String, String> + Send + Sync>;
 
+/// Garde une ligne dans la mémoire de l'IA, ou en remplace une, et rend ce
+/// qu'elle lira.
+pub type Memoriser = Arc<dyn Fn(Liste, &str, Option<&str>) -> Result<String, String> + Send + Sync>;
+
+/// Écrit dans le journal ce que l'IA a fait.
+pub type Noter = Arc<dyn Fn(Action) + Send + Sync>;
+
 /// Ce qu'il faut pour exécuter les outils : le lab, le réglage, et de quoi
 /// demander l'accord de l'utilisateur.
 #[derive(Clone)]
@@ -258,31 +305,69 @@ pub struct Execution {
     /// Sur l'écran Nouveau lab : elle n'a que l'outil pour proposer un lab,
     /// et rien ne s'affiche dans le panneau.
     pub proposer: Option<Proposer>,
+    /// Sa mémoire, quand l'utilisateur ne l'a pas coupée.
+    pub memoriser: Option<Memoriser>,
+    pub noter: Option<Noter>,
+    /// Elle parle d'elle-même : pas d'outil.
+    pub parole: bool,
 }
 
 impl Execution {
+    /// Ce qu'il faut pour agir dans `lab`, sans mémoire ni journal.
+    pub fn dans(
+        lab: Lab,
+        liberte: Liberte,
+        accorder: Arc<dyn Fn(&Demande) -> bool + Send + Sync>,
+    ) -> Execution {
+        Execution {
+            lab,
+            liberte,
+            accorder,
+            inventer: None,
+            proposer: None,
+            memoriser: None,
+            noter: None,
+            parole: false,
+        }
+    }
+
     pub fn mode(&self) -> Mode {
         if self.proposer.is_some() {
             Mode::Proposition
         } else if self.inventer.is_some() {
             Mode::Invention
+        } else if self.parole {
+            Mode::Parole
+        } else if self.memoriser.is_some() {
+            Mode::LabEtMemoire
         } else {
             Mode::Lab
+        }
+    }
+
+    fn noter(&self, action: Action) {
+        if let Some(noter) = &self.noter {
+            noter(action);
         }
     }
 
     /// Exécute un appel d'outil, après l'accord s'il le faut, et rend ce que
     /// l'IA lira.
     pub fn executer(&self, appel: &Appel, signaler: &mut dyn FnMut(Evenement)) -> String {
-        let discret = self.mode() != Mode::Lab;
+        let discret = matches!(self.mode(), Mode::Invention | Mode::Proposition);
         if appel.nom == "poser_une_panne" {
             return self.poser_une_panne(&appel.arguments);
         }
         if appel.nom == "proposer_un_lab" {
             return self.proposer_un_lab(&appel.arguments);
         }
-        if self.mode() == Mode::Proposition {
-            return format!("L'outil {} n'existe pas ici.", appel.nom);
+        match self.mode() {
+            Mode::Proposition => return format!("L'outil {} n'existe pas ici.", appel.nom),
+            Mode::Parole => return "Tu n'as pas d'outil ici : réponds en une phrase.".into(),
+            Mode::Lab | Mode::LabEtMemoire | Mode::Invention => {}
+        }
+        if appel.nom == "retenir" {
+            return self.retenir(appel, signaler);
         }
         let mut rien = |_: Evenement| {};
         let signaler: &mut dyn FnMut(Evenement) = if discret { &mut rien } else { signaler };
@@ -311,6 +396,18 @@ impl Execution {
             titre: titre.clone(),
             detail: detail.clone(),
         });
+        // Ce qu'elle fait en inventant une panne ne s'écrit pas : le journal
+        // donnerait la réponse.
+        let action = |accord| Action {
+            lieu: machine.clone(),
+            quoi: match appel.nom.as_str() {
+                "demarrer_machine" => "Démarrer la machine".into(),
+                "arreter_machine" => "Arrêter la machine".into(),
+                _ => "Commande".into(),
+            },
+            commande: (appel.nom == "lancer_commande").then(|| texte("commande")),
+            accord: Some(accord),
+        };
         if agit && self.liberte == Liberte::AvecAccord && !discret {
             let demande = Demande {
                 id: appel.id.clone(),
@@ -319,11 +416,15 @@ impl Execution {
                 detail,
             };
             if !(self.accorder)(&demande) {
+                self.noter(action(Accord::Refuse));
                 signaler(Evenement::Refus {
                     id: appel.id.clone(),
                 });
                 return "L'utilisateur a refusé cette action.".into();
             }
+            self.noter(action(Accord::Donne));
+        } else if agit && !discret {
+            self.noter(action(Accord::SansDemander));
         }
         let resultat = match appel.nom.as_str() {
             "etat_du_lab" => Ok(description_du_lab(&self.lab)),
@@ -343,6 +444,45 @@ impl Execution {
             id: appel.id.clone(),
             ok,
             apercu: borner(&contenu, APERCU_MAX),
+        });
+        contenu
+    }
+
+    fn retenir(&self, appel: &Appel, signaler: &mut dyn FnMut(Evenement)) -> String {
+        let Some(memoriser) = &self.memoriser else {
+            return "L'utilisateur a coupé ta mémoire : ne retiens rien.".into();
+        };
+        let liste = match appel.arguments["liste"].as_str() {
+            Some("toi") => Liste::Toi,
+            Some("notes") => Liste::Notes,
+            _ => return "liste vaut toi ou notes.".into(),
+        };
+        let texte = appel.arguments["texte"].as_str().unwrap_or_default();
+        let remplace = appel.arguments["remplace"]
+            .as_str()
+            .filter(|r| !r.trim().is_empty());
+        signaler(Evenement::Outil {
+            id: appel.id.clone(),
+            titre: "Retenir".into(),
+            detail: texte.trim().to_string(),
+        });
+        let resultat = memoriser(liste, texte, remplace);
+        if resultat.is_ok() {
+            self.noter(Action {
+                lieu: "sa mémoire".into(),
+                quoi: format!("Retenu : « {} »", texte.trim().trim_end_matches('.')),
+                commande: None,
+                accord: None,
+            });
+        }
+        let (ok, contenu) = match resultat {
+            Ok(contenu) => (true, contenu),
+            Err(erreur) => (false, erreur),
+        };
+        signaler(Evenement::Resultat {
+            id: appel.id.clone(),
+            ok,
+            apercu: contenu.clone(),
         });
         contenu
     }
@@ -422,13 +562,108 @@ mod tests {
     use super::*;
 
     fn execution(liberte: Liberte, oui: bool) -> Execution {
-        Execution {
-            lab: lab::premier_lab(),
-            liberte,
-            accorder: Arc::new(move |_| oui),
-            inventer: None,
-            proposer: None,
-        }
+        Execution::dans(lab::premier_lab(), liberte, Arc::new(move |_| oui))
+    }
+
+    fn journal(execution: &mut Execution) -> Arc<std::sync::Mutex<Vec<Action>>> {
+        let ecrit: Arc<std::sync::Mutex<Vec<Action>>> = Arc::default();
+        let garde = ecrit.clone();
+        execution.noter = Some(Arc::new(move |action| garde.lock().unwrap().push(action)));
+        ecrit
+    }
+
+    #[test]
+    fn un_refus_s_ecrit_dans_le_journal() {
+        let mut execution = execution(Liberte::AvecAccord, false);
+        let ecrit = journal(&mut execution);
+        let appel = Appel {
+            id: "a1".into(),
+            nom: "lancer_commande".into(),
+            arguments: json!({"machine": "pc1", "commande": "ip route"}),
+        };
+        execution.executer(&appel, &mut |_| {});
+        assert_eq!(
+            ecrit.lock().unwrap().as_slice(),
+            [Action {
+                lieu: "pc1".into(),
+                quoi: "Commande".into(),
+                commande: Some("ip route".into()),
+                accord: Some(Accord::Refuse),
+            }]
+        );
+    }
+
+    #[test]
+    fn ce_qu_elle_fait_en_inventant_ne_s_ecrit_pas() {
+        let mut execution = execution(Liberte::AvecAccord, false);
+        execution.inventer = Some(Arc::new(|_| Ok(String::new())));
+        let ecrit = journal(&mut execution);
+        let appel = Appel {
+            id: "a".into(),
+            nom: "lancer_commande".into(),
+            arguments: json!({"machine": "inconnue", "commande": "ls"}),
+        };
+        execution.executer(&appel, &mut |_| {});
+        assert!(ecrit.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn elle_retient_seulement_quand_sa_memoire_est_branchee() {
+        use crate::ia::memoire::Memoire;
+        let appel = Appel {
+            id: "m".into(),
+            nom: "retenir".into(),
+            arguments: json!({"liste": "toi", "texte": "Tu prépares le titre AIS."}),
+        };
+        let sans = execution(Liberte::AvecAccord, true);
+        assert_eq!(sans.mode(), Mode::Lab);
+        assert!(definitions(Mode::Lab).iter().all(|o| o.nom != "retenir"));
+        assert!(
+            sans.executer(&appel, &mut |_| {})
+                .contains("coupé ta mémoire")
+        );
+
+        let memoire: Arc<std::sync::Mutex<Memoire>> = Arc::default();
+        let garde = memoire.clone();
+        let mut avec = execution(Liberte::AvecAccord, true);
+        avec.memoriser = Some(Arc::new(move |liste, texte, remplace| {
+            garde.lock().unwrap().retenir(liste, texte, remplace)
+        }));
+        let ecrit = journal(&mut avec);
+        assert_eq!(avec.mode(), Mode::LabEtMemoire);
+        assert!(
+            definitions(Mode::LabEtMemoire)
+                .iter()
+                .any(|o| o.nom == "retenir")
+        );
+        let mut vus = Vec::new();
+        assert_eq!(avec.executer(&appel, &mut |e| vus.push(e)), "Retenu.");
+        assert_eq!(memoire.lock().unwrap().toi, ["Tu prépares le titre AIS."]);
+        assert!(matches!(&vus[1], Evenement::Resultat { ok: true, .. }));
+        assert_eq!(ecrit.lock().unwrap()[0].lieu, "sa mémoire");
+    }
+
+    #[test]
+    fn quand_elle_parle_d_elle_meme_elle_n_a_pas_d_outil() {
+        let mut execution = execution(Liberte::Libre, true);
+        execution.parole = true;
+        assert_eq!(execution.mode(), Mode::Parole);
+        // Décrits pour que l'historique reste valable, refusés à l'appel.
+        assert!(
+            definitions(Mode::Parole)
+                .iter()
+                .any(|o| o.nom == "lancer_commande")
+        );
+        let appel = Appel {
+            id: "p".into(),
+            nom: "arreter_machine".into(),
+            arguments: json!({"machine": "pc1"}),
+        };
+        assert!(
+            execution
+                .executer(&appel, &mut |_| {})
+                .contains("pas d'outil")
+        );
     }
 
     #[test]
@@ -480,7 +715,12 @@ mod tests {
 
     #[test]
     fn les_outils_ont_un_schema() {
-        for mode in [Mode::Lab, Mode::Invention, Mode::Proposition] {
+        for mode in [
+            Mode::Lab,
+            Mode::LabEtMemoire,
+            Mode::Invention,
+            Mode::Proposition,
+        ] {
             for outil in definitions(mode) {
                 assert_eq!(outil.parametres["type"], "object", "{}", outil.nom);
             }

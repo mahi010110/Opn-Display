@@ -7,14 +7,18 @@ import { Fenetre } from '../ui/Fenetre'
 import { Verifications } from '../ui/TonPc'
 import { BrancherIa } from './BrancherIa'
 import { ReglerIa } from './ReglerIa'
+import { SaMemoire } from './SaMemoire'
+import { SonJournal } from './SonJournal'
 
 type Retrait = 'ferme' | 'question' | 'enCours' | { erreur: string }
 
-export type Section = 'brancher' | 'regler' | 'pc'
+export type Section = 'brancher' | 'regler' | 'memoire' | 'journal' | 'pc'
 
 const SECTIONS: { section: Section; nom: string; icone: string }[] = [
   { section: 'brancher', nom: "Brancher l'IA", icone: 'i-brancher' },
   { section: 'regler', nom: "Régler l'IA", icone: 'i-reglages' },
+  { section: 'memoire', nom: 'Sa mémoire', icone: 'i-memoire' },
+  { section: 'journal', nom: 'Son journal', icone: 'i-journal' },
   { section: 'pc', nom: 'Ton PC', icone: 'i-poste' },
 ]
 
@@ -62,6 +66,8 @@ export function Reglages(props: {
           />
         )}
         {props.section === 'regler' && props.etatIa && <ReglerIa etatIa={props.etatIa} onEtatIa={props.onEtatIa} />}
+        {props.section === 'memoire' && <SaMemoire />}
+        {props.section === 'journal' && <SonJournal />}
         {props.section === 'pc' && <TonPc rapport={props.rapport} onRapport={props.onRapport} />}
       </main>
       <footer className="etat">

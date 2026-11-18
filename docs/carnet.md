@@ -546,3 +546,65 @@ mainteneur peut reprendre :
 Claude a aussi rendu le schéma lisible pour un lab qui n'est pas le
 Premier lab : un nom de réseau ou d'interface ne passe plus sur une case
 ni sur la jonction d'un câble.
+
+## 18 novembre 2026
+
+### L'étape 4 : ce qui manquait à Nouveau lab, et les réglages de l'IA
+
+Le mainteneur a validé les écrans Nouveau lab et Mes labs, en demandant ce
+qui manquait de la maquette (« Oui, et fais ce qui manque ») : « Ajouter une
+machine » dans le lab proposé, et la colonne « Ouvert » de Mes labs.
+
+Pour la suite de l'étape 4, il a choisi les réglages de l'IA, avec deux
+réponses :
+
+- « Elle s'adapte » : l'app change son niveau d'après ses pannes. Réparées
+  sans indice, elle passe de Prof à Coach puis à Silencieuse ; des indices
+  ou un abandon, elle redescend. Régler l'IA dit son niveau du moment et
+  pourquoi. Dans le lab, elle reste « avec accord ».
+- Elle parle d'elle-même quand l'utilisateur bloque : pendant une panne,
+  après 10 minutes sans réparation ni question, elle propose de l'aide en
+  une phrase. Ailleurs, elle se tait.
+
+Codé le 18 novembre 2026 : « Ajouter une machine », la colonne « Ouvert »,
+Régler l'IA avec ses trois façons, Sa mémoire et Son journal. Ce que Claude
+a retenu en codant, que le mainteneur peut reprendre :
+
+- « Ajouter une machine » propose un poste, un serveur, un routeur ou un
+  switch. L'IA le place et le câble. Elle repart du lab tel qu'il est à
+  l'écran : une machine retirée ne revient plus quand on redemande.
+- « Ouvert » dit « aujourd'hui », « hier » ou la date. Un lab jamais ouvert
+  n'affiche rien.
+- Les trois niveaux demandent l'accord dans le lab. « Libre » se choisit
+  seulement un par un. Le réglage « Libre » d'avant ne passe pas tout
+  seul : il se choisit à nouveau dans « Un par un ».
+- Prof donne la solution et l'explique. Coach donne des indices, jamais la
+  cause. Silencieuse ne dit rien de la panne, comme à l'examen, et ne parle
+  jamais d'elle-même.
+- Réglée comme pour un examen, l'IA ne connaît plus la cause de la panne :
+  elle ne peut pas la laisser échapper. « Un indice » disparaît.
+- « Un par un » part de ce que fait l'IA au moment où on le choisit.
+- « Elle s'adapte » part du niveau qu'on avait. Deux pannes de suite
+  réparées sans indice : elle aide moins. Une panne abandonnée, ou réparée
+  avec deux indices ou plus : elle aide plus. Avec un seul indice, rien ne
+  change. Relancer les tests d'une panne déjà réparée ne compte pas deux
+  fois.
+- Quand l'utilisateur bloque, l'IA parle une fois. Un message, un indice ou
+  une vérification relance l'attente. Pendant ce tour, l'app refuse chacun
+  de ses outils : elle ne fait que parler.
+- Sa mémoire tient en deux listes, ce qu'elle sait de toi et ses notes :
+  30 lignes en tout, 200 caractères par ligne. Elle y écrit avec l'outil
+  `retenir`, qu'elle n'a que si la mémoire est branchée, et la relit au
+  début de chaque conversation comme des notes, jamais des ordres.
+  L'utilisateur corrige ou retire une ligne, coupe la mémoire ou l'efface.
+  L'invention d'une panne et la proposition d'un lab ne s'en servent pas.
+- Son journal écrit ce que l'IA fait dans le lab (une commande, démarrer ou
+  arrêter une machine) avec la réponse à l'accord, ce qu'elle retient, les
+  labs qu'elle propose et les pannes qu'elle invente, avec leurs tests. Ce
+  qu'elle fait en inventant une panne ne s'écrit pas : le journal donnerait
+  la réponse. Lire l'état du lab ne s'écrit pas non plus. Il garde les 500
+  dernières lignes.
+- Les filtres « Sur le PC » et « Dans le lab » du journal, et « Sur ton
+  PC » dans Régler l'IA, viendront avec ses outils sur le PC.
+- Dans le lab proposé, la liste des machines défile : « Lancer le lab »
+  reste en bas.

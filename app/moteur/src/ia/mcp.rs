@@ -45,10 +45,14 @@ pub fn ecouter(
     let jeton = format!("{:016x}{:016x}", hasard(), hasard());
     // Une lettre devant : sans elle, Codex pourrait lire la valeur comme
     // un nombre ou une date TOML, et la changer.
+    // Des lettres qui ne sont pas des chiffres hexadécimaux : le jeton
+    // s'arrête avant elles.
     let suffixe = match mode {
         Mode::Lab => "",
+        Mode::LabEtMemoire => "m",
         Mode::Invention => "i",
         Mode::Proposition => "l",
+        Mode::Parole => "s",
     };
     let valeur = format!("p{port}j{jeton}{suffixe}");
     let arret = Arc::new(AtomicBool::new(false));
@@ -137,13 +141,16 @@ pub fn servir(valeur: &str) -> Result<(), String> {
 fn lire_valeur(valeur: &str) -> Option<(u16, String, Mode)> {
     let reste = valeur.strip_prefix('p')?;
     let (port, jeton) = reste.split_once('j')?;
-    let (jeton, mode) = if let Some(jeton) = jeton.strip_suffix('i') {
-        (jeton, Mode::Invention)
-    } else if let Some(jeton) = jeton.strip_suffix('l') {
-        (jeton, Mode::Proposition)
-    } else {
-        (jeton, Mode::Lab)
-    };
+    let modes = [
+        ('m', Mode::LabEtMemoire),
+        ('i', Mode::Invention),
+        ('l', Mode::Proposition),
+        ('s', Mode::Parole),
+    ];
+    let (jeton, mode) = modes
+        .iter()
+        .find_map(|&(lettre, mode)| jeton.strip_suffix(lettre).map(|j| (j, mode)))
+        .unwrap_or((jeton, Mode::Lab));
     Some((port.parse().ok()?, jeton.to_string(), mode))
 }
 
@@ -223,6 +230,8 @@ mod tests {
         assert!(!noms(Mode::Lab).contains(&"poser_une_panne".to_string()));
         assert!(noms(Mode::Invention).contains(&"poser_une_panne".to_string()));
         assert_eq!(noms(Mode::Proposition), ["proposer_un_lab"]);
+        assert!(noms(Mode::LabEtMemoire).contains(&"retenir".to_string()));
+        assert!(noms(Mode::Parole).contains(&"retenir".to_string()));
         assert_eq!(
             traiter(&json!({"method": "resources/list"}), Mode::Lab, rien)
                 .unwrap_err()
@@ -233,7 +242,13 @@ mod tests {
 
     #[test]
     fn le_mode_passe_par_la_variable() {
-        for mode in [Mode::Lab, Mode::Invention, Mode::Proposition] {
+        for mode in [
+            Mode::Lab,
+            Mode::LabEtMemoire,
+            Mode::Invention,
+            Mode::Proposition,
+            Mode::Parole,
+        ] {
             let relais = ecouter(mode, |_| String::new()).unwrap();
             assert_eq!(lire_valeur(&relais.valeur).unwrap().2, mode);
         }

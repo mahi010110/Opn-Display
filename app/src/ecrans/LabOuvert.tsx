@@ -6,10 +6,9 @@ import type { Gestes } from '../ui/Coque'
 import { Dialogue } from '../ui/Dialogue'
 import { Jauge, texteMemoire } from '../ui/Jauge'
 import { PanneauIa } from '../ui/PanneauIa'
+import { resumeIa } from '../ui/reglageIa'
 import { Schema } from '../ui/Schema'
 import { go } from '../ui/TonPc'
-
-const NOM_NIVEAU: Record<Niveau, string> = { prof: 'Prof', coach: 'Coach', silencieuse: 'Silencieuse' }
 
 /** Le lab ouvert : le schéma en haut, les terminaux en bas, l'IA à droite. */
 export function LabOuvert(props: {
@@ -162,10 +161,7 @@ export function LabOuvert(props: {
           <span className="etat-fin etat-erreur">{props.erreur}</span>
         ) : (
           props.etatIa?.reglages.branchement && (
-            <span className="etat-fin">
-              IA : {NOM_NIVEAU[props.etatIa.reglages.niveau]},{' '}
-              {props.etatIa.reglages.dansLeLab === 'avecAccord' ? 'avec accord dans le lab' : 'libre dans le lab'}
-            </span>
+            <span className="etat-fin">{resumeIa(props.etatIa)}</span>
           )
         )}
       </footer>

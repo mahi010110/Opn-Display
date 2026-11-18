@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { abandonnerPanne, fermerPanne, indicePanne, verifierPanne } from '../pont'
-import type { Niveau, VuePanne } from '../types'
+import type { VuePanne } from '../types'
 
 function heure(secondes: number): string {
   return new Date(secondes * 1000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -17,7 +17,8 @@ function tests(nombre: number): string {
  */
 export function CartePanne(props: {
   panne: VuePanne
-  niveau: Niveau
+  /** Réglée comme pour un examen, l'IA ne donne pas d'indice. */
+  indices: boolean
   onPanne: (panne: VuePanne | null) => void
   onDire: (texte: string, sorte: 'ia' | 'note') => void
   onAutre: () => void
@@ -119,7 +120,7 @@ export function CartePanne(props: {
               <button className="oc-btn oc-btn--ghost oc-btn--sm a-gauche" disabled={occupe !== null} onClick={abandonner}>
                 Abandonner
               </button>
-              {props.niveau !== 'silencieuse' && panne.indicesDonnes < panne.indices && (
+              {props.indices && panne.indicesDonnes < panne.indices && (
                 <button className="oc-btn" disabled={occupe !== null} onClick={indice}>
                   <i className="ic i-indice" aria-hidden="true"></i>Un indice
                 </button>

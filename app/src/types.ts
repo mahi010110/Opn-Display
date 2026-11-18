@@ -115,6 +115,8 @@ export interface EtatMachine {
 export interface EtatLab {
   lab: Lab
   machines: EtatMachine[]
+  /** Sa dernière ouverture, en secondes depuis 1970. */
+  ouvert: number | null
 }
 
 export type Branchement =
@@ -127,18 +129,64 @@ export type Niveau = 'prof' | 'coach' | 'silencieuse'
 
 export type Liberte = 'libre' | 'avecAccord'
 
+/** Comment on règle l'IA, dans Régler l'IA. */
+export type Facon = 'parNiveau' | 'unParUn' | 'sAdapte'
+
+/** Ce qu'elle fait quand on lui demande la solution d'une panne. */
+export type Solution = 'donnee' | 'indices' | 'rien'
+
+/** Quand elle parle sans qu'on lui écrive. */
+export type Initiative = 'quandTuBloques' | 'jamais'
+
+export interface Comportements {
+  dansLeLab: Liberte
+  solution: Solution
+  initiative: Initiative
+}
+
+export interface Adaptation {
+  niveau: Niveau
+  serie: number
+  raison: string
+}
+
 export interface ReglagesIa {
   branchement: Branchement | null
+  facon: Facon
   niveau: Niveau
-  dansLeLab: Liberte
+  unParUn: Comportements
+  adaptation: Adaptation
   essai: number | null
 }
 
 export interface EtatIa {
   reglages: ReglagesIa
+  /** Ce qu'elle fait en ce moment, quelle que soit la façon de régler. */
+  comportements: Comportements
+  /** Le niveau qui décide en ce moment, sauf réglée un par un. */
+  niveauDuMoment: Niveau | null
   cleRangee: boolean
   codexPresent: boolean
   ollama: string[] | null
+}
+
+export type ListeMemoire = 'toi' | 'notes'
+
+export interface Memoire {
+  active: boolean
+  toi: string[]
+  notes: string[]
+}
+
+export type Accord = 'donne' | 'refuse' | 'sansDemander'
+
+export interface EntreeJournal {
+  /** En secondes depuis 1970. */
+  quand: number
+  lieu: string
+  quoi: string
+  commande: string | null
+  accord: Accord | null
 }
 
 export type EvenementIa =

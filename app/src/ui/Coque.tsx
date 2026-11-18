@@ -181,9 +181,20 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
   }
 
   const changerNiveau = (niveau: Niveau) => {
-    reglerIa(niveau, etatIa?.reglages.dansLeLab ?? 'avecAccord')
+    if (!etatIa) return
+    reglerIa('parNiveau', niveau, etatIa.reglages.unParUn)
       .then(setEtatIa)
       .catch(() => undefined)
+  }
+
+  const changerPanne = (vue: VuePanne | null) => {
+    setPanne(vue)
+    // Une panne finie peut changer le niveau de l'IA qui s'adapte.
+    if (vue === null || vue.verification?.reparee) {
+      lireEtatIa()
+        .then(setEtatIa)
+        .catch(() => undefined)
+    }
   }
 
   const brancherLIa = () => {
@@ -280,7 +291,7 @@ export function Coque(props: { rapport: Rapport; onRapport: (rapport: Rapport) =
             onNiveau={changerNiveau}
             onBrancher={brancherLIa}
             panne={panneIci}
-            onPanne={setPanne}
+            onPanne={changerPanne}
             onAutrePanne={() => setEcran('pannes')}
           />
         </div>

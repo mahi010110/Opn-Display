@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use moteur::Rapport;
 use moteur::installation::{self, Options};
@@ -75,6 +75,45 @@ pub(crate) fn tous_les_labs(app: &AppHandle) -> Vec<Lab> {
         labs.extend(lab::labs_ranges(&dossier));
     }
     labs
+}
+
+fn fichier_ouverts(app: &AppHandle) -> Result<PathBuf, String> {
+    Ok(app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?
+        .join("ouverts.json"))
+}
+
+/// Quand chaque lab a été ouvert pour la dernière fois, pour Mes labs.
+fn ouverts(app: &AppHandle) -> HashMap<String, u64> {
+    fichier_ouverts(app)
+        .ok()
+        .and_then(|f| std::fs::read_to_string(f).ok())
+        .and_then(|texte| serde_json::from_str(&texte).ok())
+        .unwrap_or_default()
+}
+
+/// Note l'ouverture d'un lab, ou l'oublie avec `None`. Une date perdue ne
+/// gêne rien : rien ne s'affiche.
+fn noter_ouvert(app: &AppHandle, id: &str, quand: Option<u64>) {
+    let mut liste = ouverts(app);
+    match quand {
+        Some(quand) => liste.insert(id.to_string(), quand),
+        None => liste.remove(id),
+    };
+    if let (Ok(fichier), Ok(texte)) = (fichier_ouverts(app), serde_json::to_string(&liste)) {
+        if let Some(dossier) = fichier.parent() {
+            let _ = std::fs::create_dir_all(dossier);
+        }
+        let _ = std::fs::write(fichier, texte);
+    }
+}
+
+fn dater(app: &AppHandle, etat: Result<EtatLab, String>) -> Result<EtatLab, String> {
+    let mut etat = etat?;
+    etat.ouvert = ouverts(app).get(&etat.lab.id).copied();
+    Ok(etat)
 }
 
 pub(crate) fn un_lab(app: &AppHandle, id: &str) -> Result<Lab, String> {
@@ -150,7 +189,18 @@ async fn installer_wsl() -> Result<(), String> {
 /// Tous les labs et leurs machines, pour Mes labs.
 #[tauri::command]
 async fn etat_labs(app: AppHandle) -> Result<Vec<EtatLab>, String> {
-    a_cote(move || tous_les_labs(&app).iter().map(lab::etat).collect()).await
+    a_cote(move || {
+        let ouverts = ouverts(&app);
+        tous_les_labs(&app)
+            .iter()
+            .map(|le_lab| {
+                let mut etat = lab::etat(le_lab)?;
+                etat.ouvert = ouverts.get(&le_lab.id).copied();
+                Ok(etat)
+            })
+            .collect()
+    })
+    .await
 }
 
 /// Ouvre un lab à l'écran. L'IA du panneau change de lab : sa discussion
@@ -169,44 +219,51 @@ async fn ouvrir_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
         if change {
             ia::oublier(&app);
         }
-        lab::etat(&le_lab)
+        let maintenant = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .ok();
+        noter_ouvert(&app, &id, maintenant);
+        dater(&app, lab::etat(&le_lab))
     })
     .await
 }
 
 #[tauri::command]
 async fn etat_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
-    a_cote(move || lab::etat(&un_lab(&app, &id)?)).await
+    a_cote(move || dater(&app, lab::etat(&un_lab(&app, &id)?))).await
 }
 
 #[tauri::command]
 async fn lancer_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
     a_cote(move || {
-        lab::lancer(&un_lab(&app, &id)?, &mut |avance| {
+        let etat = lab::lancer(&un_lab(&app, &id)?, &mut |avance| {
             let _ = app.emit("lab-avance", avance);
-        })
+        });
+        dater(&app, etat)
     })
     .await
 }
 
 #[tauri::command]
 async fn arreter_lab(app: AppHandle, id: String) -> Result<EtatLab, String> {
-    a_cote(move || lab::arreter(&un_lab(&app, &id)?)).await
+    a_cote(move || dater(&app, lab::arreter(&un_lab(&app, &id)?))).await
 }
 
 #[tauri::command]
 async fn demarrer_machine(app: AppHandle, id: String, nom: String) -> Result<EtatLab, String> {
     a_cote(move || {
-        lab::demarrer_machine(&un_lab(&app, &id)?, &nom, &mut |avance| {
+        let etat = lab::demarrer_machine(&un_lab(&app, &id)?, &nom, &mut |avance| {
             let _ = app.emit("lab-avance", avance);
-        })
+        });
+        dater(&app, etat)
     })
     .await
 }
 
 #[tauri::command]
 async fn arreter_machine(app: AppHandle, id: String, nom: String) -> Result<EtatLab, String> {
-    a_cote(move || lab::arreter_machine(&un_lab(&app, &id)?, &nom)).await
+    a_cote(move || dater(&app, lab::arreter_machine(&un_lab(&app, &id)?, &nom))).await
 }
 
 /// Le lab proposé, sans une machine. Rien n'est créé.
@@ -245,6 +302,7 @@ async fn supprimer_lab(app: AppHandle, id: String) -> Result<(), String> {
         lab::supprimer(&le_lab)?;
         lab::oublier(&dossier_labs(&app)?, &le_lab);
         pannes::oublier_la_panne_du_lab(&app, &id);
+        noter_ouvert(&app, &id, None);
         if let Ok(mut ouvert) = app.state::<Labs>().ouvert.lock()
             && ouvert.as_deref() == Some(id.as_str())
         {
@@ -264,7 +322,7 @@ async fn remettre_a_zero(app: AppHandle, id: String) -> Result<EtatLab, String> 
         // Les machines repartent de leur image : la panne et son instantané
         // sont partis avec elles.
         pannes::oublier_la_panne_du_lab(&app, &id);
-        etat
+        dater(&app, etat)
     })
     .await
 }
@@ -438,7 +496,14 @@ fn main() {
             ia::essayer_ia,
             ia::modeles_ia,
             ia::regler_ia,
+            ia::memoire_ia,
+            ia::activer_memoire,
+            ia::corriger_memoire,
+            ia::retirer_de_la_memoire,
+            ia::effacer_memoire,
+            ia::journal_ia,
             ia::parler_ia,
+            ia::aider_ia,
             ia::repondre_accord,
             ia::arreter_ia,
             ia::oublier_conversation,

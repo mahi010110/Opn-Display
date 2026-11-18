@@ -25,6 +25,20 @@ pub enum Sorte {
     Stockage,
 }
 
+impl Sorte {
+    /// Le mot de l'IA et de l'utilisateur.
+    pub fn mot(self) -> &'static str {
+        match self {
+            Sorte::Poste => "poste",
+            Sorte::Serveur => "serveur",
+            Sorte::Routeur => "routeur",
+            Sorte::Switch => "switch",
+            Sorte::ParFeu => "pare-feu",
+            Sorte::Stockage => "stockage",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Interface {
@@ -362,6 +376,9 @@ pub struct EtatMachine {
 pub struct EtatLab {
     pub lab: Lab,
     pub machines: Vec<EtatMachine>,
+    /// Quand l'utilisateur l'a ouvert pour la dernière fois, en secondes
+    /// depuis 1970. C'est l'app qui le sait, pas Incus.
+    pub ouvert: Option<u64>,
 }
 
 fn instances(lab: &Lab) -> Result<Vec<Instance>, String> {
@@ -393,6 +410,7 @@ fn etat_depuis(lab: &Lab, instances: &[Instance]) -> EtatLab {
     EtatLab {
         lab: lab.clone(),
         machines,
+        ouvert: None,
     }
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react'
 
 import { arreterIa, oublierProposition, proposerLab, retirerDuLab } from '../pont'
-import type { EtatIa, Lab, MachineLab, Rapport } from '../types'
+import type { EtatIa, Lab, MachineLab, Rapport, Sorte } from '../types'
 import { Fenetre } from '../ui/Fenetre'
 import { Jauge, texteMemoire } from '../ui/Jauge'
 import { Schema } from '../ui/Schema'
@@ -9,6 +9,16 @@ import { go } from '../ui/TonPc'
 
 /** Ce que l'app sait faire tourner à cette étape : des labs Debian. */
 const IDEES = ['Deux réseaux et un routeur', 'Un switch et trois postes', 'Trois routeurs en chaîne']
+
+/** Comme MACHINES_MAX dans moteur/src/proposition.rs. */
+const MACHINES_MAX = 12
+
+const AJOUTS: { sorte: Sorte; nom: string; icone: string; demande: string }[] = [
+  { sorte: 'poste', nom: 'Poste', icone: 'i-poste', demande: 'Ajoute un poste.' },
+  { sorte: 'serveur', nom: 'Serveur', icone: 'i-serveur', demande: 'Ajoute un serveur.' },
+  { sorte: 'routeur', nom: 'Routeur', icone: 'i-routeur', demande: 'Ajoute un routeur.' },
+  { sorte: 'switch', nom: 'Switch', icone: 'i-switch', demande: 'Ajoute un switch.' },
+]
 
 function systeme(machine: MachineLab): string {
   return machine.sorte === 'switch' ? 'Switch' : 'Debian 13'
@@ -29,6 +39,7 @@ export function NouveauLab(props: {
   const [occupee, setOccupee] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
   const [lancement, setLancement] = useState(false)
+  const [ajout, setAjout] = useState(false)
   const branchee = props.etatIa?.reglages.branchement != null
 
   // Un nouveau lab repart d'une conversation vide avec l'IA.
@@ -41,7 +52,7 @@ export function NouveauLab(props: {
     setDescription(texte)
     setErreur(null)
     setOccupee(true)
-    proposerLab(texte)
+    proposerLab(texte, lab)
       .then((proposition) => {
         if (proposition === null) return
         if (proposition.lab) setLab(proposition.lab)
@@ -71,6 +82,12 @@ export function NouveauLab(props: {
       .catch((e) => setErreur(String(e)))
   }
 
+  // L'IA place la machine et la câble : elle repart du lab à l'écran.
+  const ajouter = (demande: string) => {
+    setAjout(false)
+    proposer(demande)
+  }
+
   const lancer = () => {
     if (!lab) return
     setLancement(true)
@@ -81,6 +98,7 @@ export function NouveauLab(props: {
   const { libreGo, totaleGo } = props.rapport.memoire
   const libre = libreGo * 1024 ** 3
   const trop = prevue > libre
+  const plein = (lab?.machines.length ?? 0) >= MACHINES_MAX
   const probleme = erreur ?? (lancement ? props.erreur : null)
 
   return (
@@ -152,36 +170,74 @@ export function NouveauLab(props: {
               {occupee && lab && <p className="mono">L'IA reprend le lab…</p>}
               {commentaire !== '' && <p className="mot mot--ia">{commentaire}</p>}
               {lab && (
-                <table className="table table--serree">
-                  <thead>
-                    <tr>
-                      <th>Machine</th>
-                      <th>Système</th>
-                      <th>RAM</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lab.machines.map((machine) => (
-                      <tr key={machine.nom}>
-                        <td className="nom">{machine.nom}</td>
-                        <td>{systeme(machine)}</td>
-                        <td className="chiffre">{texteMemoire(machine.memoirePrevue)}</td>
-                        <td className="fin">
+                <>
+                  <div className="propose-defile">
+                    <table className="table table--serree">
+                      <thead>
+                        <tr>
+                          <th>Machine</th>
+                          <th>Système</th>
+                          <th>RAM</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lab.machines.map((machine) => (
+                          <tr key={machine.nom}>
+                            <td className="nom">{machine.nom}</td>
+                            <td>{systeme(machine)}</td>
+                            <td className="chiffre">{texteMemoire(machine.memoirePrevue)}</td>
+                            <td className="fin">
+                              <button
+                                className="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm"
+                                aria-label={`Retirer ${machine.nom}`}
+                                title={`Retirer ${machine.nom}`}
+                                disabled={occupee || lancement || lab.machines.length === 1}
+                                onClick={() => retirer(machine.nom)}
+                              >
+                                <i className="ic i-fermer" aria-hidden="true"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="ajout">
+                    {ajout ? (
+                      <>
+                        {AJOUTS.map((a) => (
                           <button
-                            className="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm"
-                            aria-label={`Retirer ${machine.nom}`}
-                            title={`Retirer ${machine.nom}`}
-                            disabled={occupee || lancement || lab.machines.length === 1}
-                            onClick={() => retirer(machine.nom)}
+                            key={a.sorte}
+                            className="pointille"
+                            disabled={occupee || lancement}
+                            onClick={() => ajouter(a.demande)}
                           >
-                            <i className="ic i-fermer" aria-hidden="true"></i>
+                            <i className={'ic ' + a.icone} aria-hidden="true"></i>
+                            {a.nom}
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        ))}
+                        <button
+                          className="oc-iconbtn oc-iconbtn--ghost oc-iconbtn--sm"
+                          aria-label="Ne rien ajouter"
+                          title="Ne rien ajouter"
+                          onClick={() => setAjout(false)}
+                        >
+                          <i className="ic i-fermer" aria-hidden="true"></i>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="pointille"
+                        disabled={occupee || lancement || plein}
+                        title={plein ? `${MACHINES_MAX} machines au plus` : undefined}
+                        onClick={() => setAjout(true)}
+                      >
+                        <i className="ic i-plus" aria-hidden="true"></i>Ajouter une machine
+                      </button>
+                    )}
+                  </div>
+                </>
               )}
               {probleme && <p className="note erreur">{probleme}</p>}
               <div className="propose-pied">

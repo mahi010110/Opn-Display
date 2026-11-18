@@ -28,8 +28,9 @@ marche et peut se montrer.
    réparation. Avec ses réglages et ses garde-fous. En cours depuis le
    17 novembre 2026, avec les trois façons de la brancher ensemble. Codé :
    le branchement, ses outils dans le lab avec l'accord, les pannes du
-   catalogue et les pannes inventées, leur vérification, et l'IA qui
-   construit un lab sur l'écran Nouveau lab, avec un switch simple.
+   catalogue et les pannes inventées, leur vérification, l'IA qui
+   construit un lab sur l'écran Nouveau lab, avec un switch simple, et ses
+   réglages : les trois façons, sa mémoire et son journal.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
    capture d'un câble, les câbles qu'on coupe et qu'on dégrade, et la vue
    des baies.

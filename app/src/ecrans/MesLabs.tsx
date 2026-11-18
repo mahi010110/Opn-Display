@@ -10,6 +10,24 @@ const PREMIER_LAB = 'premier-lab'
 
 const enMarche = (etat: EtatLab) => etat.machines.filter((m) => m.marche === 'enMarche')
 
+const JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
+const JOUR_ET_ANNEE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+
+/** « aujourd'hui », « hier », ou le jour : « 12 novembre ». Rien pour un lab
+ * jamais ouvert. */
+function ouvertLe(secondes: number | null): string {
+  if (secondes === null) return ''
+  const date = new Date(secondes * 1000)
+  const maintenant = new Date()
+  const minuit = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  // Arrondi : un jour du changement d'heure fait 23 ou 25 heures.
+  const jours = Math.round((minuit(maintenant) - minuit(date)) / 86_400_000)
+  if (jours <= 0) return "aujourd'hui"
+  if (jours === 1) return 'hier'
+  const texte = (date.getFullYear() === maintenant.getFullYear() ? JOUR : JOUR_ET_ANNEE).format(date)
+  return date.getDate() === 1 ? texte.replace(/^1 /, '1er ') : texte
+}
+
 /** La liste des labs, et ce que le PC sait faire. */
 export function MesLabs(props: {
   rapport: Rapport
@@ -86,6 +104,7 @@ export function MesLabs(props: {
                     <th>Lab</th>
                     <th>Machines</th>
                     <th>RAM</th>
+                    <th>Ouvert</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -99,6 +118,7 @@ export function MesLabs(props: {
                       <td className="chiffre">
                         {texteMemoire(etat.lab.machines.reduce((total, m) => total + m.memoirePrevue, 0))}
                       </td>
+                      <td className="chiffre">{ouvertLe(etat.ouvert)}</td>
                       <td className="fin">
                         {etat.lab.id !== PREMIER_LAB && (
                           <button

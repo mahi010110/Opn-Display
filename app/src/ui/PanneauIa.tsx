@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
-import { arreterIa, oublierConversation, parlerIa, repondreAccord, suivreIa } from '../pont'
+import { aiderIa, arreterIa, oublierConversation, parlerIa, repondreAccord, suivreIa } from '../pont'
 import type { Demande, EtatIa, Niveau, VuePanne } from '../types'
 import { CartePanne } from './CartePanne'
+import { NIVEAUX, faconIa } from './reglageIa'
 
 type EtatOutil = 'enCours' | 'fait' | 'echec' | 'refuse'
 
@@ -13,11 +14,8 @@ type Entree =
   | { sorte: 'erreur'; texte: string }
   | { sorte: 'note'; texte: string }
 
-const NIVEAUX: { niveau: Niveau; nom: string }[] = [
-  { niveau: 'prof', nom: 'Prof' },
-  { niveau: 'coach', nom: 'Coach' },
-  { niveau: 'silencieuse', nom: 'Silencieuse' },
-]
+/** Sur une panne, sans rien demander depuis ce temps, l'utilisateur bloque. */
+const BLOCAGE = 10 * 60 * 1000
 
 const MOT_ETAT: Record<EtatOutil, string> = {
   enCours: 'en cours',
@@ -45,6 +43,14 @@ export function PanneauIa(props: {
   const fil = useRef<HTMLDivElement>(null)
   const posee = props.panne?.posee
   const dernierePosee = useRef(posee)
+  // Elle propose son aide une fois par blocage : ce que fait l'utilisateur
+  // remet l'attente à zéro.
+  const derniereActivite = useRef(Date.now())
+  const aidee = useRef(false)
+  const activite = () => {
+    derniereActivite.current = Date.now()
+    aidee.current = false
+  }
 
   useEffect(() => {
     let arreter: (() => void) | undefined
@@ -97,11 +103,30 @@ export function PanneauIa(props: {
   }, [posee, occupee])
 
   const branchee = props.etatIa?.reglages.branchement != null
+  const peutAider = props.etatIa?.comportements.initiative === 'quandTuBloques'
+  const enPanne = props.panne !== null && !props.panne.verification?.reparee
+
+  useEffect(activite, [posee, props.panne?.indicesDonnes, props.panne?.verification])
+
+  useEffect(() => {
+    if (!branchee || !peutAider || !enPanne || occupee) return
+    const minuterie = window.setInterval(() => {
+      if (aidee.current || document.visibilityState !== 'visible') return
+      if (Date.now() - derniereActivite.current < BLOCAGE) return
+      aidee.current = true
+      setOccupee(true)
+      aiderIa()
+        .catch((e) => setEntrees((avant) => [...avant, { sorte: 'erreur', texte: String(e) }]))
+        .finally(() => setOccupee(false))
+    }, 30_000)
+    return () => window.clearInterval(minuterie)
+  }, [branchee, peutAider, enPanne, occupee])
 
   const envoyer = (evenement: FormEvent) => {
     evenement.preventDefault()
     const message = texte.trim()
     if (message === '' || occupee) return
+    activite()
     setTexte('')
     setEntrees((avant) => [...avant, { sorte: 'toi', texte: message }])
     setOccupee(true)
@@ -136,17 +161,21 @@ export function PanneauIa(props: {
         <div className="ia">
           {branchee && props.etatIa && (
             <div className="ia-niveau">
-              <div className="segments" role="group" aria-label="Niveau de l'IA">
-                {NIVEAUX.map(({ niveau, nom }) => (
-                  <button
-                    key={niveau}
-                    aria-pressed={props.etatIa?.reglages.niveau === niveau}
-                    onClick={() => props.onNiveau(niveau)}
-                  >
-                    {nom}
-                  </button>
-                ))}
-              </div>
+              {props.etatIa.reglages.facon === 'parNiveau' ? (
+                <div className="segments" role="group" aria-label="Niveau de l'IA">
+                  {NIVEAUX.map(({ niveau, nom }) => (
+                    <button
+                      key={niveau}
+                      aria-pressed={props.etatIa?.reglages.niveau === niveau}
+                      onClick={() => props.onNiveau(niveau)}
+                    >
+                      {nom}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="mono">{faconIa(props.etatIa)}</span>
+              )}
               {entrees.length > 0 && !occupee && (
                 <button className="oc-btn oc-btn--ghost oc-btn--sm ia-recommencer" onClick={recommencer}>
                   Nouvelle discussion
@@ -158,7 +187,7 @@ export function PanneauIa(props: {
           {props.panne && (
             <CartePanne
               panne={props.panne}
-              niveau={props.etatIa?.reglages.niveau ?? 'coach'}
+              indices={props.etatIa?.comportements.solution !== 'rien'}
               onPanne={props.onPanne}
               onDire={dire}
               onAutre={props.onAutrePanne}

@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use moteur::ia::reglage::Issue;
+use moteur::ia::{Action, Solution};
 use moteur::lab;
 use moteur::pannes::{self, Difficulte, Panne, ResultatTest};
 use serde::{Deserialize, Serialize};
@@ -207,22 +209,43 @@ pub fn poser_et_retenir(app: &AppHandle, panne: Panne) -> Result<VuePanne, Strin
     Ok(vue)
 }
 
-/// Ce que l'IA doit savoir de la panne posée, pour en parler selon son
-/// niveau.
-pub fn contexte(app: &AppHandle) -> Option<String> {
+/// Une panne attend dans le lab ouvert.
+pub(crate) fn en_cours_ici(app: &AppHandle) -> bool {
+    let ouvert = le_lab(app).id;
+    app.state::<Pannes>().en_cours.lock().ok().is_some_and(|e| {
+        e.as_ref()
+            .is_some_and(|e| e.lab == ouvert && !e.verification.as_ref().is_some_and(|v| v.reparee))
+    })
+}
+
+/// Ce que l'IA doit savoir de la panne posée, selon ce qu'elle fait quand
+/// on lui demande la solution. Comme à un examen, elle n'en connaît pas la
+/// cause : elle ne peut pas la laisser échapper.
+pub fn contexte(app: &AppHandle, solution: Solution) -> Option<String> {
     let etat = app.state::<Pannes>();
     let place = etat.en_cours.lock().ok()?;
     let en_cours = place.as_ref()?;
     if en_cours.verification.as_ref().is_some_and(|v| v.reparee) || en_cours.lab != le_lab(app).id {
         return None;
     }
-    Some(format!(
-        "Une panne est posée dans le lab : « {} ». Sa cause, que l'utilisateur doit trouver : {}\n\
-         En mode Coach, ne donne jamais la cause : guide par des questions et des indices. \
-         En mode Silencieuse, ne dis rien de la panne. En mode Prof, tu peux l'expliquer si \
-         on te demande la solution. Ne la répare pas toi-même, sauf si on te le demande en mode Prof.",
-        en_cours.panne.titre, en_cours.panne.explication
-    ))
+    let (titre, cause) = (&en_cours.panne.titre, &en_cours.panne.explication);
+    Some(match solution {
+        Solution::Donnee => format!(
+            "Une panne est posée dans le lab : « {titre} ». Sa cause : {cause}\n\
+             Si on te demande la solution, donne la cause et explique-la. Ne la répare pas \
+             toi-même, sauf si on te le demande."
+        ),
+        Solution::Indices => format!(
+            "Une panne est posée dans le lab : « {titre} ». Sa cause, que l'utilisateur doit \
+             trouver : {cause}\n\
+             Ne donne jamais la cause : guide par des questions et des indices. Ne la répare pas \
+             toi-même."
+        ),
+        Solution::Rien => format!(
+            "Une panne est posée dans le lab : « {titre} ». L'utilisateur la répare seul, comme à \
+             un examen : ne dis rien de la panne, ni cause ni indice, et ne la répare pas."
+        ),
+    })
 }
 
 /// Les pannes prêtes pour le lab ouvert.
@@ -261,6 +284,9 @@ pub fn panne_en_cours(app: AppHandle, etat: State<'_, Pannes>) -> Option<VuePann
 
 #[tauri::command]
 pub fn indice_panne(app: AppHandle, etat: State<'_, Pannes>) -> Result<String, String> {
+    if crate::ia::comportements(&app).solution == Solution::Rien {
+        return Err("Pas d'indice : l'IA est réglée comme pour un examen.".into());
+    }
     let mut place = etat.en_cours.lock().map_err(|e| e.to_string())?;
     let en_cours = place.as_mut().ok_or("Aucune panne n'est posée.")?;
     let texte = texte_indice(&en_cours.panne, en_cours.indices_donnes)
@@ -290,16 +316,54 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
         if reparee {
             pannes::oublier(&lab);
         }
+        if panne.inventee {
+            let reussis = tests.iter().filter(|t| t.reussi).count();
+            let mut machines: Vec<&str> = Vec::new();
+            for test in &tests {
+                if !machines.contains(&test.machine.as_str()) {
+                    machines.push(&test.machine);
+                }
+            }
+            crate::ia::noter(
+                &app,
+                Action {
+                    lieu: machines.join(", "),
+                    quoi: format!(
+                        "Tests de la panne : {reussis} {} sur {}",
+                        if reussis > 1 { "réussis" } else { "réussi" },
+                        tests.len()
+                    ),
+                    commande: None,
+                    accord: None,
+                },
+            );
+        }
         let etat = app.state::<Pannes>();
-        let mut place = etat.en_cours.lock().map_err(|e| e.to_string())?;
-        let en_cours = place.as_mut().ok_or("Aucune panne n'est posée.")?;
-        en_cours.verification = Some(Verification {
-            reparee,
-            tests,
-            explication: reparee.then(|| panne.explication.clone()),
-        });
-        garder(&app, Some(en_cours));
-        Ok(vue(&app, en_cours))
+        let (vue, premiere_reparation) = {
+            let mut place = etat.en_cours.lock().map_err(|e| e.to_string())?;
+            let en_cours = place.as_mut().ok_or("Aucune panne n'est posée.")?;
+            let deja = en_cours.verification.as_ref().is_some_and(|v| v.reparee);
+            let indices = en_cours.indices_donnes;
+            en_cours.verification = Some(Verification {
+                reparee,
+                tests,
+                explication: reparee.then(|| panne.explication.clone()),
+            });
+            garder(&app, Some(en_cours));
+            (vue(&app, en_cours), (reparee && !deja).then_some(indices))
+        };
+        // « Relancer les tests » sur une panne déjà réparée ne compte pas
+        // une deuxième fois.
+        if let Some(indices) = premiere_reparation {
+            crate::ia::adapter(
+                &app,
+                Issue::Reparee {
+                    titre: &panne.titre,
+                    indices,
+                },
+            );
+        }
+        Ok(vue)
     })
     .await
 }
@@ -308,16 +372,17 @@ pub async fn verifier_panne(app: AppHandle) -> Result<VuePanne, String> {
 #[tauri::command]
 pub async fn abandonner_panne(app: AppHandle) -> Result<(), String> {
     a_cote(move || {
-        let son_lab = app
+        let posee = app
             .state::<Pannes>()
             .en_cours
             .lock()
             .ok()
-            .and_then(|e| e.as_ref().map(|e| e.lab.clone()));
-        if let Some(id) = son_lab
+            .and_then(|e| e.as_ref().map(|e| (e.lab.clone(), e.panne.titre.clone())));
+        if let Some((id, titre)) = posee
             && active(&app)
         {
             pannes::revenir(&un_lab(&app, &id)?)?;
+            crate::ia::adapter(&app, Issue::Abandonnee { titre: &titre });
         }
         oublier_la_panne(&app);
         Ok(())

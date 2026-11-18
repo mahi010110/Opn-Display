@@ -3,14 +3,18 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
 import type {
   Branchement,
+  Comportements,
   Demande,
   Difficulte,
+  EntreeJournal,
   Etape,
   EtatIa,
   EtatLab,
   EvenementIa,
+  Facon,
   Lab,
-  Liberte,
+  ListeMemoire,
+  Memoire,
   Niveau,
   PropositionLab,
   Rapport,
@@ -90,9 +94,10 @@ export function supprimerLab(id: string): Promise<void> {
   return invoke<void>('supprimer_lab', { id })
 }
 
-/** Le lab que propose l'IA, ou rien si l'utilisateur l'a arrêtée. */
-export function proposerLab(description: string): Promise<PropositionLab | null> {
-  return invoke<PropositionLab | null>('proposer_lab', { description })
+/** Le lab que propose l'IA, ou rien si l'utilisateur l'a arrêtée. `actuel`
+ * est le lab proposé tel qu'il est à l'écran : l'IA repart de lui. */
+export function proposerLab(description: string, actuel: Lab | null): Promise<PropositionLab | null> {
+  return invoke<PropositionLab | null>('proposer_lab', { description, actuel })
 }
 
 export function oublierProposition(): Promise<void> {
@@ -164,12 +169,43 @@ export function modelesIa(branchement: Branchement, cle: string | null): Promise
   return invoke<string[]>('modeles_ia', { branchement, cle })
 }
 
-export function reglerIa(niveau: Niveau, dansLeLab: Liberte): Promise<EtatIa> {
-  return invoke<EtatIa>('regler_ia', { niveau, dansLeLab })
+export function reglerIa(facon: Facon, niveau: Niveau, unParUn: Comportements): Promise<EtatIa> {
+  return invoke<EtatIa>('regler_ia', { facon, niveau, unParUn })
+}
+
+export function memoireIa(): Promise<Memoire> {
+  return invoke<Memoire>('memoire_ia')
+}
+
+export function activerMemoire(active: boolean): Promise<Memoire> {
+  return invoke<Memoire>('activer_memoire', { active })
+}
+
+/** Une ligne corrigée. Vide, elle part. */
+export function corrigerMemoire(liste: ListeMemoire, rang: number, texte: string): Promise<Memoire> {
+  return invoke<Memoire>('corriger_memoire', { liste, rang, texte })
+}
+
+export function retirerDeLaMemoire(liste: ListeMemoire, rang: number): Promise<Memoire> {
+  return invoke<Memoire>('retirer_de_la_memoire', { liste, rang })
+}
+
+export function effacerMemoire(): Promise<Memoire> {
+  return invoke<Memoire>('effacer_memoire')
+}
+
+/** Le journal de l'IA, du plus récent au plus ancien. */
+export function journalIa(): Promise<EntreeJournal[]> {
+  return invoke<EntreeJournal[]>('journal_ia')
 }
 
 export function parlerIa(texte: string): Promise<void> {
   return invoke<void>('parler_ia', { texte })
+}
+
+/** L'utilisateur bloque sur une panne : l'IA propose son aide, si elle en a le droit. */
+export function aiderIa(): Promise<void> {
+  return invoke<void>('aider_ia')
 }
 
 export function repondreAccord(id: string, oui: boolean): Promise<void> {

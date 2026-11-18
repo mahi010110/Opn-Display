@@ -14,8 +14,10 @@ Le code d'Opn-Display. La pile est dans
   veille sur Incus dans `veille.rs`. L'IA est dans `ia/` : la boucle de
   l'agent (`mod.rs`), le format d'OpenAI qui sert aussi pour Ollama
   (`openai.rs`), celui d'Anthropic (`anthropic.rs`), Codex pour l'abonnement
-  ChatGPT (`codex.rs`) avec son relais MCP (`mcp.rs`), et les outils du lab
-  avec l'accord de l'utilisateur (`outils.rs`). Les pannes sont dans
+  ChatGPT (`codex.rs`) avec son relais MCP (`mcp.rs`), les outils du lab
+  avec l'accord de l'utilisateur (`outils.rs`), les trois façons de la
+  régler et l'IA qui s'adapte (`reglage.rs`), sa mémoire (`memoire.rs`) et
+  son journal (`journal.rs`). Les pannes sont dans
   `pannes.rs` : la pose, l'instantané du lab, les tests et le retour en
   arrière. Le catalogue du premier lab est `pannes/premier-lab.json`. Un
   lab proposé par l'IA est vérifié et placé sur le schéma dans
@@ -28,13 +30,20 @@ Le code d'Opn-Display. La pile est dans
   `supprimer_lab`, `veiller`, pour les terminaux `ouvrir_terminal`,
   `ecrire_terminal`, `redimensionner_terminal`, `fermer_terminal`, et pour
   l'IA `etat_ia`, `brancher_ia`, `essayer_ia`, `modeles_ia`, `regler_ia`,
-  `parler_ia`, `repondre_accord`, `arreter_ia`, `oublier_conversation`,
-  `inventer_panne`, `proposer_lab`, `oublier_proposition`, et pour les pannes `catalogue_pannes`, `poser_panne`,
+  `memoire_ia`, `activer_memoire`, `corriger_memoire`,
+  `retirer_de_la_memoire`, `effacer_memoire`, `journal_ia`, `parler_ia`,
+  `aider_ia`, `repondre_accord`, `arreter_ia`, `oublier_conversation`,
+  `inventer_panne`, `proposer_lab`, `oublier_proposition`, et pour les
+  pannes `catalogue_pannes`, `poser_panne`,
   `panne_en_cours`, `indice_panne`, `verifier_panne`, `abandonner_panne`,
   `fermer_panne`. Les évènements : `installation`, `lab-avance`, `lab`,
   `ia`, `ia-accord` et `panne`. Ce qu'affiche un terminal passe par un
-  canal, en octets. Les réglages de l'IA sont dans `ia.json`, dans le
-  dossier de configuration de l'app, et sa clé dans le trousseau du système.
+  canal, en octets. Les réglages de l'IA sont dans `ia.json`, sa mémoire
+  dans `memoire.json` et la panne posée dans `panne.json`, dans le dossier
+  de configuration de l'app ; sa clé est dans le trousseau du système. Le
+  journal de l'IA (`journal.json`), les labs construits (`labs/`) et la
+  date d'ouverture de chaque lab (`ouverts.json`) sont dans son dossier de
+  données.
   Lancée avec la variable `OPN_OUTILS`, l'app ne fait que relayer les outils
   pour Codex.
 - `src/` : les écrans, en React et TypeScript. Ils reprennent les maquettes
