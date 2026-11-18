@@ -24,9 +24,9 @@ export function faconIa(etat: EtatIa): string | null {
 export function resumeIa(etat: EtatIa): string {
   const facon =
     etat.reglages.facon === 'unParUn'
-      ? 'un par un'
+      ? 'réglée un par un'
       : etat.reglages.facon === 'sAdapte'
-        ? `s'adapte, ${NOM_NIVEAU[etat.niveauDuMoment ?? 'coach']}`
+        ? `s'adapte, en ${NOM_NIVEAU[etat.niveauDuMoment ?? 'coach']}`
         : NOM_NIVEAU[etat.reglages.niveau]
   const lab = etat.comportements.dansLeLab === 'avecAccord' ? 'avec accord dans le lab' : 'libre dans le lab'
   return `IA : ${facon}, ${lab}`

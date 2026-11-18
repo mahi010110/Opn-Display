@@ -608,3 +608,14 @@ a retenu en codant, que le mainteneur peut reprendre :
   PC » dans Régler l'IA, viendront avec ses outils sur le PC.
 - Dans le lab proposé, la liste des machines défile : « Lancer le lab »
   reste en bas.
+- Une aide que personne n'a demandée et qui échoue (le modèle injoignable,
+  l'IA occupée ailleurs) ne s'affiche pas.
+
+Essayé dans l'environnement cloud, avec un vrai Incus et un faux modèle,
+dans l'app lancée pour de vrai : l'IA a retenu une ligne, que sa consigne
+relit ensuite ; une commande autorisée et la ligne retenue sont dans le
+journal ; pc3 retiré puis « Ajouter une machine » a donné un poste derrière
+sw1, sans pc3 ; avec « Elle s'adapte », une panne du catalogue réparée sans
+indice a donné « Encore une, et elle passe en Coach », et « Relancer les
+tests » ne l'a pas comptée deux fois ; l'IA a proposé son aide 10 minutes
+et 24 secondes après la pose ; Mes labs dit « aujourd'hui ».

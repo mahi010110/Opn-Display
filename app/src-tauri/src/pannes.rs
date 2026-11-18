@@ -228,7 +228,8 @@ pub fn contexte(app: &AppHandle, solution: Solution) -> Option<String> {
     if en_cours.verification.as_ref().is_some_and(|v| v.reparee) || en_cours.lab != le_lab(app).id {
         return None;
     }
-    let (titre, cause) = (&en_cours.panne.titre, &en_cours.panne.explication);
+    let titre = en_cours.panne.titre.trim_end_matches('.');
+    let cause = &en_cours.panne.explication;
     Some(match solution {
         Solution::Donnee => format!(
             "Une panne est posée dans le lab : « {titre} ». Sa cause : {cause}\n\

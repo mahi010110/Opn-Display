@@ -115,8 +115,9 @@ export function PanneauIa(props: {
       if (Date.now() - derniereActivite.current < BLOCAGE) return
       aidee.current = true
       setOccupee(true)
+      // Personne ne l'a demandée : si elle échoue, rien ne s'affiche.
       aiderIa()
-        .catch((e) => setEntrees((avant) => [...avant, { sorte: 'erreur', texte: String(e) }]))
+        .catch(() => undefined)
         .finally(() => setOccupee(false))
     }, 30_000)
     return () => window.clearInterval(minuterie)

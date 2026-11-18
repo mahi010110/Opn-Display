@@ -413,3 +413,8 @@ Le 18 novembre 2026, « Ajouter une machine » et les réglages de l'IA :
   l'accord ; l'app y ajoute les labs proposés et les pannes inventées.
   Pour Codex, le relais MCP passe ces nouveaux modes par la variable
   `OPN_OUTILS`, comme les autres.
+
+Essayé ici dans l'app lancée pour de vrai, avec un vrai Incus et un faux
+modèle : la mémoire écrite puis relue dans la consigne, le journal, « Ajouter
+une machine » après un retrait, l'IA qui s'adapte après une panne réparée,
+et l'aide proposée au bout de 10 minutes.
