@@ -446,3 +446,56 @@ avant de choisir ce que l'IA peut mettre dans un lab.
 - Docker tourne sur la même machine. Sa règle `FORWARD DROP` vit dans le
   réseau de l'hôte, pas dans celui du switch : elle ne le gêne pas.
 - Le switch prend 13 Mo de RAM, comme un poste.
+
+## 16. Le réseau de l'étape 5
+
+Mesuré et lu le 23 novembre 2026, avant les questions de l'étape 5.
+
+Le noyau de WSL2, lu dans sa configuration publiée par Microsoft
+(`microsoft/WSL2-Linux-Kernel`, `arch/x86/configs/config-wsl`, branches
+`linux-msft-wsl-6.6.y` et `linux-msft-wsl-6.18.y`). Les deux versions ont
+la même chose :
+
+| Ce qu'il faut | Dans le noyau | En module |
+|---|---|---|
+| Ponts qui filtrent les VLAN | oui | |
+| VLAN 802.1Q sur une carte (routeur sur un trunk) | | oui |
+| nftables, NAT et masquerade | oui | |
+| netem (délai, gigue, perte), tbf et htb (débit) | | oui |
+| Recopie de port, pour la capture ou un IDS (mirred, matchall) | | oui |
+| Bonding, pour LACP | | oui |
+| Open vSwitch | | oui |
+| VXLAN | oui | |
+| VRF | | oui |
+| Plusieurs chemins (ECMP) | oui | |
+| WireGuard, IPsec | | oui |
+| MPLS | non | non |
+
+L'image Debian 13 d'Incus, lue dans sa recette (`lxc/lxc-ci`,
+`images/debian.yaml`) : une base minimale de debootstrap (`minbase`), plus
+curl, iproute2, iputils-ping, net-tools, openssh-client, procps, sudo, udev,
+vim et quelques autres. iproute2 donne `ip`, `bridge` et `tc` : les VLAN, le
+bonding et la dégradation d'un câble se règlent sans rien ajouter. Il n'y a
+ni nftables (le NAT), ni tcpdump (la capture), ni FRR (OSPF, BGP, VRRP), ni
+mstpd (RSTP, MSTP). Le lab n'a pas Internet : ce qui manque doit entrer dans
+l'image quand l'app la prépare.
+
+Mesuré dans l'environnement cloud, avec un vrai Incus, sur le Premier lab.
+Ce noyau-là (6.18, sans modules) n'a ni VLAN 802.1Q, ni netem, ni bonding :
+ces trois-là se mesureront sur le PC du mainteneur, par l'app.
+
+- Couper un câble : retirer la carte d'une machine qui tourne. L'interface
+  disparaît de la machine, et root dans la machine ne peut pas la recréer.
+  Rebranchée, la machine retrouve son adresse et sa passerelle (networkd) :
+  le ping revient en 1,3 seconde.
+- Dégrader un câble : `tc`, lancé depuis l'hôte dans le réseau de la
+  machine (`nsenter`), y pose sa règle (essayé avec tbf, le débit). root
+  dans la machine peut la retirer.
+- Capturer un câble : tcpdump, lancé depuis l'hôte dans le réseau de la
+  machine, écrit un fichier pcap qui se relit, ici avec tcpdump, ailleurs
+  avec Wireshark. Il faut tcpdump sur l'hôte, pas dans la machine.
+
+La place des paquets qui manquent, lue dans l'index d'Ubuntu 24.04 (celui de
+Debian n'est pas joignable d'ici) : nftables et ses bibliothèques 1,4 Mo,
+tcpdump et libpcap 1,7 Mo, FRR et ses bibliothèques 22 Mo. L'image fait
+105 Mo. La taille pour Debian 13 se mesurera quand l'app préparera l'image.

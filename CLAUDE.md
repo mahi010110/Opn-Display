@@ -3,8 +3,8 @@
 Ce fichier est lu au début de chaque session. Il dit comment on travaille et
 ce qui est déjà décidé. Le détail est dans `docs/`.
 
-Opn-Display est un nom de travail. Le code est dans `app/`. L'étape 4 de
-l'ordre de construction (l'IA) est en cours.
+Opn-Display est un nom de travail. Le code est dans `app/`. L'étape 5 de
+l'ordre de construction (le réseau) est en cours.
 
 ## Comment on travaille
 

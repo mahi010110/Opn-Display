@@ -619,3 +619,10 @@ sw1, sans pc3 ; avec « Elle s'adapte », une panne du catalogue réparée sans
 indice a donné « Encore une, et elle passe en Coach », et « Relancer les
 tests » ne l'a pas comptée deux fois ; l'IA a proposé son aide 10 minutes
 et 24 secondes après la pose ; Mes labs dit « aujourd'hui ».
+
+### L'étape 4 est validée, l'étape 5 est choisie
+
+Le 18 novembre 2026, le mainteneur a validé les écrans de « Ajouter une
+machine », de la colonne « Ouvert » et des réglages de l'IA (« Oui, ils me
+vont »). Pour la suite, il a choisi de passer au réseau, l'étape 5
+(« Passer au réseau »).
