@@ -58,20 +58,7 @@
             <polyline points="72,47 72,65"/>
             <polyline points="60,80 60,65 84,65 84,80"/>
           </svg>
-          <span class="reseau" style="left:38%;top:20%">trunk 10, 20</span>
-          <span class="reseau" style="left:50%;top:43%">trunk 10, 20</span>
-          <span class="reseau reseau--bloque" style="left:50%;top:54%">bloqué par STP</span>
-
-          <span class="port" style="left:44.5%;top:20%">eth0</span>
-          <span class="port port--cote" style="left:28%;top:31%">swp25</span>
-          <span class="port" style="left:35%;top:43%">swp27</span>
-          <span class="port" style="left:65%;top:43%">swp27</span>
-          <span class="port" style="left:35%;top:54%">swp28</span>
-          <span class="port" style="left:65%;top:54%">swp28</span>
-          <span class="port port--cote" style="left:16%;top:69%">swp1</span>
-          <span class="port port--cote" style="left:40%;top:69%">swp2</span>
-          <span class="port port--cote" style="left:60%;top:69%">swp1</span>
-          <span class="port port--cote" style="left:84%;top:69%">swp2</span>
+          <span class="feu feu--bloque" style="left:calc(72% - 31px);top:54%" title="swp28, bloqué par STP"></span>
 
           <div class="machine" style="left:50%;top:20%">
             <span class="machine-case"><i class="ic ic-24 i-routeur"></i></span>
@@ -81,32 +68,30 @@
           <div class="machine" style="left:28%;top:47%">
             <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
             <span class="machine-nom">sw1</span>
-            <button class="machine-ports">28 ports</button>
           </div>
           <div class="machine" style="left:72%;top:47%">
             <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
             <span class="machine-nom">sw2</span>
-            <button class="machine-ports">28 ports</button>
           </div>
           <div class="machine machine--choisie" style="left:16%;top:80%">
             <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
             <span class="machine-nom">pc1</span>
-            <span class="machine-ip">10.0.10.10 · VLAN 10</span>
+            <span class="machine-ip">10.0.10.10</span>
           </div>
           <div class="machine" style="left:40%;top:80%">
             <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
             <span class="machine-nom">pc2</span>
-            <span class="machine-ip">10.0.20.10 · VLAN 20</span>
+            <span class="machine-ip">10.0.20.10</span>
           </div>
           <div class="machine" style="left:60%;top:80%">
             <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
             <span class="machine-nom">pc3</span>
-            <span class="machine-ip">10.0.10.11 · VLAN 10</span>
+            <span class="machine-ip">10.0.10.11</span>
           </div>
           <div class="machine" style="left:84%;top:80%">
             <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
             <span class="machine-nom">srv1</span>
-            <span class="machine-ip">10.0.20.20 · VLAN 20</span>
+            <span class="machine-ip">10.0.20.20</span>
           </div>
           <div class="vlans">
             <span>VLAN 10 : 10.0.10.0/24</span>

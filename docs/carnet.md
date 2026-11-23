@@ -684,3 +684,10 @@ ce qui se fait en vrai. Ses réponses :
   suit le port. Claude a retenu swp1, swp2… Linux refuse les noms à barre
   oblique comme Gi1/0/1. Un switch de 24 ports a en plus 4 ports SFP+ à
   10 Gb/s, comme les vrais, pour relier les switchs et le routeur.
+
+Le mainteneur a ensuite trouvé qu'il y avait trop d'information sur le
+schéma (« Trop d'info sur le schéma »). Claude l'a allégé comme Packet
+Tracer : les machines, leur adresse et les câbles. Les noms des ports
+passent au survol d'un câble et dans la fiche du switch, un lien bloqué
+garde son pointillé et un voyant ambre au port bloqué, et un clic sur un
+switch ouvre sa fiche.

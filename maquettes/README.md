@@ -94,22 +94,25 @@ idées.
 ## Les VLAN et la fiche du switch
 
 Retenu par Claude le 23 novembre 2026, pour l'étape 5, puis refait le même
-jour pour être fidèle à la réalité.
+jour : fidèle à la réalité, et un schéma plus léger (« trop d'info sur le
+schéma »).
 
-- Les VLAN se disent en texte : la plage de chaque VLAN en haut à gauche du
-  schéma, et le VLAN sous l'adresse de chaque poste. Pas de couleur : celles
-  du matériel ont déjà un sens (le teal pour ce qui se clique, l'ambre pour
-  prévenir).
-- Un trunk porte « trunk 10, 20 ». Un lien que STP a bloqué reste dessiné,
-  en pointillé, avec « bloqué par STP » en ambre.
+- Le schéma montre les machines, leur adresse et les câbles, comme Packet
+  Tracer. Les noms des ports s'affichent au survol d'un câble, et dans la
+  fiche du switch.
+- La plage de chaque VLAN est écrite en haut à gauche du schéma. Pas de
+  couleur pour les VLAN : celles du matériel ont déjà un sens.
+- Un lien que STP a bloqué reste dessiné, en pointillé, avec un voyant ambre
+  au port bloqué, comme la diode d'un vrai switch. Un port qui transmet ne
+  montre rien.
 - Les ports s'appellent swp1, swp2… Un switch de 24 ports a 24 ports cuivre
   à 1 Gb/s et 4 ports SFP+ à 10 Gb/s, qui relient les switchs et le
   routeur, comme sur un vrai switch d'accès.
-- Sous le nom d'un switch, « 28 ports » ouvre sa fiche. Elle montre et ne
-  règle pas : chaque port branché, son type, la machine en face, son mode
-  (accès ou trunk), ses VLAN et son état STP, et quel switch est la racine.
-  Les ports libres tiennent en une ligne. On règle dans le terminal du
-  switch, et la fiche y mène.
+- Un clic sur un switch ouvre sa fiche. Elle montre et ne règle pas :
+  chaque port branché, son type, la machine en face, son mode (accès ou
+  trunk), ses VLAN et son état STP, et quel switch est la racine. Les ports
+  libres tiennent en une ligne. On règle dans le terminal du switch, et la
+  fiche y mène.
 
 ## Ce que l'IA montre à droite
 

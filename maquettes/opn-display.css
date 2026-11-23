@@ -1394,3 +1394,16 @@ a.oc-btn {
 .table .stp-bloque {
   color: var(--status-warn);
 }
+
+/* Le voyant d'un port qui ne transmet pas, comme la diode d'un vrai switch.
+   Un port qui transmet n'en montre pas : l'encre va à ce qui change. */
+.feu {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--border-strong);
+}
+.feu--bloque {
+  background: var(--status-warn);
+}
