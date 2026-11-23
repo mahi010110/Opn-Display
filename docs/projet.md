@@ -99,10 +99,11 @@ switchs passent par Packet Tracer ou Cisco Modeling Labs. Cisco interdit de
 faire tourner ses images ailleurs. CML-Free est gratuit, avec 5 machines
 Cisco à la fois ([mesures.md](mesures.md), partie 10).
 
-Dans l'app, le VLAN d'un port de switch se règle de deux façons : dans le
-terminal du switch, avec les commandes Linux, et dans une fiche du switch,
-en cliquant sur le port, comme le switch de GNS3. L'IA donne l'équivalent
-Cisco (23 novembre 2026).
+Dans l'app, un switch est un vrai switch Linux : le VLAN d'un port se règle
+dans son terminal, avec les commandes Linux, comme sur un switch
+d'entreprise avec les siennes. Sa fiche, ouverte depuis le schéma, montre
+ses ports, leurs VLAN et leur état STP. L'IA donne l'équivalent Cisco
+(23 novembre 2026).
 
 ### L'IA supervise
 

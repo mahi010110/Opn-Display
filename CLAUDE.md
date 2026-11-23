@@ -37,6 +37,9 @@ l'ordre de construction (le réseau) est en cours.
   dans la doc. Les recherches se sont déjà contredites.
 - Un changement visible (un écran, un bouton) est montré au mainteneur en
   captures avant d'être gardé.
+- Fidèle à la réalité : ce que l'app émule se fait comme en vrai. Quand un
+  choix s'en éloigne, même un choix du mainteneur, Claude le dit et explique
+  ce qui se fait en vrai (23 novembre 2026).
 - Pour les maquettes, le mainteneur a laissé la main à Claude (« C'est toi
   qui as la main », 16 novembre 2026). Claude décide, montre les captures et
   note ce qu'il a retenu. Le mainteneur peut revenir dessus. Ça ne vaut pas

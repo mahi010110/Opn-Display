@@ -653,3 +653,34 @@ Puis ses trois réponses sur cette partie :
 
 La fiche du switch et les VLAN sur le schéma sont des écrans nouveaux :
 Claude en fait d'abord la maquette, et la montre avant de coder.
+
+### Fidèle à la réalité
+
+Devant les maquettes des VLAN, le mainteneur a demandé : « il faut que ce
+soit fidèle à la réalité. Même quand j'ai tort dans mes choix, dis-le moi.
+Je pense que je me suis trompé. » Claude a reposé les questions en disant
+ce qui se fait en vrai. Ses réponses :
+
+- Les commandes des switchs : il a laissé Claude choisir (« le meilleur des
+  choix »). Claude a retenu un vrai switch Linux : de vraies commandes
+  (`bridge`, `ip`), qui font vraiment passer les trames. Une console qui
+  imite Cisco serait une imitation. L'IA donne l'équivalent Cisco, et le
+  vrai Cisco passe par Packet Tracer et CML, au pilotage.
+- STP : il a laissé Claude choisir. Claude voulait RSTP, comme en
+  entreprise, mais ce n'est pas possible aujourd'hui : dans un conteneur, le
+  noyau ne laisse un démon comme mstpd piloter le pont qu'à partir de
+  Linux 7.1, et le noyau de WSL2 est en 6.6 ou 6.18 ([mesures.md](mesures.md),
+  partie 16). Ce sera donc le STP d'origine (802.1D) : la même élection de
+  la racine et les mêmes ports bloqués, mais plus lent à se rattraper. RSTP
+  viendra avec un noyau de WSL2 plus récent, ou avec les switchs en VM.
+- La fiche du switch montre, et le terminal règle (« Elle montre, le
+  terminal règle »), comme sur un switch d'entreprise. Le réglage en
+  cliquant est abandonné.
+- Le routage entre VLAN se fait des deux façons (« Les deux façons ») : sur
+  un switch de niveau 3, avec une interface par VLAN, et sur un routeur
+  relié par un trunk.
+- Les noms des ports : le mainteneur pensait qu'ils dépendaient du câble.
+  En vrai, ils dépendent du port, de son type et de sa vitesse, et le câble
+  suit le port. Claude a retenu swp1, swp2… Linux refuse les noms à barre
+  oblique comme Gi1/0/1. Un switch de 24 ports a en plus 4 ports SFP+ à
+  10 Gb/s, comme les vrais, pour relier les switchs et le routeur.

@@ -92,9 +92,16 @@ RSTP et MSTP, FRR pour VRRP, OSPF et BGP. Ce qu'on sait de chacun est dans
 
 Les switchs, à l'étape 5 (23 novembre 2026) : un pont Linux qui filtre les
 VLAN, dans un conteneur Debian, avec le STP du noyau (802.1D) pour les
-liens en double. Un port est un VLAN d'accès ou un trunk 802.1Q. Le routage
-entre VLAN se fait sur un routeur Debian, une sous-interface par VLAN. Le
-noyau de WSL2 a tout cela ([mesures.md](mesures.md), partie 16).
+liens en double. Ses ports s'appellent swp1, swp2… : 8, 24 ou 48 ports en
+cuivre à 1 Gb/s, et 4 ports SFP+ à 10 Gb/s sur les modèles de 24 et 48. Un
+port est un VLAN d'accès ou un trunk 802.1Q. Le routage entre VLAN se fait
+sur un switch de niveau 3, une interface par VLAN, ou sur un routeur
+Debian relié par un trunk, une sous-interface par VLAN. Le noyau de WSL2 a
+tout cela ([mesures.md](mesures.md), partie 16).
+
+RSTP et MSTP attendent : dans un conteneur, le noyau ne laisse mstpd
+piloter un pont qu'à partir de Linux 7.1 (`BR_STP_MODE_USER`), et le noyau
+de WSL2 est en 6.6 ou 6.18.
 
 Sur chaque câble, comme GNS3, EVE-NG et CML : la capture (tcpdump dans le
 réseau d'une des deux machines), la coupure (un bout éteint), la

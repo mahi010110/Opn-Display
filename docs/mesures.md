@@ -499,3 +499,18 @@ La place des paquets qui manquent, lue dans l'index d'Ubuntu 24.04 (celui de
 Debian n'est pas joignable d'ici) : nftables et ses bibliothèques 1,4 Mo,
 tcpdump et libpcap 1,7 Mo, FRR et ses bibliothèques 22 Mo. L'image fait
 105 Mo. La taille pour Debian 13 se mesurera quand l'app préparera l'image.
+
+Lu le 23 novembre 2026 dans les sources du noyau Linux
+(`include/uapi/linux/if_link.h`, `net/bridge/br_stp_if.c`) : par défaut,
+le noyau ne confie un pont à un démon STP comme mstpd que dans le réseau de
+l'hôte ; dans un autre espace de noms, celui d'un conteneur, il garde son
+propre STP (802.1D). Le mode `BR_STP_MODE_USER`, qui le permet partout, est
+dans Linux 7.1 et 7.2, pas dans 6.6, 6.18, 6.19 ni 7.0. Les branches 6.6 et
+6.18 du noyau de WSL2 ne l'ont pas non plus. RSTP et MSTP avec mstpd ne
+tournent donc pas dans un switch en conteneur sous WSL2 aujourd'hui.
+
+Le nom des ports d'un switch sous Linux : la doc du noyau
+(`Documentation/networking/switchdev.rst`) conseille « swXpYsZ », le switch,
+le port et le sous-port. `ip` refuse la barre oblique, même dans un nom de
+remplacement (altname) : « Gi1/0/1 » est refusé, « gi1-0-1 » est accepté
+(essayé ici).

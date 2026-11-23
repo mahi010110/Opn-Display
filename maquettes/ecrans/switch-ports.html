@@ -63,15 +63,15 @@
           <span class="reseau reseau--bloque" style="left:50%;top:54%">bloqué par STP</span>
 
           <span class="port" style="left:44.5%;top:20%">eth0</span>
-          <span class="port port--cote" style="left:28%;top:31%">port1</span>
-          <span class="port" style="left:35%;top:43%">port23</span>
-          <span class="port" style="left:65%;top:43%">port23</span>
-          <span class="port" style="left:35%;top:54%">port24</span>
-          <span class="port" style="left:65%;top:54%">port24</span>
-          <span class="port port--cote" style="left:16%;top:69%">port2</span>
-          <span class="port port--cote" style="left:40%;top:69%">port3</span>
-          <span class="port port--cote" style="left:60%;top:69%">port2</span>
-          <span class="port port--cote" style="left:84%;top:69%">port3</span>
+          <span class="port port--cote" style="left:28%;top:31%">swp25</span>
+          <span class="port" style="left:35%;top:43%">swp27</span>
+          <span class="port" style="left:65%;top:43%">swp27</span>
+          <span class="port" style="left:35%;top:54%">swp28</span>
+          <span class="port" style="left:65%;top:54%">swp28</span>
+          <span class="port port--cote" style="left:16%;top:69%">swp1</span>
+          <span class="port port--cote" style="left:40%;top:69%">swp2</span>
+          <span class="port port--cote" style="left:60%;top:69%">swp1</span>
+          <span class="port port--cote" style="left:84%;top:69%">swp2</span>
 
           <div class="machine" style="left:50%;top:20%">
             <span class="machine-case"><i class="ic ic-24 i-routeur"></i></span>
@@ -81,12 +81,12 @@
           <div class="machine" style="left:28%;top:47%">
             <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
             <span class="machine-nom">sw1</span>
-            <button class="machine-ports">24 ports</button>
+            <button class="machine-ports">28 ports</button>
           </div>
           <div class="machine" style="left:72%;top:47%">
             <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
             <span class="machine-nom">sw2</span>
-            <button class="machine-ports">24 ports</button>
+            <button class="machine-ports">28 ports</button>
           </div>
           <div class="machine machine--choisie" style="left:16%;top:80%">
             <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
@@ -129,17 +129,17 @@
             </div>
 <div class="ecran"><pre>root@sw2:~# bridge vlan show
 <span class="sortie">port              vlan-id
-port2             10 PVID Egress Untagged
-port3             20 PVID Egress Untagged
-port23            10
+swp1              10 PVID Egress Untagged
+swp2              20 PVID Egress Untagged
+swp27             10
                   20
-port24            10
+swp28             10
                   20</span>
 root@sw2:~# bridge link show
-<span class="sortie">8: port2@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
-9: port3@if9: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
-10: port23@if12: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
-11: port24@if14: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state blocking</span>
+<span class="sortie">8: swp1@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+9: swp2@if9: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+10: swp27@if12: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+11: swp28@if14: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state blocking</span>
 root@sw2:~# <span class="curseur"></span></pre></div>
           </div>
           <div class="terminal">
@@ -176,10 +176,10 @@ root@pc1:~# <span class="curseur"></span></pre></div>
           </div>
         </div>
         <div class="ia-fil">
-          <p class="mot mot--toi">Pourquoi port24 est bloqué ?</p>
-          <p class="mot mot--ia">sw1 et sw2 sont reliés deux fois. Sans STP, une trame tournerait sans fin entre eux. STP a élu sw1 racine et coupe un des deux liens côté sw2. Débranche port23 : que devrait faire port24 ?</p>
+          <p class="mot mot--toi">Pourquoi swp28 est bloqué ?</p>
+          <p class="mot mot--ia">sw1 et sw2 sont reliés deux fois. Sans STP, une trame tournerait sans fin entre eux. STP a élu sw1 racine et coupe un des deux liens côté sw2. Débranche swp27 : que devrait faire swp28 ?</p>
           <p class="mot mot--toi">Et sur un switch Cisco, je mets pc1 dans le VLAN 10 comment ?</p>
-          <p class="mot mot--ia">switchport mode access, puis switchport access vlan 10. Ici, sur sw1 : bridge vlan add dev port2 vid 10 pvid untagged. Ou dans la fiche de sw1, en cliquant sur « 24 ports ».</p>
+          <p class="mot mot--ia">switchport mode access, puis switchport access vlan 10. Ici, sur sw1 : bridge vlan add dev swp1 vid 10 pvid untagged.</p>
         </div>
         <div class="ia-saisie">
           <input class="oc-input" type="text" placeholder="Écris à l'IA" aria-label="Écrire à l'IA">
@@ -202,47 +202,22 @@ root@pc1:~# <span class="curseur"></span></pre></div>
       <button class="oc-window__btn" aria-label="Fermer"><i class="ic i-fermer"></i></button>
     </header>
     <div class="oc-window__body">
-      <p class="mono ports-tete">24 ports · STP actif, racine : sw1</p>
+      <p class="mono ports-tete">24 ports cuivre à 1 Gb/s, 4 ports SFP+ à 10 Gb/s · STP 802.1D, racine : sw1</p>
       <table class="table ports">
         <thead>
-          <tr><th>Port</th><th>Branché à</th><th>Mode</th><th>VLAN</th><th>STP</th></tr>
+          <tr><th>Port</th><th>Type</th><th>Branché à</th><th>Mode</th><th>VLAN</th><th>STP</th></tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="nom">port2</td>
-            <td class="chiffre">pc3, eth0</td>
-            <td><div class="segments" role="group" aria-label="Mode de port2"><button aria-pressed="true">Accès</button><button aria-pressed="false">Trunk</button></div></td>
-            <td><input class="oc-input" type="text" value="10" aria-label="VLAN de port2"></td>
-            <td class="chiffre">transmet</td>
-          </tr>
-          <tr>
-            <td class="nom">port3</td>
-            <td class="chiffre">srv1, eth0</td>
-            <td><div class="segments" role="group" aria-label="Mode de port3"><button aria-pressed="true">Accès</button><button aria-pressed="false">Trunk</button></div></td>
-            <td><input class="oc-input" type="text" value="20" aria-label="VLAN de port3"></td>
-            <td class="chiffre">transmet</td>
-          </tr>
-          <tr>
-            <td class="nom">port23</td>
-            <td class="chiffre">sw1, port23</td>
-            <td><div class="segments" role="group" aria-label="Mode de port23"><button aria-pressed="false">Accès</button><button aria-pressed="true">Trunk</button></div></td>
-            <td><input class="oc-input" type="text" value="10, 20" aria-label="VLAN de port23"></td>
-            <td class="chiffre">transmet</td>
-          </tr>
-          <tr>
-            <td class="nom">port24</td>
-            <td class="chiffre">sw1, port24</td>
-            <td><div class="segments" role="group" aria-label="Mode de port24"><button aria-pressed="false">Accès</button><button aria-pressed="true">Trunk</button></div></td>
-            <td><input class="oc-input" type="text" value="10, 20" aria-label="VLAN de port24"></td>
-            <td class="chiffre stp-bloque">bloqué</td>
-          </tr>
-          <tr class="libres">
-            <td>port1, port4 à port22</td>
-            <td colspan="4">libres</td>
-          </tr>
+          <tr><td class="nom">swp1</td><td class="chiffre">cuivre 1 Gb/s</td><td class="chiffre">pc3, eth0</td><td>accès</td><td class="chiffre">10</td><td class="chiffre">transmet</td></tr>
+          <tr><td class="nom">swp2</td><td class="chiffre">cuivre 1 Gb/s</td><td class="chiffre">srv1, eth0</td><td>accès</td><td class="chiffre">20</td><td class="chiffre">transmet</td></tr>
+          <tr><td class="nom">swp27</td><td class="chiffre">SFP+ 10 Gb/s</td><td class="chiffre">sw1, swp27</td><td>trunk</td><td class="chiffre">10, 20</td><td class="chiffre">transmet</td></tr>
+          <tr><td class="nom">swp28</td><td class="chiffre">SFP+ 10 Gb/s</td><td class="chiffre">sw1, swp28</td><td>trunk</td><td class="chiffre">10, 20</td><td class="chiffre stp-bloque">bloqué</td></tr>
+          <tr class="libres"><td colspan="2">swp3 à swp26</td><td colspan="4">libres</td></tr>
         </tbody>
       </table>
-      <p class="note">Un changement s'applique tout de suite, et reste au redémarrage.</p>
+      <div class="oc-dialog__foot">
+        <button class="oc-btn"><i class="ic i-taper"></i>Terminal de sw2</button>
+      </div>
     </div>
   </section>
 </div>

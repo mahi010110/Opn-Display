@@ -93,7 +93,8 @@ idées.
 
 ## Les VLAN et la fiche du switch
 
-Retenu par Claude le 23 novembre 2026, pour l'étape 5.
+Retenu par Claude le 23 novembre 2026, pour l'étape 5, puis refait le même
+jour pour être fidèle à la réalité.
 
 - Les VLAN se disent en texte : la plage de chaque VLAN en haut à gauche du
   schéma, et le VLAN sous l'adresse de chaque poste. Pas de couleur : celles
@@ -101,14 +102,14 @@ Retenu par Claude le 23 novembre 2026, pour l'étape 5.
   prévenir).
 - Un trunk porte « trunk 10, 20 ». Un lien que STP a bloqué reste dessiné,
   en pointillé, avec « bloqué par STP » en ambre.
-- Les ports d'un switch s'appellent port1 à port24. Linux refuse la barre
-  oblique des noms Cisco, comme Gi0/1.
-- Sous le nom d'un switch, « 24 ports » ouvre sa fiche : chaque port
-  branché, la machine en face, son mode (accès ou trunk), ses VLAN et son
-  état STP. Les ports libres tiennent en une ligne. La fiche dit aussi quel
-  switch est la racine STP.
-- Un changement dans la fiche s'applique tout de suite et reste au
-  redémarrage. Il n'y a donc pas de bouton « Enregistrer ».
+- Les ports s'appellent swp1, swp2… Un switch de 24 ports a 24 ports cuivre
+  à 1 Gb/s et 4 ports SFP+ à 10 Gb/s, qui relient les switchs et le
+  routeur, comme sur un vrai switch d'accès.
+- Sous le nom d'un switch, « 28 ports » ouvre sa fiche. Elle montre et ne
+  règle pas : chaque port branché, son type, la machine en face, son mode
+  (accès ou trunk), ses VLAN et son état STP, et quel switch est la racine.
+  Les ports libres tiennent en une ligne. On règle dans le terminal du
+  switch, et la fiche y mène.
 
 ## Ce que l'IA montre à droite
 
