@@ -90,6 +90,12 @@ Les protocoles : le bonding de Linux ou Open vSwitch pour LACP, mstpd pour
 RSTP et MSTP, FRR pour VRRP, OSPF et BGP. Ce qu'on sait de chacun est dans
 [mesures.md](mesures.md), partie 10.
 
+Les switchs, à l'étape 5 (23 novembre 2026) : un pont Linux qui filtre les
+VLAN, dans un conteneur Debian, avec le STP du noyau (802.1D) pour les
+liens en double. Un port est un VLAN d'accès ou un trunk 802.1Q. Le routage
+entre VLAN se fait sur un routeur Debian, une sous-interface par VLAN. Le
+noyau de WSL2 a tout cela ([mesures.md](mesures.md), partie 16).
+
 Sur chaque câble, comme GNS3, EVE-NG et CML : la capture (tcpdump dans le
 réseau d'une des deux machines), la coupure (un bout éteint), la
 dégradation (tc et netem : délai, gigue, perte, débit). La vue des baies

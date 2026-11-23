@@ -73,6 +73,8 @@ idées.
 | `reglages-images` | les images : d'où elles viennent, leur place, celles qui manquent | retenu |
 | `reglages-pc` | ce que le PC sait faire, la mémoire de WSL2, la place sur le disque | retenu |
 | `reglages-affichage` | le thème et la taille du texte | retenu |
+| `lab-vlan` | un lab avec des VLAN, des trunks et un lien bloqué par STP | retenu |
+| `switch-ports` | la fiche d'un switch : ses ports, leur VLAN, leur état STP | retenu |
 
 ## L'écran du lab
 
@@ -88,6 +90,25 @@ idées.
   une barre en trame.
 - Une machine en marche a un carré vert. Une machine éteinte est en trame. La
   machine dont le terminal est ouvert a son nom en bleu marine.
+
+## Les VLAN et la fiche du switch
+
+Retenu par Claude le 23 novembre 2026, pour l'étape 5.
+
+- Les VLAN se disent en texte : la plage de chaque VLAN en haut à gauche du
+  schéma, et le VLAN sous l'adresse de chaque poste. Pas de couleur : celles
+  du matériel ont déjà un sens (le teal pour ce qui se clique, l'ambre pour
+  prévenir).
+- Un trunk porte « trunk 10, 20 ». Un lien que STP a bloqué reste dessiné,
+  en pointillé, avec « bloqué par STP » en ambre.
+- Les ports d'un switch s'appellent port1 à port24. Linux refuse la barre
+  oblique des noms Cisco, comme Gi0/1.
+- Sous le nom d'un switch, « 24 ports » ouvre sa fiche : chaque port
+  branché, la machine en face, son mode (accès ou trunk), ses VLAN et son
+  état STP. Les ports libres tiennent en une ligne. La fiche dit aussi quel
+  switch est la racine STP.
+- Un changement dans la fiche s'applique tout de suite et reste au
+  redémarrage. Il n'y a donc pas de bouton « Enregistrer ».
 
 ## Ce que l'IA montre à droite
 

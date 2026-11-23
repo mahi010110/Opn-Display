@@ -34,7 +34,10 @@ marche et peut se montrer.
    validés.
 5. Le réseau : routeurs, switchs, VLAN, routage, NAT. Avec les ports, la
    capture d'un câble, les câbles qu'on coupe et qu'on dégrade, et la vue
-   des baies. Choisie le 18 novembre 2026 pour la suite.
+   des baies. Choisie le 18 novembre 2026 pour la suite. Commencée le
+   23 novembre 2026 par les switchs et les VLAN : VLAN d'accès, trunks,
+   routage entre VLAN, liens en double protégés par STP, et une fiche du
+   switch pour régler ses ports en cliquant.
 6. Les services et la haute disponibilité, en conteneurs : DNS, DHCP, web,
    bases de données, équilibrage de charge, redondance, supervision,
    journaux, sauvegarde.

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ports de sw2 · Opn-Display</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="app">
+
+<header class="barre">
+  <span class="marque">Opn-Display</span>
+  <nav class="menu" aria-label="Menu">
+    <a href="#" aria-current="page"><i class="ic i-labs"></i>Labs</a>
+    <a href="#"><i class="ic i-cours"></i>Cours</a>
+    <a href="#"><i class="ic i-pannes"></i>Pannes</a>
+    <a href="#"><i class="ic i-progression"></i>Progression</a>
+  </nav>
+  <div class="barre-fin">
+    <a href="#"><i class="ic i-reglages"></i>Réglages</a>
+  </div>
+</header>
+
+<div class="lab-barre">
+  <a class="oc-btn oc-btn--ghost oc-btn--sm" href="#"><i class="ic i-retour"></i>Mes labs</a>
+  <h1 class="lab-nom">Deux VLAN et deux switchs</h1>
+  <span class="oc-chip oc-chip--dot">7 machines en marche</span>
+  <div class="lab-gestes">
+    <button class="oc-btn"><i class="ic i-zero"></i>Remettre à zéro</button>
+    <button class="oc-btn"><i class="ic i-arreter"></i>Arrêter le lab</button>
+  </div>
+</div>
+
+<main class="lab">
+  <div class="lab-gauche">
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--inactive">
+        <h2 class="oc-window__title">Schéma</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="palette">
+          <p class="palette-titre">Ajouter</p>
+          <button><i class="ic ic-24 i-serveur"></i>Serveur</button>
+          <button><i class="ic ic-24 i-poste"></i>Poste</button>
+          <button><i class="ic ic-24 i-routeur"></i>Routeur</button>
+          <button><i class="ic ic-24 i-switch"></i>Switch</button>
+          <button><i class="ic ic-24 i-parefeu"></i>Pare-feu</button>
+          <button><i class="ic ic-24 i-stockage"></i>Stockage</button>
+        </div>
+        <div class="plan">
+          <svg class="cables" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="50,20 28,20 28,47"/>
+            <polyline points="28,43 72,43"/>
+            <polyline class="bloque" points="28,54 72,54"/>
+            <polyline points="28,47 28,65"/>
+            <polyline points="16,80 16,65 40,65 40,80"/>
+            <polyline points="72,47 72,65"/>
+            <polyline points="60,80 60,65 84,65 84,80"/>
+          </svg>
+          <span class="reseau" style="left:38%;top:20%">trunk 10, 20</span>
+          <span class="reseau" style="left:50%;top:43%">trunk 10, 20</span>
+          <span class="reseau reseau--bloque" style="left:50%;top:54%">bloqué par STP</span>
+
+          <span class="port" style="left:44.5%;top:20%">eth0</span>
+          <span class="port port--cote" style="left:28%;top:31%">port1</span>
+          <span class="port" style="left:35%;top:43%">port23</span>
+          <span class="port" style="left:65%;top:43%">port23</span>
+          <span class="port" style="left:35%;top:54%">port24</span>
+          <span class="port" style="left:65%;top:54%">port24</span>
+          <span class="port port--cote" style="left:16%;top:69%">port2</span>
+          <span class="port port--cote" style="left:40%;top:69%">port3</span>
+          <span class="port port--cote" style="left:60%;top:69%">port2</span>
+          <span class="port port--cote" style="left:84%;top:69%">port3</span>
+
+          <div class="machine" style="left:50%;top:20%">
+            <span class="machine-case"><i class="ic ic-24 i-routeur"></i></span>
+            <span class="machine-nom">r1</span>
+            <span class="machine-ip">10.0.10.1 · 10.0.20.1</span>
+          </div>
+          <div class="machine" style="left:28%;top:47%">
+            <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
+            <span class="machine-nom">sw1</span>
+            <button class="machine-ports">24 ports</button>
+          </div>
+          <div class="machine" style="left:72%;top:47%">
+            <span class="machine-case"><i class="ic ic-24 i-switch"></i></span>
+            <span class="machine-nom">sw2</span>
+            <button class="machine-ports">24 ports</button>
+          </div>
+          <div class="machine machine--choisie" style="left:16%;top:80%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc1</span>
+            <span class="machine-ip">10.0.10.10 · VLAN 10</span>
+          </div>
+          <div class="machine" style="left:40%;top:80%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc2</span>
+            <span class="machine-ip">10.0.20.10 · VLAN 20</span>
+          </div>
+          <div class="machine" style="left:60%;top:80%">
+            <span class="machine-case"><i class="ic ic-24 i-poste"></i></span>
+            <span class="machine-nom">pc3</span>
+            <span class="machine-ip">10.0.10.11 · VLAN 10</span>
+          </div>
+          <div class="machine" style="left:84%;top:80%">
+            <span class="machine-case"><i class="ic ic-24 i-serveur"></i></span>
+            <span class="machine-nom">srv1</span>
+            <span class="machine-ip">10.0.20.20 · VLAN 20</span>
+          </div>
+          <div class="vlans">
+            <span>VLAN 10 : 10.0.10.0/24</span>
+            <span>VLAN 20 : 10.0.20.0/24</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oc-window">
+      <header class="oc-window__bar oc-window__bar--accent">
+        <h2 class="oc-window__title">Terminaux</h2>
+      </header>
+      <div class="oc-window__body oc-window__body--flush">
+        <div class="terminaux">
+          <div class="terminal">
+            <div class="onglets" role="tablist">
+              <button role="tab" aria-selected="true">sw2</button>
+              <button role="tab" aria-selected="false" aria-label="Ouvrir un terminal"><i class="ic i-plus"></i></button>
+            </div>
+<div class="ecran"><pre>root@sw2:~# bridge vlan show
+<span class="sortie">port              vlan-id
+port2             10 PVID Egress Untagged
+port3             20 PVID Egress Untagged
+port23            10
+                  20
+port24            10
+                  20</span>
+root@sw2:~# bridge link show
+<span class="sortie">8: port2@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+9: port3@if9: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+10: port23@if12: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state forwarding
+11: port24@if14: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; master br0 state blocking</span>
+root@sw2:~# <span class="curseur"></span></pre></div>
+          </div>
+          <div class="terminal">
+            <div class="onglets" role="tablist">
+              <button role="tab" aria-selected="true">pc1</button>
+            </div>
+<div class="ecran"><pre>root@pc1:~# ping -c 2 10.0.10.11
+<span class="sortie">PING 10.0.10.11 (10.0.10.11) 56(84) bytes of data.
+64 bytes from 10.0.10.11: icmp_seq=1 ttl=64 time=0.091 ms
+64 bytes from 10.0.10.11: icmp_seq=2 ttl=64 time=0.067 ms</span>
+root@pc1:~# ping -c 2 10.0.20.20
+<span class="sortie">PING 10.0.20.20 (10.0.20.20) 56(84) bytes of data.
+64 bytes from 10.0.20.20: icmp_seq=1 ttl=63 time=0.142 ms
+64 bytes from 10.0.20.20: icmp_seq=2 ttl=63 time=0.118 ms</span>
+root@pc1:~# <span class="curseur"></span></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="oc-window">
+    <header class="oc-window__bar oc-window__bar--inactive">
+      <h2 class="oc-window__title">IA</h2>
+    </header>
+    <div class="oc-window__body oc-window__body--flush">
+      <div class="ia">
+        <div class="ia-niveau">
+          <div class="segments" role="group" aria-label="Niveau de l'IA">
+            <button aria-pressed="false">Prof</button>
+            <button aria-pressed="true">Coach</button>
+            <button aria-pressed="false">Silencieuse</button>
+          </div>
+        </div>
+        <div class="ia-fil">
+          <p class="mot mot--toi">Pourquoi port24 est bloqué ?</p>
+          <p class="mot mot--ia">sw1 et sw2 sont reliés deux fois. Sans STP, une trame tournerait sans fin entre eux. STP a élu sw1 racine et coupe un des deux liens côté sw2. Débranche port23 : que devrait faire port24 ?</p>
+          <p class="mot mot--toi">Et sur un switch Cisco, je mets pc1 dans le VLAN 10 comment ?</p>
+          <p class="mot mot--ia">switchport mode access, puis switchport access vlan 10. Ici, sur sw1 : bridge vlan add dev port2 vid 10 pvid untagged. Ou dans la fiche de sw1, en cliquant sur « 24 ports ».</p>
+        </div>
+        <div class="ia-saisie">
+          <input class="oc-input" type="text" placeholder="Écris à l'IA" aria-label="Écrire à l'IA">
+          <button class="oc-iconbtn" aria-label="Envoyer"><i class="ic i-envoyer"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="etat">
+  <span>RAM du lab<span class="jauge" aria-hidden="true"><i class="plein"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>92 Mo sur 24 Go</span>
+  <span class="etat-fin">IA : Coach, avec accord dans le lab</span>
+</footer>
+
+<div class="oc-overlay">
+  <section class="oc-window dialogue dialogue--ports" role="dialog" aria-label="Ports de sw2">
+    <header class="oc-window__bar oc-window__bar--accent">
+      <h2 class="oc-window__title">Ports de sw2</h2>
+      <button class="oc-window__btn" aria-label="Fermer"><i class="ic i-fermer"></i></button>
+    </header>
+    <div class="oc-window__body">
+      <p class="mono ports-tete">24 ports · STP actif, racine : sw1</p>
+      <table class="table ports">
+        <thead>
+          <tr><th>Port</th><th>Branché à</th><th>Mode</th><th>VLAN</th><th>STP</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="nom">port2</td>
+            <td class="chiffre">pc3, eth0</td>
+            <td><div class="segments" role="group" aria-label="Mode de port2"><button aria-pressed="true">Accès</button><button aria-pressed="false">Trunk</button></div></td>
+            <td><input class="oc-input" type="text" value="10" aria-label="VLAN de port2"></td>
+            <td class="chiffre">transmet</td>
+          </tr>
+          <tr>
+            <td class="nom">port3</td>
+            <td class="chiffre">srv1, eth0</td>
+            <td><div class="segments" role="group" aria-label="Mode de port3"><button aria-pressed="true">Accès</button><button aria-pressed="false">Trunk</button></div></td>
+            <td><input class="oc-input" type="text" value="20" aria-label="VLAN de port3"></td>
+            <td class="chiffre">transmet</td>
+          </tr>
+          <tr>
+            <td class="nom">port23</td>
+            <td class="chiffre">sw1, port23</td>
+            <td><div class="segments" role="group" aria-label="Mode de port23"><button aria-pressed="false">Accès</button><button aria-pressed="true">Trunk</button></div></td>
+            <td><input class="oc-input" type="text" value="10, 20" aria-label="VLAN de port23"></td>
+            <td class="chiffre">transmet</td>
+          </tr>
+          <tr>
+            <td class="nom">port24</td>
+            <td class="chiffre">sw1, port24</td>
+            <td><div class="segments" role="group" aria-label="Mode de port24"><button aria-pressed="false">Accès</button><button aria-pressed="true">Trunk</button></div></td>
+            <td><input class="oc-input" type="text" value="10, 20" aria-label="VLAN de port24"></td>
+            <td class="chiffre stp-bloque">bloqué</td>
+          </tr>
+          <tr class="libres">
+            <td>port1, port4 à port22</td>
+            <td colspan="4">libres</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">Un changement s'applique tout de suite, et reste au redémarrage.</p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

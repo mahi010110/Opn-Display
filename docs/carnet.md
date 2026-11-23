@@ -626,3 +626,30 @@ Le 18 novembre 2026, le mainteneur a validé les écrans de « Ajouter une
 machine », de la colonne « Ouvert » et des réglages de l'IA (« Oui, ils me
 vont »). Pour la suite, il a choisi de passer au réseau, l'étape 5
 (« Passer au réseau »).
+
+## 23 novembre 2026
+
+### L'étape 5 commence par les switchs et les VLAN
+
+Claude a mesuré le réseau avant la question ([mesures.md](mesures.md),
+partie 16). Le mainteneur a choisi de commencer l'étape 5 par les switchs
+et les VLAN (« Les switchs et les VLAN ») : des switchs à ports numérotés,
+des VLAN d'accès et des trunks 802.1Q, le routage entre VLAN sur un routeur
+Debian. Les câbles, le routage et le NAT, et la vue des baies viendront
+ensuite.
+
+Puis ses trois réponses sur cette partie :
+
+- « Avec STP et les liens en double » : des VLAN d'accès, des trunks
+  802.1Q entre switchs et vers le routeur, le routage entre VLAN, et des
+  liens redondants entre switchs, protégés par le STP du noyau (802.1D).
+  RSTP et MSTP demandent mstpd, qui n'est pas encore dans l'image.
+- « Aussi en cliquant sur le port » : le VLAN d'un port se règle dans le
+  terminal du switch, avec les commandes Linux, et aussi dans une fiche du
+  switch dans l'app, comme le switch de GNS3. L'IA donne l'équivalent
+  Cisco.
+- « Seulement celles de l'IA » : pas de nouveau lab tout fait. L'IA
+  construit les labs avec des VLAN et invente leurs pannes.
+
+La fiche du switch et les VLAN sur le schéma sont des écrans nouveaux :
+Claude en fait d'abord la maquette, et la montre avant de coder.
